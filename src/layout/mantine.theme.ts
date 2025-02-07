@@ -4,12 +4,38 @@ import {
     AppShellNavbar,
     Card,
     colorsTuple,
+    defaultVariantColorsResolver,
     Divider,
+    parseThemeColor,
     Text,
+    Title,
+    VariantColorsResolver,
 } from '@mantine/core';
 import { AppShellMain, MantineProviderProps } from '@mantine/core';
 
+const variantColorResolver: VariantColorsResolver = (input) => {
+    const defaultResolvedColors = defaultVariantColorsResolver(input);
+    const parsedColor = parseThemeColor({
+        color: input.color || input.theme.primaryColor,
+        theme: input.theme,
+    });
+
+    // Add new variant
+    if (input.variant === 'button-light') {
+        return {
+            background: '#192531',
+            hover: '#2b3641',
+            border: `1px solid ${parsedColor.value}`,
+            boxShadow: `0 0 0 1px ${parsedColor.value}`,
+            color: '#ffffff',
+        };
+    }
+
+    return defaultResolvedColors;
+};
+
 export const mantineTheme: MantineProviderProps['theme'] = {
+    variantColorResolver: variantColorResolver,
     fontFamily: 'Space Grotesk',
     fontFamilyMonospace: 'Roboto Mono,Courier New,Courier,monospace',
     colors: {
@@ -61,6 +87,12 @@ export const mantineTheme: MantineProviderProps['theme'] = {
             defaultProps: {
                 c: 'fontColor',
                 size: '1em',
+                lh: '1.3em',
+            },
+        }),
+        Title: Title.extend({
+            defaultProps: {
+                c: 'fontColor',
             },
         }),
         Card: Card.extend({

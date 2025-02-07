@@ -1,167 +1,124 @@
-'use client';
-
-import styles from './page.module.css';
-import { initTransport, getAppAndVersion } from '../../lib/ledger';
+import { use, useState } from 'react';
 import { useNavigate } from 'react-router';
-
-import { notifications } from '@mantine/notifications';
-
-import { Image, Stack, Group, Text, useMantineColorScheme } from '@mantine/core';
-import { TransportOpenUserCancelled } from '@ledgerhq/errors';
-import { IconUsb, IconBluetooth } from '@tabler/icons-react';
-
-import { useViewportSize } from '@mantine/hooks';
-import { use, useEffect, useState } from 'react';
+import {
+    Alert,
+    Button,
+    Center,
+    Divider,
+    Flex,
+    Group,
+    Stack,
+    Text,
+    Title,
+    Transition,
+} from '@mantine/core';
+import { useHomepageSiteHostName } from '../../hooks/homepage';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
-
-async function prepareAppData(deviceType = 'usb') {
-    if (deviceType === 'demo') {
-        return true;
-    }
-
-    if (deviceType !== 'usb' && deviceType !== 'bluetooth') {
-        throw new Error(`Invalid device type: ${deviceType} - must be "usb" or "bluetooth"`);
-    }
-
-    try {
-        /**
-         * @type {Transport}
-         */
-        const transport = await initTransport(deviceType);
-        const { name } = await getAppAndVersion(transport);
-
-        if (name == 'Kaspa') {
-            return true;
-        } else {
-            notifications.show({
-                title: 'Action Required',
-                message: 'Please open the Kaspa app on your device.',
-            });
-            return false;
-        }
-    } catch (e) {
-        if (e instanceof TransportOpenUserCancelled) {
-            notifications.show({
-                title: 'Action Required',
-                message:
-                    'WebUSB is not supported in this browser. Please use a compatible browser.',
-            });
-        } else {
-            console.error(e);
-            if (e.message) {
-                notifications.show({
-                    title: 'Action Required',
-                    message: `Could not interact with the Ledger device: ${e.message}`,
-                });
-            } else {
-                notifications.show({
-                    title: 'Action Required',
-                    message: `Could not interact with the Ledger device.`,
-                });
-            }
-        }
-
-        return false;
-    }
-}
-
-const WHITELIST = [
-    'kasvault.io',
-    'preview.kasvault.io',
-    'privatepreview.kasvault.io',
-    'kasvault.vercel.app',
-];
+import { prepareAppData } from './page.utils';
+import styles from './page.module.css';
+import { LogoBig } from '../../components/logo-big';
+import InfoIcon from '@mui/icons-material/Info';
+import BluetoothIcon from '@mui/icons-material/Bluetooth';
+import UsbIcon from '@mui/icons-material/DeveloperMode';
+import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 
 export default function Home() {
     const navigate = useNavigate();
-    const { width } = useViewportSize();
-    const [siteHostname, setSiteHostname] = useState('INVALID SITE');
-    const [isShowDemo, setIsShowDemo] = useState(false);
-    const { colorScheme } = useMantineColorScheme();
+
     const { setDeviceType } = use(DeviceTypeContext);
+    const { siteHostname } = useHomepageSiteHostName();
 
-    useEffect(() => {
-        if (window.location.hostname === 'localhost') {
-            setSiteHostname('http://localhost:3000');
-        } else {
-            for (const currentWhitelist of WHITELIST) {
-                if (window.location.hostname === currentWhitelist) {
-                    setSiteHostname(`https://${window.location.hostname}`);
-                    break;
-                }
-            }
-        }
+    const isShowDemo = siteHostname !== 'https://kasvault.io';
 
-        setIsShowDemo(window.location.hostname !== 'kasvault.io');
-    }, []);
-
-    const smallStyles = width <= 48 * 16 ? { fontSize: '1rem' } : {};
-
-    const demoButton = isShowDemo ? (
-        <Stack
-            className={styles.card}
-            onClick={async () => {
-                const isAppDataPrepared = await prepareAppData('demo');
-
-                if (isAppDataPrepared) {
-                    setDeviceType('demo');
-                    navigate(`/wallet/addresses`, { replace: true });
-                }
-            }}
-            align='center'
-        >
-            <h2>
-                <Group style={smallStyles}>
-                    <IconBluetooth style={smallStyles} /> Go to Demo Mode <span>-&gt;</span>
-                </Group>
-            </h2>
-            <Text>(Replaced with bluetooth in the future)</Text>
-        </Stack>
-    ) : null;
+    const [showVerifyUrlAlert, setShowVerifyUrlAlert] = useState(true);
 
     return (
-        <Stack className={styles.main}>
-            <div>
-                Verify URL is{width <= 465 ? <br /> : <>&nbsp;</>}
-                <code>{siteHostname}</code>
-            </div>
+        <Flex align='center' direction='column'>
+            <Transition
+                mounted={showVerifyUrlAlert}
+                transition='fade'
+                duration={400}
+                timingFunction='ease'
+            >
+                {(styles) => (
+                    <Alert
+                        variant='light'
+                        color='brand'
+                        withCloseButton
+                        onClose={() => setShowVerifyUrlAlert(false)}
+                        title='Verify URL'
+                        icon={<InfoIcon />}
+                        style={styles}
+                    >
+                        Your verify URL is <code>{siteHostname}</code>
+                    </Alert>
+                )}
+            </Transition>
 
             <Group className={styles.center}>
-                <Image
-                    className={styles.logo}
-                    src={
-                        colorScheme === 'light' ? '/Qubic-Logo-Dark.svg' : '/Qubic-Symbol-White.svg'
-                    }
-                    alt='Qubic'
-                    width={180}
-                    height={180}
-                />
+                <LogoBig />
             </Group>
 
-            <Group>
-                {demoButton}
-
-                <Stack
-                    className={styles.card}
-                    onClick={async () => {
-                        const isAppDataPrepared = await prepareAppData('usb');
-
-                        if (isAppDataPrepared) {
-                            setDeviceType('usb');
-                            navigate(`/wallet/addresses`, { replace: true });
-                        }
-                    }}
-                    align='center'
-                >
-                    <h2>
-                        <Group style={smallStyles}>
-                            <IconUsb /> Connect with USB <span>-&gt;</span>
-                        </Group>
-                    </h2>
-
-                    <Text>All Ledger devices</Text>
+            <Stack gap='xl'>
+                <Stack justify='center' align='center' ta='center' gap='md' maw='600px'>
+                    <Title order={1} size='h2'>
+                        Connect Ledger Device
+                    </Title>
+                    <Text>
+                        To connect your Ledger device, please ensure it is plugged in and unlocked.
+                        Follow the on-screen instructions to complete the connection. The connection
+                        will be terminated if this page is reloaded or closed.
+                    </Text>
                 </Stack>
-            </Group>
-        </Stack>
+
+                <Stack component={Center} gap='md' maw='350px' justify='center' mx='auto'>
+                    {isShowDemo ? (
+                        <>
+                            <Button
+                                variant='button-light'
+                                onClick={async () => {
+                                    const isAppDataPrepared = await prepareAppData('demo');
+
+                                    if (isAppDataPrepared) {
+                                        setDeviceType('demo');
+                                        navigate(`/wallet/addresses`, { replace: true });
+                                    }
+                                }}
+                            >
+                                <Group gap={10}>
+                                    <DeveloperIcon fontSize='small' />
+                                    Go to demo mode
+                                </Group>
+                            </Button>
+
+                            <Divider />
+                        </>
+                    ) : null}
+
+                    <Button disabled variant='button-light'>
+                        <Group gap={10}>
+                            <BluetoothIcon fontSize='small' />
+                            Connect with Bluetooth
+                        </Group>
+                    </Button>
+
+                    <Button
+                        variant='button-light'
+                        onClick={async () => {
+                            const isAppDataPrepared = await prepareAppData('usb');
+
+                            if (isAppDataPrepared) {
+                                setDeviceType('usb');
+                                navigate(`/wallet/addresses`, { replace: true });
+                            }
+                        }}
+                    >
+                        <Group gap={10}>
+                            <UsbIcon fontSize='small' /> Connect with USB
+                        </Group>
+                    </Button>
+                </Stack>
+            </Stack>
+        </Flex>
     );
 }

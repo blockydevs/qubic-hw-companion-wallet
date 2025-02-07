@@ -9,7 +9,7 @@ import {
     useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -25,8 +25,10 @@ interface LayoutProps
 export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure();
     const { pathname } = useLocation();
-    const showNavbar = pathname.startsWith('/wallet');
     const { colorScheme } = useMantineColorScheme();
+
+    const isWalletDashboard = pathname.startsWith('/wallet');
+    const showNavbar = isWalletDashboard;
 
     useLayoutEffect(() => {
         if (!showNavbar && isNavbarOpened) {
@@ -81,7 +83,21 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
 
                     <Grid.Col span={3}>
                         <Flex gap={24} justify='flex-end'>
-                            <LockIcon htmlColor='var(--mantine-color-fontColor-text)' />
+                            <Transition
+                                mounted={isWalletDashboard}
+                                transition='fade'
+                                duration={400}
+                                timingFunction='ease'
+                            >
+                                {(styles) => (
+                                    <Link to='/'>
+                                        <LockIcon
+                                            htmlColor='var(--mantine-color-fontColor-text)'
+                                            style={styles}
+                                        />
+                                    </Link>
+                                )}
+                            </Transition>
                             <GavelIcon htmlColor='var(--mantine-color-fontColor-text)' />
                             <LanguageIcon htmlColor='var(--mantine-color-fontColor-text)' />
                         </Flex>
