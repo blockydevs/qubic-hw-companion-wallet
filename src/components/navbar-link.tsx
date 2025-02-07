@@ -1,12 +1,31 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router';
-import * as Icons from '@mui/icons-material';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import Face5Icon from '@mui/icons-material/Face5';
+import BoltIcon from '@mui/icons-material/Bolt';
 import { Flex } from '@mantine/core';
 
-export const NavbarLink = ({ to, icon, label }: { to: string; icon: string; label: string }) => {
-    const Icon = Icons[icon];
+const availableIconsMap = {
+    ManageHistory: ManageHistoryIcon,
+    ImportContacts: ImportContactsIcon,
+    Face5: Face5Icon,
+    Bolt: BoltIcon,
+};
+
+export const NavbarLink = ({
+    to,
+    icon,
+    label,
+}: {
+    to: string;
+    icon: keyof typeof availableIconsMap;
+    label: string;
+}) => {
     const { pathname } = useLocation();
     const isActive = pathname === to;
+
+    const Icon = availableIconsMap[icon];
 
     return (
         <Flex
@@ -14,7 +33,7 @@ export const NavbarLink = ({ to, icon, label }: { to: string; icon: string; labe
             to={to}
             gap='12'
             px='24px'
-            py='11.62px'
+            py='11px'
             fw={isActive ? 'bold' : undefined}
             td='none'
             c='fontColor'
