@@ -1,9 +1,8 @@
-import { ColorSchemeScript } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { Outlet, Route, Routes as RouterRoutes } from 'react-router';
 import { Layout } from './layout/Layout';
 import { NavbarContent } from './layout/NavbarContent';
-import { AppMantineProvider } from './providers/AppMantineProvider';
 import { DashboardContextProvider } from './providers/DashboardContextProvider';
 import { DeviceTypeProvider } from './providers/DeviceTypeProvider';
 import { RequireDeviceTypeProvider } from './providers/RequireDeviceTypeProvider';
@@ -11,13 +10,14 @@ import Home from './routes/home/page';
 import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
+import { mantineTheme } from './layout/mantine.theme';
 
 export default function App() {
     return (
         <>
             <ColorSchemeScript />
 
-            <AppMantineProvider>
+            <MantineProvider defaultColorScheme='dark' theme={mantineTheme}>
                 <Notifications />
 
                 <Layout navbarContent={<NavbarContent />}>
@@ -42,7 +42,7 @@ export default function App() {
                         </RouterRoutes>
                     </DeviceTypeProvider>
                 </Layout>
-            </AppMantineProvider>
+            </MantineProvider>
         </>
     );
 }
