@@ -1,4 +1,4 @@
-import { UtxoInfo } from '../../lib/ledger';
+import { UtxoInfo } from './lib/ledger';
 
 export interface IAddressData {
     key: string;
@@ -18,3 +18,5 @@ export interface ISelectedAddress {
     balance: number;
     utxos: UtxoInfo[];
 }
+
+export type DeviceType = 'usb' | 'bluetooth' | 'demo';

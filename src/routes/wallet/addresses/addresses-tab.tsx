@@ -1,6 +1,6 @@
 'use client';
 
-import AddressText from '../../components/address-text';
+import AddressText from '../../../components/address-text';
 import styles from './addresses-tab.module.css';
 import {
     Badge,
@@ -17,12 +17,10 @@ import {
 } from '@mantine/core';
 import { IconCircleX } from '@tabler/icons-react';
 import { useEffect } from 'react';
-import { IAddressData, ISelectedAddress } from './types';
+import { IAddressData, ISelectedAddress } from '../../../types';
+import { useNavigate } from 'react-router';
 
 interface IAddressesTabProps {
-    containerWidth: number;
-    containerHeight: number;
-    setActiveTab: (tabName: string) => void;
     setSelectedAddress: (selectedAddress: ISelectedAddress) => void;
     selectedAddress?: ISelectedAddress;
     // TODO: Set correct type
@@ -30,11 +28,11 @@ interface IAddressesTabProps {
 }
 
 export default function AddressesTab(props: IAddressesTabProps) {
-    const width = props.containerWidth;
+    const navigate = useNavigate();
 
     const onRowClick = (row: ISelectedAddress) => {
         props.setSelectedAddress(row);
-        props.setActiveTab('overview');
+        navigate('/wallet/overview');
     };
 
     const rows = (props.addresses || []).map((row) => {
@@ -52,7 +50,7 @@ export default function AddressesTab(props: IAddressesTabProps) {
             >
                 <Table.Td>
                     <Stack className={styles.small} justify='space-between'>
-                        <Text className={styles.address} w={width - 40}>
+                        <Text className={styles.address}>
                             <AddressText address={row.address} />
                         </Text>
                         <Group justify='space-between'>
@@ -79,7 +77,7 @@ export default function AddressesTab(props: IAddressesTabProps) {
                 className={props.selectedAddress ? styles.selectedAddress : null}
                 onClick={() => {
                     if (props.selectedAddress) {
-                        props.setActiveTab('overview');
+                        navigate('/wallet/overview');
                     }
                 }}
                 style={{
@@ -89,7 +87,7 @@ export default function AddressesTab(props: IAddressesTabProps) {
                 <Group>
                     {props.selectedAddress ? (
                         <Stack className={styles.small} justify='space-between'>
-                            <Text className={styles.address} w={width - 40}>
+                            <Text className={styles.address}>
                                 <AddressText address={props.selectedAddress.address} />
                                 <Badge
                                     ml={'1rem'}

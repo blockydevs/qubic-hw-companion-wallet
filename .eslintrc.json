@@ -1,8 +1,9 @@
 {
-    "extends": ["prettier"],
+    "extends": ["prettier", "plugin:react/recommended"],
     "plugins": ["prettier", "react"],
     "rules": {
-        "prettier/prettier": ["error"]
+        "prettier/prettier": ["error"],
+        "react/react-in-jsx-scope": "off"
     },
     "parserOptions": {
         "ecmaVersion": "latest",

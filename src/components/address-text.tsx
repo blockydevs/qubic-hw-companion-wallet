@@ -1,6 +1,6 @@
 import { Text } from '@mantine/core';
 
-export default function AddressText(props) {
+export default function AddressText(props: any) {
     if (!props.address) {
         return null;
     }

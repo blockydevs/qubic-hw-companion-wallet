@@ -1,6 +1,6 @@
 import { Modal, Stack, CopyButton, Button, Code, Text } from '@mantine/core';
 
-export default function MessageModal(props) {
+export default function MessageModal(props: any) {
     return (
         <Modal centered withCloseButton={true} size={'md'} title={'Message Signed'} {...props}>
             <Stack mt='md'>
