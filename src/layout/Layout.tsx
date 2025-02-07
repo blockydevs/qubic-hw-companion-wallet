@@ -31,9 +31,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const showNavbar = isWalletDashboard;
 
     useLayoutEffect(() => {
-        if (!showNavbar && isNavbarOpened) {
-            toggleNavbar();
-        } else if (showNavbar && !isNavbarOpened) {
+        if (showNavbar !== isNavbarOpened) {
             toggleNavbar();
         }
     }, [pathname]);
