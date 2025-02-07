@@ -19,7 +19,7 @@ import styles from './page.module.css';
 import { LogoBig } from '../../components/logo-big';
 import InfoIcon from '@mui/icons-material/Info';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
-import UsbIcon from '@mui/icons-material/DeveloperMode';
+import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 
 export default function Home() {
