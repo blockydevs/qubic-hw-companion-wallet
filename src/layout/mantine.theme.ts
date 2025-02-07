@@ -37,8 +37,10 @@ const variantColorResolver: VariantColorsResolver = (input) => {
 export const mantineTheme: MantineProviderProps['theme'] = {
     variantColorResolver: variantColorResolver,
     fontFamily: 'Space Grotesk',
+
     fontFamilyMonospace: 'Roboto Mono,Courier New,Courier,monospace',
     colors: {
+        body: colorsTuple('#101820'),
         background: colorsTuple('#101820'),
         fontColor: colorsTuple('#ffffff'),
         brand: colorsTuple('#1bdef5'),
@@ -61,6 +63,21 @@ export const mantineTheme: MantineProviderProps['theme'] = {
 
     components: {
         AppShell: AppShell.extend({
+            styles: {
+                header: {
+                    margin: '0 auto',
+                    maxWidth: '1920px',
+                },
+                root: {
+                    overflow: 'hidden',
+                    position: 'relative',
+                    margin: '0 auto',
+                    maxWidth: '1920px',
+                },
+                navbar: {
+                    position: 'absolute',
+                },
+            },
             classNames: {
                 section: '.border-color',
             },
