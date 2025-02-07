@@ -12,6 +12,11 @@ on:
     branches:
       - main
 
+
+env:
+  PNPM_VERSION: ${{ vars.PNPM_VERSION || '9' }}
+
+
 # Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
 permissions:
   checks: write
