@@ -60,15 +60,21 @@ export default function Home() {
             </Group>
 
             <Stack gap='xl'>
-                <Stack justify='center' align='center' ta='center' gap='md' maw='600px'>
-                    <Title order={1} size='h2'>
+                <Stack gap='md'>
+                    <Title order={1} size='h2' ta='center'>
                         Connect Ledger Device
                     </Title>
-                    <Text>
-                        To connect your Ledger device, please ensure it is plugged in and unlocked.
-                        Follow the on-screen instructions to complete the connection. The connection
-                        will be terminated if this page is reloaded or closed.
-                    </Text>
+                    <Stack justify='center' align='center' ta='center' gap='0.275rem' maw='660px'>
+                        <Text>
+                            To connect your Ledger device, please ensure it is plugged in and
+                            unlocked.
+                        </Text>
+                        <Text>
+                            Follow the on-screen instructions to complete the connection. The
+                            connection
+                        </Text>
+                        <Text>will be terminated if this page is reloaded or closed.</Text>
+                    </Stack>
                 </Stack>
 
                 <Stack component={Center} gap='md' maw='350px' justify='center' mx='auto'>
