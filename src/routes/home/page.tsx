@@ -75,7 +75,10 @@ export default function Home() {
                     {isShowDemo ? (
                         <>
                             <Button
+                                leftSection={<DeveloperIcon fontSize='small' />}
+                                rightSection={<span />}
                                 variant='button-light'
+                                justify='space-between'
                                 onClick={async () => {
                                     const isAppDataPrepared = await prepareAppData('demo');
 
@@ -85,24 +88,27 @@ export default function Home() {
                                     }
                                 }}
                             >
-                                <Group gap={10}>
-                                    <DeveloperIcon fontSize='small' />
-                                    Go to demo mode
-                                </Group>
+                                Go to demo mode
                             </Button>
 
                             <Divider />
                         </>
                     ) : null}
 
-                    <Button disabled variant='button-light'>
-                        <Group gap={10}>
-                            <BluetoothIcon fontSize='small' />
-                            Connect with Bluetooth
-                        </Group>
+                    <Button
+                        disabled
+                        variant='button-light'
+                        rightSection={<span />}
+                        justify='space-between'
+                        leftSection={<BluetoothIcon fontSize='small' />}
+                    >
+                        Connect with Bluetooth
                     </Button>
 
                     <Button
+                        rightSection={<span />}
+                        leftSection={<UsbIcon fontSize='small' />}
+                        justify='space-between'
                         variant='button-light'
                         onClick={async () => {
                             const isAppDataPrepared = await prepareAppData('usb');
@@ -113,9 +119,7 @@ export default function Home() {
                             }
                         }}
                     >
-                        <Group gap={10}>
-                            <UsbIcon fontSize='small' /> Connect with USB
-                        </Group>
+                        Connect with USB
                     </Button>
                 </Stack>
             </Stack>
