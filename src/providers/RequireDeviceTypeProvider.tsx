@@ -4,7 +4,7 @@ import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { DeviceTypeContext } from './DeviceTypeProvider';
 
-export const DeviceTypeChecker = ({ children }: PropsWithChildren) => {
+export const RequireDeviceTypeProvider = ({ children }: PropsWithChildren) => {
     const { deviceType } = use(DeviceTypeContext);
     const navigate = useNavigate();
 

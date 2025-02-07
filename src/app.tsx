@@ -9,7 +9,7 @@ import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
 import { DeviceTypeProvider } from './providers/DeviceTypeProvider';
-import { DeviceTypeChecker } from './providers/DeviceChecker';
+import { RequireDeviceTypeProvider } from './providers/RequireDeviceTypeProvider';
 import { DashboardContextProvider } from './providers/DashboardContextProvider';
 
 export default function App() {
@@ -57,11 +57,11 @@ export default function App() {
                             <Route
                                 path='wallet'
                                 element={
-                                    <DeviceTypeChecker>
+                                    <RequireDeviceTypeProvider>
                                         <DashboardContextProvider>
                                             <Outlet />
                                         </DashboardContextProvider>
-                                    </DeviceTypeChecker>
+                                    </RequireDeviceTypeProvider>
                                 }
                             >
                                 <Route path='addresses' element={<WalletAddressesPage />} />
