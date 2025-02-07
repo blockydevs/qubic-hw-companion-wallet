@@ -31,8 +31,8 @@ export const NavbarLink = ({
         <Flex
             component={Link}
             to={to}
-            gap='12'
-            px='24px'
+            gap='0.75rem'
+            px='1.25rem'
             py='11px'
             fw={isActive ? 'bold' : undefined}
             td='none'
