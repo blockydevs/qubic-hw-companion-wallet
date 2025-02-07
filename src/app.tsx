@@ -1,16 +1,16 @@
 import { ColorSchemeScript, Divider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { Route, Routes as RouterRoutes, useLocation } from 'react-router';
+import { Outlet, Route, Routes as RouterRoutes, useLocation } from 'react-router';
 import { NavbarLink } from './components/navbar-link';
 import { Layout } from './layout/Layout';
 import { AppMantineProvider } from './providers/AppMantineProvider';
-import { WalletPagesProvider } from './providers/WalletPagesProvider';
 import Home from './routes/home/page';
 import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
 import { DeviceTypeProvider } from './providers/DeviceTypeProvider';
 import { DeviceTypeChecker } from './providers/DeviceChecker';
+import { DashboardContextProvider } from './providers/DashboardContextProvider';
 
 export default function App() {
     const { pathname } = useLocation();
@@ -58,7 +58,9 @@ export default function App() {
                                 path='wallet'
                                 element={
                                     <DeviceTypeChecker>
-                                        <WalletPagesProvider />
+                                        <DashboardContextProvider>
+                                            <Outlet />
+                                        </DashboardContextProvider>
                                     </DeviceTypeChecker>
                                 }
                             >
