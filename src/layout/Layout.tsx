@@ -29,9 +29,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const { colorScheme } = useMantineColorScheme();
 
     useLayoutEffect(() => {
-        if (!showNavbar && isNavbarOpened) {
-            toggleNavbar();
-        } else if (showNavbar && !isNavbarOpened) {
+        if (showNavbar !== isNavbarOpened) {
             toggleNavbar();
         }
     }, [pathname]);
