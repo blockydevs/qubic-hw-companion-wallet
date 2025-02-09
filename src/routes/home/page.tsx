@@ -15,7 +15,6 @@ import {
 import { useHomepageSiteHostName } from '../../hooks/homepage';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
 import { prepareAppData } from './page.utils';
-import styles from './page.module.css';
 import { LogoBig } from '../../components/logo-big';
 import InfoIcon from '@mui/icons-material/Info';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
@@ -55,7 +54,7 @@ export default function Home() {
                 )}
             </Transition>
 
-            <Group className={styles.center}>
+            <Group py='4rem'>
                 <LogoBig />
             </Group>
 
