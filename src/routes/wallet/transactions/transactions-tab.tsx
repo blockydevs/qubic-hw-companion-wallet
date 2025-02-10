@@ -16,13 +16,14 @@ import {
     fetchTransactions,
     fetchTransactionCount,
     findTransactionsInMempool,
-} from '../../lib/ledger';
+} from '../../../lib/ledger';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { IMempoolEntry } from '../../lib/kaspa-rpc/kaspa';
-import { sompiToKas } from '../../lib/kaspa-util';
+import { IMempoolEntry } from '../../../lib/kaspa-rpc/kaspa';
+import { sompiToKas } from '../../../lib/kaspa-util';
 import { IconReplace } from '@tabler/icons-react';
-import { ISelectedAddress } from './types';
+import { ISelectedAddress } from '../../../types';
+import { useNavigate } from 'react-router';
 
 const PAGE_SIZE = 10;
 
@@ -71,7 +72,6 @@ interface TransactionsTabProps {
     pendingTxId?: string;
     selectedAddress: ISelectedAddress;
     setMempoolEntryToReplace: (mempoolEntry: IMempoolEntry) => void;
-    setActiveTab: (tab: string) => void;
 }
 
 export default function TransactionsTab(props: TransactionsTabProps) {
@@ -81,6 +81,8 @@ export default function TransactionsTab(props: TransactionsTabProps) {
     const [loading, setLoading] = useState(true);
     const [pendingTxs, setPendingTxs] = useState<IMempoolEntry[]>([]);
     const width = props.containerWidth;
+
+    const navigate = useNavigate();
 
     const maxPages = txCount ? Math.ceil(txCount / PAGE_SIZE) : 0;
 
@@ -173,7 +175,7 @@ export default function TransactionsTab(props: TransactionsTabProps) {
                                             onClick={() => {
                                                 // Set the tx to replace, and switch to overview:
                                                 props.setMempoolEntryToReplace(mempoolEntry);
-                                                props.setActiveTab('overview');
+                                                navigate('/wallet/overview');
                                             }}
                                         />
                                     </Tooltip>

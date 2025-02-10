@@ -1,15 +1,19 @@
 import { Text } from '@mantine/core';
 
-export default function AddressText(props) {
-    if (!props.address) {
+interface AddressTextProps {
+    address?: string;
+}
+
+export default function AddressText({ address }: AddressTextProps) {
+    if (!address) {
         return null;
     }
 
-    const prefLen = props.address.split(':')[0].length;
+    const prefLen = address.split(':')[0].length;
     const endLen = 8;
-    const prefix = props.address.substring(0, prefLen);
-    const mid = props.address.substring(prefLen, props.address.length - endLen);
-    const end = props.address.substring(props.address.length - endLen, props.address.length);
+    const prefix = address.substring(0, prefLen);
+    const mid = address.substring(prefLen, address.length - endLen);
+    const end = address.substring(address.length - endLen, address.length);
 
     return (
         <Text ff={'Roboto Mono,Courier New,Courier,monospace'} component='span'>

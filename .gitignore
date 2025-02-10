@@ -33,4 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# styles
+/src/dist.css
+
+# idea
 .idea/

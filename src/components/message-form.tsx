@@ -6,8 +6,12 @@ import { signMessage } from '../lib/ledger';
 
 import MessageModal from './message-modal';
 import { notifications } from '@mantine/notifications';
+import { ISelectedAddress } from '../types';
 
-export default function MessageForm(props) {
+export default function MessageForm(props: {
+    selectedAddress: ISelectedAddress;
+    deviceType: string;
+}) {
     const [signature, setSignature] = useState('');
     const [opened, { open, close }] = useDisclosure(false);
 

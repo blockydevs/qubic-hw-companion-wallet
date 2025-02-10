@@ -13,9 +13,9 @@ import {
 import { useViewportSize } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useRef, useState, useEffect } from 'react';
-import KaspaQrCode from '../../components/kaspa-qrcode';
-import SendForm from '../../components/send-form';
-import MessageForm from '../../components/message-form';
+import KaspaQrCode from '../../../components/kaspa-qrcode';
+import SendForm from '../../../components/send-form';
+import MessageForm from '../../../components/message-form';
 import {
     IconCopy,
     IconCheck,
@@ -23,7 +23,7 @@ import {
     IconShield,
     IconReplace,
 } from '@tabler/icons-react';
-import AddressText from '../../components/address-text';
+import AddressText from '../../../components/address-text';
 import {
     SendAmountResult,
     confirmationsSinceDaaScore,
@@ -32,13 +32,13 @@ import {
     // fetchTransaction,
     getAddress,
     trackUntilConfirmed,
-} from '../../lib/ledger';
-import { delay } from '../../lib/util';
+} from '../../../lib/ledger';
+import { delay } from '../../../lib/util';
 
 import styles from './overview-tab.module.css';
-import { sompiToKas } from '../../lib/kaspa-util';
-import { ISelectedAddress } from './types';
-import { IMempoolEntry } from '../../lib/kaspa-rpc/kaspa';
+import { sompiToKas } from '../../../lib/kaspa-util';
+import { ISelectedAddress } from '../../../types';
+import { IMempoolEntry } from '../../../lib/kaspa-rpc/kaspa';
 
 interface OverviewTabProps {
     containerWidth: number;

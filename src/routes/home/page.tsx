@@ -1,22 +1,22 @@
 'use client';
 
 import styles from './page.module.css';
-import { initTransport, getAppAndVersion } from '../lib/ledger';
-import { useNavigate } from 'react-router-dom';
+import { initTransport, getAppAndVersion } from '../../lib/ledger';
+import { useNavigate } from 'react-router';
 
 import { notifications } from '@mantine/notifications';
 
-import { Image, Stack, Group, Text } from '@mantine/core';
+import { Image, Stack, Group, Text, useMantineColorScheme } from '@mantine/core';
 import { TransportOpenUserCancelled } from '@ledgerhq/errors';
 import { IconUsb, IconBluetooth } from '@tabler/icons-react';
 
-import Header from '../components/header';
 import { useViewportSize } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
+import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
 
-async function getAppData(navigate, deviceType = 'usb') {
+async function prepareAppData(deviceType = 'usb') {
     if (deviceType === 'demo') {
-        return navigate(`/wallet?deviceType=${deviceType}`, { replace: true });
+        return true;
     }
 
     if (deviceType !== 'usb' && deviceType !== 'bluetooth') {
@@ -31,12 +31,13 @@ async function getAppData(navigate, deviceType = 'usb') {
         const { name } = await getAppAndVersion(transport);
 
         if (name == 'Kaspa') {
-            return navigate(`/wallet?deviceType=${deviceType}`, { replace: true });
+            return true;
         } else {
             notifications.show({
                 title: 'Action Required',
                 message: 'Please open the Kaspa app on your device.',
             });
+            return false;
         }
     } catch (e) {
         if (e instanceof TransportOpenUserCancelled) {
@@ -59,6 +60,8 @@ async function getAppData(navigate, deviceType = 'usb') {
                 });
             }
         }
+
+        return false;
     }
 }
 
@@ -74,6 +77,8 @@ export default function Home() {
     const { width } = useViewportSize();
     const [siteHostname, setSiteHostname] = useState('INVALID SITE');
     const [isShowDemo, setIsShowDemo] = useState(false);
+    const { colorScheme } = useMantineColorScheme();
+    const { setDeviceType } = use(DeviceTypeContext);
 
     useEffect(() => {
         if (window.location.hostname === 'localhost') {
@@ -95,8 +100,13 @@ export default function Home() {
     const demoButton = isShowDemo ? (
         <Stack
             className={styles.card}
-            onClick={() => {
-                getAppData(navigate, 'demo');
+            onClick={async () => {
+                const isAppDataPrepared = await prepareAppData('demo');
+
+                if (isAppDataPrepared) {
+                    setDeviceType('demo');
+                    navigate(`/wallet/addresses`, { replace: true });
+                }
             }}
             align='center'
         >
@@ -111,18 +121,18 @@ export default function Home() {
 
     return (
         <Stack className={styles.main}>
-            <Header>
-                <div>
-                    Verify URL is{width <= 465 ? <br /> : <>&nbsp;</>}
-                    <code>{siteHostname}</code>
-                </div>
-            </Header>
+            <div>
+                Verify URL is{width <= 465 ? <br /> : <>&nbsp;</>}
+                <code>{siteHostname}</code>
+            </div>
 
             <Group className={styles.center}>
                 <Image
                     className={styles.logo}
-                    src='/kasvault-full-stk.svg'
-                    alt='KasVault'
+                    src={
+                        colorScheme === 'light' ? '/Qubic-Logo-Dark.svg' : '/Qubic-Symbol-White.svg'
+                    }
+                    alt='Qubic'
                     width={180}
                     height={180}
                 />
@@ -133,8 +143,13 @@ export default function Home() {
 
                 <Stack
                     className={styles.card}
-                    onClick={() => {
-                        getAppData(navigate, 'usb');
+                    onClick={async () => {
+                        const isAppDataPrepared = await prepareAppData('usb');
+
+                        if (isAppDataPrepared) {
+                            setDeviceType('usb');
+                            navigate(`/wallet/addresses`, { replace: true });
+                        }
                     }}
                     align='center'
                 >
