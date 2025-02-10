@@ -2,10 +2,12 @@ import {
     AppShell,
     AppShellHeader,
     AppShellNavbar,
+    Button,
     Card,
     colorsTuple,
     defaultVariantColorsResolver,
     Divider,
+    Paper,
     parseThemeColor,
     Text,
     Title,
@@ -19,6 +21,13 @@ const variantColorResolver: VariantColorsResolver = (input) => {
         color: input.color || input.theme.primaryColor,
         theme: input.theme,
     });
+
+    if (input.variant === 'filled') {
+        return {
+            ...defaultResolvedColors,
+            color: '#000',
+        };
+    }
 
     // Add new variant
     if (input.variant === 'button-light') {
@@ -50,11 +59,12 @@ export const mantineTheme: MantineProviderProps['theme'] = {
         borderColor: colorsTuple('#222930'),
         borderColorDark: colorsTuple('#000000'),
 
+        inputBackgroundColor: colorsTuple('#222e39'),
         inputBorderColor: colorsTuple('#3a3a3a'),
 
         tooltipBackgroundColor: colorsTuple('#2b2b2b'),
 
-        cardBackground: colorsTuple('#192531'),
+        cardBackground: colorsTuple('#151e27'),
         cardBoxShadow: colorsTuple('1px 1px 1px 0px rgba(63, 62, 62, 1)'),
         carorderColor: colorsTuple('#192531'),
     },
@@ -119,9 +129,23 @@ export const mantineTheme: MantineProviderProps['theme'] = {
                 shadow: 'cardBoxShadow',
             },
         }),
+        Paper: Paper.extend({
+            defaultProps: {
+                radius: 'lg',
+                shadow: '1px 1px 1px 0px rgba(63, 62, 62, 1)',
+                bg: 'cardBackground',
+            },
+        }),
         Divider: Divider.extend({
             defaultProps: {
                 color: 'borderColor',
+            },
+        }),
+        Button: Button.extend({
+            styles: {
+                root: {
+                    fontWeight: 'normal',
+                },
             },
         }),
     },

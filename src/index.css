@@ -29,43 +29,78 @@ body {
     }
 }
 
-.hover-alpha-background {
-    @mixin hover {
-        &:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+.hover {
+    &-alpha-background {
+        @mixin hover {
+            &:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
 
-            @mixin dark {
-                background-color: rgba(255, 255, 255, 0.2);
+                @mixin dark {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+
+                @mixin light {
+                    background-color: rgba(0, 0, 0, 0.2);
+                }
             }
+        }
 
-            @mixin light {
-                background-color: rgba(0, 0, 0, 0.2);
+        &-strong {
+            @mixin hover {
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+
+                    @mixin dark {
+                        background-color: rgba(255, 255, 255, 0.3);
+                    }
+
+                    @mixin light {
+                        background-color: rgba(0, 0, 0, 0.3);
+                    }
+                }
             }
         }
     }
-}
 
-.hover-alpha-background-strong {
-    @mixin hover {
+    &-text-underline {
+        position: relative;
+
+        p {
+            transition: color 200ms;
+        }
+
         &:after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: -1px;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 1px;
+            background-color: var(--mantine-color-brand-text);
+            transform: scaleX(0);
+            transform-origin: 0 0;
+            transition: transform 200ms;
+        }
 
-            @mixin dark {
-                background-color: rgba(255, 255, 255, 0.3);
+        @mixin hover {
+            cursor: pointer;
+
+            p {
+                color: var(--mantine-color-brand-text) !important;
             }
 
-            @mixin light {
-                background-color: rgba(0, 0, 0, 0.3);
+            &:after {
+                transform: scaleX(1);
             }
         }
     }
@@ -78,5 +113,63 @@ body {
 
     @mixin light {
         border-color: var(--mantine-color-borderColor-filled);
+    }
+}
+
+button {
+    &[data-variant='touch'] {
+        all: initial;
+
+        background-color: transparent;
+        position: relative;
+        width: max-content;
+        height: max-content;
+        padding: 0.75rem;
+        display: inline-flex;
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-color: #fff;
+            opacity: 0;
+            transition: opacity 100ms;
+        }
+
+        &:hover {
+            all: iniital;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:after {
+                opacity: 0.1;
+            }
+        }
+
+        &:active {
+            transform: unset;
+
+            &:after {
+                opacity: 0.2;
+            }
+        }
+
+        &:focus-visible {
+            outline: none;
+
+            &:after {
+                opacity: 0.1;
+            }
+
+            &:active {
+                &:after {
+                    opacity: 0.2;
+                }
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ import KaspaBIP32 from '../lib/bip32';
 import SettingsStore from '../lib/settings-store';
 import type { IMempoolEntry } from '../lib/kaspa-rpc/kaspa';
 import { getAddress, initTransport } from '../lib/ledger';
-import { delay } from '../lib/util';
+import { delay } from '../utils/delay';
 import {
     demoLoadAddress,
     getDemoXPub,
@@ -216,6 +216,12 @@ export const DashboardContextProvider = ({ children }: PropsWithChildren) => {
             );
         }
     }, [bip32base, userSettings, deviceType]);
+
+    useEffect(() => {
+        if (!selectedAddress && addresses?.length === 1) {
+            setSelectedAddress(addresses[0]);
+        }
+    }, [selectedAddress, addresses]);
 
     return (
         <DashboardContext
