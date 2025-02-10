@@ -153,18 +153,18 @@ export const mantineTheme: MantineProviderProps['theme'] = {
         }),
         Input: Input.extend({
             classNames: {
-                input: 'qubix__input',
+                input: 'qubic__input',
             },
         }),
         Checkbox: Checkbox.extend({
             classNames: {
-                input: 'qubix__checkbox',
+                input: 'qubic__checkbox',
             },
         }),
         SegmentedControl: SegmentedControl.extend({
             classNames: {
-                indicator: 'qubix__segmented-control__indicator',
-                control: 'qubix__segmented-control__control',
+                indicator: 'qubic__segmented-control__indicator',
+                control: 'qubic__segmented-control__control',
             },
         }),
     },
