@@ -56,7 +56,15 @@ export const useTransactionsPage = () => {
 
         try {
             setLoading(true);
-            await loadAddressTransactions(selectedAddress, setTransactions, page, txCount);
+
+            if (!selectedAddress) {
+                setTransactions([]);
+                return;
+            }
+
+            const transactions = await loadAddressTransactions(selectedAddress, page, txCount);
+
+            setTransactions(transactions);
         } catch (error) {
             console.error('Error loading transactions:', error);
         } finally {

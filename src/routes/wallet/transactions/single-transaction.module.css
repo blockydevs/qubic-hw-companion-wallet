@@ -1,0 +1,27 @@
+.transaction {
+    flex-direction: column;
+    justify-content: center;
+    background-color: #151e27;
+    gap: 0.5rem;
+    padding: 0.75rem 0.875rem 0.5rem;
+    border: 1px solid #202e3c;
+    justify-content: space-between;
+    border-radius: 0.5rem;
+
+    @media (min-width: 64em) {
+        gap: 1rem;
+        padding: 1rem;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+}
+
+.transactionGroup {
+    justify-content: space-between;
+    width: 100%;
+
+    @media (min-width: 64em) {
+        justify-content: unset;
+        width: max-content;
+    }
+}

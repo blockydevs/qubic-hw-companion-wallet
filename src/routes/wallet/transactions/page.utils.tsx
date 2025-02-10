@@ -6,18 +6,12 @@ import type { IMempoolEntry } from '@/src/lib/kaspa-rpc/kaspa';
 
 export const loadAddressTransactions = async (
     selectedAddress: ISelectedAddress,
-    setTransactions: (txs: any) => void,
     page = 1,
     count = 0,
 ) => {
-    if (!selectedAddress) {
-        setTransactions([]);
-        return;
-    }
-
     const maxPages = Math.ceil(count / TRANSACTIONS_PAGE_SIZE);
     const offset = Math.min(maxPages, page - 1) * TRANSACTIONS_PAGE_SIZE;
-    const limit = page * TRANSACTIONS_PAGE_SIZE;
+    const limit = TRANSACTIONS_PAGE_SIZE;
 
     const txsData = await fetchTransactions(selectedAddress.address, offset, limit);
 
@@ -42,10 +36,11 @@ export const loadAddressTransactions = async (
             timestamp: format(new Date(tx.block_time), 'yyyy-MM-dd HH:mm:ss'),
             transactionId: tx.transaction_id,
             amount: (myOutputSum - myInputSum) / 100000000,
+            isSuccess: Math.random() > 0.5,
         };
     });
 
-    setTransactions(processedTxData);
+    return processedTxData;
 };
 
 export const preparePendingTranasactionHistoryRowData = (
