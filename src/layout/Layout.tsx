@@ -5,6 +5,7 @@ import {
     Center,
     Flex,
     Grid,
+    Group,
     Transition,
     useMantineColorScheme,
 } from '@mantine/core';
@@ -118,7 +119,11 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                 </Transition>
             </AppShell.Navbar>
 
-            <AppShell.Main pl={isNavbarOpened ? NAVBAR_WIDTH : 0}>{children}</AppShell.Main>
+            <AppShell.Main pl={isNavbarOpened ? NAVBAR_WIDTH : 0}>
+                <Group px='lg' py='md' w='100%'>
+                    {children}
+                </Group>
+            </AppShell.Main>
         </AppShell>
     );
 };
