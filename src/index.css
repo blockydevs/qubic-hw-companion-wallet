@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 
 body {
-    --mantine-color-body: #101820;
+    @mixin dark {
+        --mantine-color-body: #101820;
+    }
 }
 
 .alpha-background {
@@ -54,5 +56,41 @@ body {
 }
 
 .border-color * {
-    border-color: var(--mantine-color-borderColor-filled);
+    @mixin dark {
+        border-color: var(--mantine-color-borderColor-filled);
+    }
+}
+
+:root {
+    --navbar-width: 249px;
+    --max-app-shell-width: 1920px;
+}
+
+.mantine-AppShell-navbar {
+    position: fixed;
+    border: unset !important;
+
+    .navbar__content {
+        transition-property: opacity, transform !important;
+        border-right: 1px solid;
+        border-color: var(--mantine-color-borderColor-filled);
+        height: 100%;
+    }
+
+    @media (min-width: 1920px) {
+        overflow: hidden;
+        left: calc(
+            50% - calc(calc(var(--max-app-shell-width) - var(--navbar-width)) / 2)
+        ) !important;
+        transform: translateX(-50%) !important;
+
+        .navbar__content {
+            transform: var(--app-shell-navbar-transform, translateX(0));
+            transition-property: opacity, transform !important;
+            position: relative;
+            border-right: 1px solid;
+            border-color: var(--mantine-color-borderColor-filled);
+            height: 100%;
+        }
+    }
 }
