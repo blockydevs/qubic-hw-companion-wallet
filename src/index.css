@@ -1,13 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 
 body {
-    @mixin light {
-        --mantine-color-body: #101820;
-    }
-
-    @mixin dark {
-        --mantine-color-body: #101820;
-    }
+    --mantine-color-body: #101820;
 }
 
 .alpha-background {
@@ -21,10 +15,6 @@ body {
 
         @mixin dark {
             background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        @mixin light {
-            background-color: rgba(0, 0, 0, 0.2);
         }
     }
 }
@@ -41,10 +31,6 @@ body {
 
             @mixin dark {
                 background-color: rgba(255, 255, 255, 0.2);
-            }
-
-            @mixin light {
-                background-color: rgba(0, 0, 0, 0.2);
             }
         }
     }
@@ -63,20 +49,10 @@ body {
             @mixin dark {
                 background-color: rgba(255, 255, 255, 0.3);
             }
-
-            @mixin light {
-                background-color: rgba(0, 0, 0, 0.3);
-            }
         }
     }
 }
 
 .border-color * {
-    @mixin dark {
-        border-color: var(--mantine-color-borderColor-filled);
-    }
-
-    @mixin light {
-        border-color: var(--mantine-color-borderColor-filled);
-    }
+    border-color: var(--mantine-color-borderColor-filled);
 }
