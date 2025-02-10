@@ -8,8 +8,6 @@ export const WalletTransactionsPage = () => {
     return (
         <TransactionsTab
             selectedAddress={selectedAddress}
-            containerWidth={1}
-            containerHeight={1}
             pendingTxId={pendingTxId}
             setMempoolEntryToReplace={setMempoolEntryToReplace}
         />

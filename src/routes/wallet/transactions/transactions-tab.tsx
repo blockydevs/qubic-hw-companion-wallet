@@ -1,4 +1,3 @@
-import styles from './transactions-tab.module.css';
 import {
     Anchor,
     Group,
@@ -67,8 +66,6 @@ async function loadAddressTransactions(selectedAddress, setTransactions, page = 
 }
 
 interface TransactionsTabProps {
-    containerWidth: number;
-    containerHeight: number;
     pendingTxId?: string;
     selectedAddress: ISelectedAddress;
     setMempoolEntryToReplace: (mempoolEntry: IMempoolEntry) => void;
@@ -80,7 +77,6 @@ export default function TransactionsTab(props: TransactionsTabProps) {
     const [txCount, setTxCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [pendingTxs, setPendingTxs] = useState<IMempoolEntry[]>([]);
-    const width = props.containerWidth;
 
     const navigate = useNavigate();
 
@@ -143,7 +139,6 @@ export default function TransactionsTab(props: TransactionsTabProps) {
                     <Group justify='space-between'>
                         <Group>
                             <Text
-                                className={styles.transaction}
                                 ff={'Roboto Mono,Courier New,Courier,monospace'}
                                 fw={600}
                                 c='gray.0'
@@ -206,11 +201,9 @@ export default function TransactionsTab(props: TransactionsTabProps) {
                         <Anchor
                             href={`https://explorer.kaspa.org/txs/${row.transactionId}`}
                             target='_blank'
-                            className={styles.transaction}
                             ff={'Roboto Mono,Courier New,Courier,monospace'}
                             fw={600}
                             c='gray.0'
-                            w={width - 64}
                         >
                             <Text fw={600} c='brand' component='span'>
                                 {row.transactionId.substring(0, 6)}
@@ -247,11 +240,11 @@ export default function TransactionsTab(props: TransactionsTabProps) {
                     <Pagination total={maxPages} value={page} onChange={setPage}></Pagination>
                 </Group>
             </Box>
-            <Table className={styles.transactionTable}>
+            <Table>
                 <Table.Tbody>{pendingRows}</Table.Tbody>
             </Table>
             <ScrollArea.Autosize mah={600} mx='auto'>
-                <Table className={styles.transactionTable}>
+                <Table>
                     <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
             </ScrollArea.Autosize>
