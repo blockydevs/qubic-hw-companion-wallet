@@ -30,6 +30,6 @@ jobs:
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
-          command: pages deploy dist --branch=${{ github.ref_name }} --project-name=${{secrets.FRONT_CLOUDFLARE_PROJECT_NAME}}
+          command: pages deploy build --branch=${{ github.ref_name }} --project-name=${{secrets.FRONT_CLOUDFLARE_PROJECT_NAME}}
           accountId: ${{ secrets.FRONT_CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.FRONT_CLOUDFLARE_API_TOKEN }}
