@@ -4,3 +4,5 @@ export const HOMEPAGE_SITE_NAME_WHITELIST = [
     'privatepreview.kasvault.io',
     'kasvault.vercel.app',
 ];
+
+export const TRANSACTIONS_PAGE_SIZE = 10;
