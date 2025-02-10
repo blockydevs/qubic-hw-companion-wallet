@@ -14,13 +14,12 @@ import {
     Transition,
 } from '@mantine/core';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
-import { prepareAppData } from './page.utils';
+import { prepareAppData, getSiteHostName } from './page.utils';
 import InfoIcon from '@mui/icons-material/Info';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import { IS_DEMO_MODE } from '../../constants';
-import { getSiteHostName } from '../../utils/site-host-name';
 
 export default function Home() {
     const navigate = useNavigate();
