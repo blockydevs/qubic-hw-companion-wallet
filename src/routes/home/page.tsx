@@ -32,7 +32,7 @@ export default function Home() {
     const [showVerifyUrlAlert, setShowVerifyUrlAlert] = useState(true);
 
     return (
-        <Flex align='center' direction='column'>
+        <Flex align='center' direction='column' w='100%'>
             <Transition
                 mounted={showVerifyUrlAlert}
                 transition='fade'
