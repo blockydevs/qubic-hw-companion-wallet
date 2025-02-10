@@ -70,13 +70,13 @@ export const mantineTheme: MantineProviderProps['theme'] = {
             styles: {
                 header: {
                     margin: '0 auto',
-                    maxWidth: 'var(--max-app-shell-width)',
+                    maxWidth: '1920px',
                 },
                 root: {
                     overflow: 'hidden',
                     position: 'relative',
                     margin: '0 auto',
-                    maxWidth: 'var(--max-app-shell-width)',
+                    maxWidth: '1920px',
                 },
             },
             classNames: {

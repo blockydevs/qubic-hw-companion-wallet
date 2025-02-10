@@ -6,6 +6,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LanguageIcon from '@mui/icons-material/Language';
 
+const NAVBAR_WIDTH = 249;
 const HEADER_HEIGHT = 64;
 
 interface LayoutProps
@@ -30,7 +31,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
             className='border-color'
             header={{ height: HEADER_HEIGHT }}
             navbar={{
-                width: 'var(--max-app-shell-width)',
+                width: NAVBAR_WIDTH,
                 breakpoint: 'sm',
                 collapsed: { mobile: !isNavbarOpened, desktop: !isNavbarOpened },
             }}
@@ -103,7 +104,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                 </Transition>
             </AppShell.Navbar>
 
-            <AppShell.Main pl={isNavbarOpened ? 'var(--max-app-shell-width)' : 0}>
+            <AppShell.Main pl={isNavbarOpened ? NAVBAR_WIDTH : 0}>
                 <Group px='lg' py='md' w='100%'>
                     {children}
                 </Group>
