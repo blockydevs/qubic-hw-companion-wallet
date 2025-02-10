@@ -1,4 +1,4 @@
-import { Divider, Group, Modal, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
+import { Divider, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import ExploreIcon from '@mui/icons-material/Explore';
@@ -17,7 +17,7 @@ import { useMyOverviewPage } from './page.hooks';
 import { ReplacingTransactionSection } from './replacting-transaction-section';
 import SendForm from './send-form';
 import { useQrCodeModal } from '../../../hooks/qr-code';
-import { QrCode } from '../../../components/qr-code';
+import { QrCodeModal } from '../../../components/qr-code-modal';
 
 const WALLET_ACTIONS = ['Transaction', 'Message'];
 
@@ -71,11 +71,11 @@ export const WalletOverviewPage = () => {
 
     return (
         <>
-            <Modal opened={isQrCodeModalOpened} onClose={closeQrCodeModal} title='QR Code' centered>
-                <Group mx='auto' w='100%' justify='center' p='md'>
-                    <QrCode value={qrCodeAddress} title={qrCodeAddress} />
-                </Group>
-            </Modal>
+            <QrCodeModal
+                isQrCodeModalOpened={isQrCodeModalOpened}
+                closeQrCodeModal={closeQrCodeModal}
+                qrCodeAddress={qrCodeAddress}
+            />
 
             <Stack w='100%'>
                 <Title size='h2'>Overview</Title>
