@@ -7,15 +7,16 @@ import {
     Divider,
     Flex,
     Group,
+    Image,
     Stack,
     Text,
     Title,
     Transition,
+    useMantineColorScheme,
 } from '@mantine/core';
 import { useHomepageSiteHostName } from './page.hooks';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
 import { prepareAppData } from './page.utils';
-import { LogoBig } from '../../components/logo-big';
 import InfoIcon from '@mui/icons-material/Info';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
@@ -27,9 +28,11 @@ export default function Home() {
     const { setDeviceType } = use(DeviceTypeContext);
     const { siteHostname } = useHomepageSiteHostName();
 
-    const isShowDemo = siteHostname !== 'https://kasvault.io';
+    const { colorScheme } = useMantineColorScheme();
 
     const [showVerifyUrlAlert, setShowVerifyUrlAlert] = useState(true);
+
+    const isShowDemo = siteHostname !== 'https://kasvault.io';
 
     return (
         <Flex align='center' direction='column' w='100%'>
@@ -55,7 +58,14 @@ export default function Home() {
             </Transition>
 
             <Group py='4rem'>
-                <LogoBig />
+                <Image
+                    src={
+                        colorScheme === 'light' ? '/Qubic-Logo-Dark.svg' : '/Qubic-Symbol-White.svg'
+                    }
+                    alt='Qubic'
+                    width={180}
+                    height={180}
+                />
             </Group>
 
             <Stack gap='xl'>
