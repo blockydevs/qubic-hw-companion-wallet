@@ -173,3 +173,19 @@ button {
         }
     }
 }
+
+.qubix {
+    &__input {
+        --input-bg: #222e39;
+    }
+
+    &__checkbox {
+        background-color: #222e39 !important;
+    }
+
+    &__segmented-control {
+        &__control {
+            background-color: rgba(34, 46, 57, 0.65) !important;
+        }
+    }
+}

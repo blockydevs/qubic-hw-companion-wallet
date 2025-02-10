@@ -11,24 +11,15 @@ import {
     Text,
     NumberInput,
     UnstyledButton,
-    // Tooltip,
 } from '@mantine/core';
 import { useTimeout, useDisclosure, useViewportSize } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-
 import { useState, useEffect } from 'react';
-import {
-    createTransaction,
-    sendAmount,
-    selectUtxos,
-    // fetchFeeRate,
-    SendAmountResult,
-} from '../lib/ledger';
-import AddressText from '../components/address-text';
+import { createTransaction, sendAmount, selectUtxos, SendAmountResult } from '../../../lib/ledger';
+import { TruncatedText } from '../../../components/truncated-text';
 import { useForm } from '@mantine/form';
-import { kasToSompi, sompiToKas, NETWORK_UTXO_LIMIT } from '../lib/kaspa-util';
-import { IMempoolEntry } from '../lib/kaspa-rpc';
-// import { IconAlertCircle } from '@tabler/icons-react';
+import { kasToSompi, sompiToKas, NETWORK_UTXO_LIMIT } from '../../../lib/kaspa-util';
+import { IMempoolEntry } from '../../../lib/kaspa-rpc/kaspa';
 
 interface SendFormProps {
     // TODO: set correct typing
@@ -261,7 +252,7 @@ export default function SendForm(props: SendFormProps) {
                 notifications.show({
                     title: 'Error',
                     color: 'red',
-                    message: `You have too many UTXOs to send this amount. Please compound first by sending KAS to your address. Maximum sendable without compounding (including fee): ${maxCompoundableAmount}`,
+                    message: `You have too many UTXOs to send this amount. Please compound first by sending QUBIC to your address. Maximum sendable without compounding (including fee): ${maxCompoundableAmount}`,
                     autoClose: false,
                     loading: false,
                 });
@@ -273,7 +264,7 @@ export default function SendForm(props: SendFormProps) {
                 }
 
                 let expectedFee = feeCalcResult;
-                // The change is added to the fee if it's less than 0.0001 KAS
+                // The change is added to the fee if it's less than 0.0001 QUBIC
                 console.info('changeAmount', changeAmount);
                 if (changeAmount < 10000) {
                     console.info(`Adding dust change ${changeAmount} sompi to fee`);
@@ -329,7 +320,7 @@ export default function SendForm(props: SendFormProps) {
                 />
 
                 <NumberInput
-                    label='Amount in KAS'
+                    label='Amount in QUBIC'
                     placeholder='0'
                     min={0}
                     decimalScale={8}
@@ -421,7 +412,7 @@ export default function SendForm(props: SendFormProps) {
                     </Anchor>
 
                     <Text component='h2' fw={600}>
-                        {form.values.sentAmount} KAS
+                        {form.values.sentAmount} QUBIC
                     </Text>
 
                     <Text>sent to</Text>
@@ -430,7 +421,7 @@ export default function SendForm(props: SendFormProps) {
                         w={'calc(var(--modal-size) - 6rem)'}
                         style={{ overflowWrap: 'break-word' }}
                     >
-                        <AddressText address={form.values.sentTo} />
+                        <TruncatedText>{form.values.sentTo}</TruncatedText>
                     </Text>
 
                     <Button onClick={closeSuccessModal}>Close</Button>

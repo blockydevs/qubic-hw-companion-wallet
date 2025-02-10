@@ -2,11 +2,11 @@ import { Box, Group, Textarea, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useState, useEffect } from 'react';
-import { signMessage } from '../lib/ledger';
+import { signMessage } from '../../../lib/ledger';
 
 import MessageModal from './message-modal';
 import { notifications } from '@mantine/notifications';
-import { ISelectedAddress } from '../types';
+import { ISelectedAddress } from '../../../types';
 
 export default function MessageForm(props: {
     selectedAddress: ISelectedAddress;

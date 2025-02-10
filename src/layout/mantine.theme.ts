@@ -4,11 +4,14 @@ import {
     AppShellNavbar,
     Button,
     Card,
+    Checkbox,
     colorsTuple,
     defaultVariantColorsResolver,
     Divider,
+    Input,
     Paper,
     parseThemeColor,
+    SegmentedControl,
     Text,
     Title,
     VariantColorsResolver,
@@ -146,6 +149,22 @@ export const mantineTheme: MantineProviderProps['theme'] = {
                 root: {
                     fontWeight: 'normal',
                 },
+            },
+        }),
+        Input: Input.extend({
+            classNames: {
+                input: 'qubix__input',
+            },
+        }),
+        Checkbox: Checkbox.extend({
+            classNames: {
+                input: 'qubix__checkbox',
+            },
+        }),
+        SegmentedControl: SegmentedControl.extend({
+            classNames: {
+                indicator: 'qubix__segmented-control__indicator',
+                control: 'qubix__segmented-control__control',
             },
         }),
     },
