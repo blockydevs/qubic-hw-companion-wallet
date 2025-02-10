@@ -1,6 +1,6 @@
 import { use } from 'react';
 import { useNavigate } from 'react-router';
-import { Button, Center, Flex, Group, Modal, Stack, Text, Title, Tooltip } from '@mantine/core';
+import { Button, Center, Flex, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -14,8 +14,8 @@ import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
 import { DashboardContext } from '../../../providers/DashboardContextProvider';
 import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
 import { shouldShowClearSelectedAddressButton } from './page.utils';
-import { QrCode } from '../../../components/qr-code';
 import { useQrCodeModal } from '../../../hooks/qr-code';
+import { QrCodeModal } from '../../../components/qr-code-modal';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -44,11 +44,11 @@ export const WalletAddressesPage = () => {
 
     return (
         <>
-            <Modal opened={isQrCodeModalOpened} onClose={closeQrCodeModal} title='QR Code' centered>
-                <Group mx='auto' w='100%' justify='center' p='md'>
-                    <QrCode value={qrCodeAddress} title={qrCodeAddress} />
-                </Group>
-            </Modal>
+            <QrCodeModal
+                isQrCodeModalOpened={isQrCodeModalOpened}
+                closeQrCodeModal={closeQrCodeModal}
+                qrCodeAddress={qrCodeAddress}
+            />
 
             <Group w='100%'>
                 <Flex w='100%' justify='space-between'>

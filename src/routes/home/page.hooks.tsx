@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { HOMEPAGE_SITE_NAME_WHITELIST } from '../constants';
+import { HOMEPAGE_SITE_NAME_WHITELIST } from '../../constants';
 
 export const useHomepageSiteHostName = () => {
     const [siteHostname, setSiteHostname] = useState('INVALID SITE');

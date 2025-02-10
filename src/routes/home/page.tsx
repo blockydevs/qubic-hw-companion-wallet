@@ -12,7 +12,7 @@ import {
     Title,
     Transition,
 } from '@mantine/core';
-import { useHomepageSiteHostName } from '../../hooks/homepage';
+import { useHomepageSiteHostName } from './page.hooks';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
 import { prepareAppData } from './page.utils';
 import { LogoBig } from '../../components/logo-big';
