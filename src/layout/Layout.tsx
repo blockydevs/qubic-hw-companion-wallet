@@ -1,14 +1,5 @@
 import { useLayoutEffect, type PropsWithChildren } from 'react';
-import {
-    AppShell,
-    Burger,
-    Center,
-    Flex,
-    Grid,
-    Group,
-    Transition,
-    useMantineColorScheme,
-} from '@mantine/core';
+import { AppShell, Burger, Center, Flex, Grid, Group, Transition } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
@@ -26,13 +17,11 @@ interface LayoutProps
 export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure();
     const { pathname } = useLocation();
-    const { colorScheme } = useMantineColorScheme();
 
     const isWalletDashboard = pathname.startsWith('/wallet');
-    const showNavbar = isWalletDashboard;
 
     useLayoutEffect(() => {
-        if (showNavbar !== isNavbarOpened) {
+        if (isWalletDashboard !== isNavbarOpened) {
             toggleNavbar();
         }
     }, [pathname]);
@@ -52,7 +41,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                 <Grid w='100%' h='100%' px='12px' display='flex' align='center'>
                     <Grid.Col span={3}>
                         <Transition
-                            mounted={showNavbar}
+                            mounted={isWalletDashboard}
                             transition='fade'
                             duration={400}
                             timingFunction='ease'
@@ -72,11 +61,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
 
                     <Grid.Col span='auto'>
                         <Center>
-                            {colorScheme === 'dark' ? (
-                                <img src='/qubic_wallet_dark.svg' alt='qubic logo' />
-                            ) : (
-                                <img src='qubic_wallet_light.svg' alt='qubic logo' />
-                            )}
+                            <img src='/qubic_wallet_dark.svg' alt='qubic logo' />
                         </Center>
                     </Grid.Col>
 
@@ -112,7 +97,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                     timingFunction='ease'
                 >
                     {(styles) => (
-                        <Flex direction='column' style={styles}>
+                        <Flex direction='column' style={styles} className='navbar__content'>
                             {navbarContent}
                         </Flex>
                     )}

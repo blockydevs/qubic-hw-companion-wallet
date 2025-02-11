@@ -1,4 +1,4 @@
-export const HOMEPAGE_SITE_NAME_WHITELIST = [
+export const SITE_NAME_WHITELIST = [
     'kasvault.io',
     'preview.kasvault.io',
     'privatepreview.kasvault.io',
@@ -6,3 +6,5 @@ export const HOMEPAGE_SITE_NAME_WHITELIST = [
 ];
 
 export const TRANSACTIONS_PAGE_SIZE = 10;
+
+export const IS_DEMO_MODE = process.env.REACT_APP_IS_DEMO_MODE === 'true';

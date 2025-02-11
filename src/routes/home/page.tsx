@@ -1,4 +1,4 @@
-import { use, useState } from 'react';
+import { use, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Alert,
@@ -7,29 +7,45 @@ import {
     Divider,
     Flex,
     Group,
+    Image,
     Stack,
     Text,
     Title,
     Transition,
 } from '@mantine/core';
-import { useHomepageSiteHostName } from './page.hooks';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
-import { prepareAppData } from './page.utils';
-import { LogoBig } from '../../components/logo-big';
+import { prepareAppData, getSiteHostName } from './page.utils';
 import InfoIcon from '@mui/icons-material/Info';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
+import { IS_DEMO_MODE } from '../../constants';
 
 export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
-    const { siteHostname } = useHomepageSiteHostName();
-
-    const isShowDemo = siteHostname !== 'https://kasvault.io';
+    const siteHostname = getSiteHostName();
 
     const [showVerifyUrlAlert, setShowVerifyUrlAlert] = useState(true);
+
+    const handleConnectWithUsb = useCallback(async () => {
+        const isAppDataPrepared = await prepareAppData('usb');
+
+        if (isAppDataPrepared) {
+            setDeviceType('usb');
+            navigate(`/wallet/addresses`, { replace: true });
+        }
+    }, [navigate, setDeviceType]);
+
+    const handleGoToDemoMode = useCallback(async () => {
+        const isAppDataPrepared = await prepareAppData('demo');
+
+        if (isAppDataPrepared) {
+            setDeviceType('demo');
+            navigate(`/wallet/addresses`, { replace: true });
+        }
+    }, [navigate, setDeviceType]);
 
     return (
         <Flex align='center' direction='column' w='100%'>
@@ -55,7 +71,7 @@ export default function Home() {
             </Transition>
 
             <Group py='4rem'>
-                <LogoBig />
+                <Image src='/Qubic-Symbol-White.svg' alt='Qubic' width={180} height={180} />
             </Group>
 
             <Stack gap='xl'>
@@ -77,21 +93,14 @@ export default function Home() {
                 </Stack>
 
                 <Stack component={Center} gap='md' maw='350px' justify='center' mx='auto'>
-                    {isShowDemo ? (
+                    {IS_DEMO_MODE ? (
                         <>
                             <Button
                                 leftSection={<DeveloperIcon fontSize='small' />}
                                 rightSection={<span />}
                                 variant='button-light'
                                 justify='space-between'
-                                onClick={async () => {
-                                    const isAppDataPrepared = await prepareAppData('demo');
-
-                                    if (isAppDataPrepared) {
-                                        setDeviceType('demo');
-                                        navigate(`/wallet/addresses`, { replace: true });
-                                    }
-                                }}
+                                onClick={handleGoToDemoMode}
                             >
                                 Go to demo mode
                             </Button>
@@ -115,14 +124,7 @@ export default function Home() {
                         leftSection={<UsbIcon fontSize='small' />}
                         justify='space-between'
                         variant='button-light'
-                        onClick={async () => {
-                            const isAppDataPrepared = await prepareAppData('usb');
-
-                            if (isAppDataPrepared) {
-                                setDeviceType('usb');
-                                navigate(`/wallet/addresses`, { replace: true });
-                            }
-                        }}
+                        onClick={handleConnectWithUsb}
                     >
                         Connect with USB
                     </Button>
