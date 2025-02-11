@@ -32,11 +32,11 @@ const variantColorResolver: VariantColorsResolver = (input) => {
     // Add new variant
     if (input.variant === 'button-light') {
         return {
-            background: '#192531',
-            hover: '#2b3641',
+            background: 'var(--mantine-color-buttonLightBackground-filled)',
+            hover: 'var(--mantine-color-buttonLightHover-filled)',
             border: `1px solid ${parsedColor.value}`,
             boxShadow: `0 0 0 1px ${parsedColor.value}`,
-            color: '#ffffff',
+            color: 'var(--mantine-color-buttonLightColor-filled)',
         };
     }
 
@@ -64,7 +64,11 @@ export const mantineTheme: MantineProviderProps['theme'] = {
 
         tooltipBackgroundColor: colorsTuple('#2b2b2b'),
 
-        cardBackground: colorsTuple('#151e27'),
+        buttonLightBackground: colorsTuple('#192531'),
+        buttonLightHover: colorsTuple('#2b3641'),
+        buttonLightColor: colorsTuple('#ffffff'),
+
+        cardBackground: colorsTuple('#192531'),
         cardBoxShadow: colorsTuple('1px 1px 1px 0px rgba(63, 62, 62, 1)'),
         carorderColor: colorsTuple('#192531'),
     },
@@ -84,12 +88,10 @@ export const mantineTheme: MantineProviderProps['theme'] = {
                     margin: '0 auto',
                     maxWidth: '1920px',
                 },
-                navbar: {
-                    position: 'absolute',
-                },
             },
             classNames: {
-                section: '.border-color',
+                header: 'border-color',
+                main: 'border-color',
             },
         }),
         AppShellHeader: AppShellHeader.extend({

@@ -65,9 +65,6 @@ importers:
       bip32:
         specifier: ^4.0.0
         version: 4.0.0
-      copy-text-to-clipboard:
-        specifier: ^3.2.0
-        version: 3.2.0
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -105,6 +102,9 @@ importers:
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
+      copy-text-to-clipboard:
+        specifier: ^3.2.0
+        version: 3.2.0
       eslint:
         specifier: ^8.57.1
         version: 8.57.1

@@ -1,6 +1,7 @@
 import { notifications } from '@mantine/notifications';
 import { TransportOpenUserCancelled } from '@ledgerhq/errors';
 import { getAppAndVersion, initTransport } from '../../lib/ledger';
+import { SITE_NAME_WHITELIST } from '../../constants';
 
 export const prepareAppData = async (deviceType = 'usb') => {
     if (deviceType === 'demo') {
@@ -51,4 +52,14 @@ export const prepareAppData = async (deviceType = 'usb') => {
 
         return false;
     }
+};
+
+export const getSiteHostName = () => {
+    if (window.location.hostname === 'localhost') {
+        return 'http://localhost:3000';
+    } else if (SITE_NAME_WHITELIST.includes(window.location.hostname)) {
+        return `https://${window.location.hostname}`;
+    }
+
+    return 'INVALID SITE';
 };
