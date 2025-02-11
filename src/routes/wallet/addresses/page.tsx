@@ -84,12 +84,13 @@ export const WalletAddressesPage = () => {
 
                 {addresses?.length >= 1 ? (
                     <Flex wrap='wrap' gap='md'>
-                        {addresses.map((address) => (
+                        {addresses.map((address, index) => (
                             <AddressCard
                                 key={address.address}
                                 w='385px'
                                 h='auto'
                                 accountDetails={{
+                                    accountName: `Account ${index + 1}`,
                                     address: address.address,
                                     isSelected: selectedAddress?.address === address.address,
                                     isAddressVerified: isAddressVerified,
