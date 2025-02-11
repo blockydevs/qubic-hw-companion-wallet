@@ -9,7 +9,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { AddressCard } from '../../../components/address-card';
-import { AddressCardBalance } from '../../../components/address-card-balance';
+import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
 import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
 import { DashboardContext } from '../../../providers/DashboardContextProvider';
 import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
@@ -140,9 +140,8 @@ export const WalletAddressesPage = () => {
                                             <ExploreIcon htmlColor='var(--mantine-color-brand-text)' />
                                         ),
                                         label: 'Explorer',
-                                        onClick: () => {
-                                            alert('explorer');
-                                        },
+                                        isExternalLink: true,
+                                        to: `https://explorer.qubic.org/network/address/${address.address}`,
                                     },
                                     ...(shouldShowClearSelectedAddressButton({
                                         address: address.address,

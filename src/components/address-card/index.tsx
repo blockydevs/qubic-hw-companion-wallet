@@ -1,10 +1,12 @@
-import { useId } from 'react';
-import type { ReactNode } from 'react';
-import { Button, Flex, Paper, Stack, Tooltip } from '@mantine/core';
 import type { PaperProps, PolymorphicComponentProps } from '@mantine/core';
-import { copyAddress } from '../utils/copy';
-import { AddressCardAccountDetails } from './address-card-account-details';
+import { Button, Flex, Paper, Stack, Tooltip } from '@mantine/core';
+import type { ReactNode } from 'react';
+import { useId } from 'react';
+import { copyAddress } from '../../utils/copy';
 import type { AddressCardAccountDetailsProps } from './address-card-account-details';
+import { AddressCardAccountDetails } from './address-card-account-details';
+import type { AddressCardButtonProps } from './address-card-button';
+import { AddressCardButtonWrapper } from './address-card-button-wrapper';
 
 export interface AddressCardProps
     extends Omit<PolymorphicComponentProps<'paper', PaperProps>, 'component' | 'children'> {
@@ -12,11 +14,7 @@ export interface AddressCardProps
         showCopyAddressButton?: boolean;
     };
     afterAccountDetails?: ReactNode;
-    buttons?: {
-        component: ReactNode;
-        label?: string;
-        onClick: () => void;
-    }[];
+    buttons?: AddressCardButtonProps[];
 }
 
 export const AddressCard = ({
@@ -63,16 +61,18 @@ export const AddressCard = ({
 
             {buttons && buttons.length ? (
                 <Flex pt='0.75rem' w='100%' justify='center'>
-                    {buttons.map(({ component, onClick, label }, index) => (
-                        <Tooltip
-                            label={label}
-                            position='bottom'
+                    {buttons.map(({ component, onClick, label, isExternalLink, to }, index) => (
+                        <AddressCardButtonWrapper
+                            to={to}
+                            isExternalLink={isExternalLink}
                             key={`${id}-address-card-button-${index}`}
                         >
-                            <Button variant='touch' onClick={onClick}>
-                                {component}
-                            </Button>
-                        </Tooltip>
+                            <Tooltip label={label} position='bottom'>
+                                <Button variant='touch' onClick={onClick}>
+                                    {component}
+                                </Button>
+                            </Tooltip>
+                        </AddressCardButtonWrapper>
                     ))}
                 </Flex>
             ) : null}

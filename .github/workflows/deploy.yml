@@ -1,0 +1,35 @@
+name: Web app Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - qa
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Copy ENV file
+        run: echo "${{ vars.FRONT_APP_ENV_FILE }}" > .env
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build static assets
+        run: pnpm build
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          command: pages deploy build --branch=${{ github.ref_name }} --project-name=${{secrets.FRONT_CLOUDFLARE_PROJECT_NAME}}
+          accountId: ${{ secrets.FRONT_CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.FRONT_CLOUDFLARE_API_TOKEN }}
