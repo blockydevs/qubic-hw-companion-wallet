@@ -1,15 +1,7 @@
 import { useLayoutEffect, type PropsWithChildren } from 'react';
-import {
-    AppShell,
-    Burger,
-    Center,
-    Flex,
-    Grid,
-    Transition,
-    useMantineColorScheme,
-} from '@mantine/core';
+import { AppShell, Burger, Center, Flex, Grid, Group, Transition } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -25,11 +17,11 @@ interface LayoutProps
 export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure();
     const { pathname } = useLocation();
-    const showNavbar = pathname.startsWith('/wallet');
-    const { colorScheme } = useMantineColorScheme();
+
+    const isWalletDashboard = pathname.startsWith('/wallet');
 
     useLayoutEffect(() => {
-        if (showNavbar !== isNavbarOpened) {
+        if (isWalletDashboard !== isNavbarOpened) {
             toggleNavbar();
         }
     }, [pathname]);
@@ -49,7 +41,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                 <Grid w='100%' h='100%' px='12px' display='flex' align='center'>
                     <Grid.Col span={3}>
                         <Transition
-                            mounted={showNavbar}
+                            mounted={isWalletDashboard}
                             transition='fade'
                             duration={400}
                             timingFunction='ease'
@@ -69,17 +61,27 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
 
                     <Grid.Col span='auto'>
                         <Center>
-                            {colorScheme === 'dark' ? (
-                                <img src='/qubic_wallet_dark.svg' alt='qubic logo' />
-                            ) : (
-                                <img src='qubic_wallet_light.svg' alt='qubic logo' />
-                            )}
+                            <img src='/qubic_wallet_dark.svg' alt='qubic logo' />
                         </Center>
                     </Grid.Col>
 
                     <Grid.Col span={3}>
                         <Flex gap={24} justify='flex-end'>
-                            <LockIcon htmlColor='var(--mantine-color-fontColor-text)' />
+                            <Transition
+                                mounted={isWalletDashboard}
+                                transition='fade'
+                                duration={400}
+                                timingFunction='ease'
+                            >
+                                {(styles) => (
+                                    <Link to='/'>
+                                        <LockIcon
+                                            htmlColor='var(--mantine-color-fontColor-text)'
+                                            style={styles}
+                                        />
+                                    </Link>
+                                )}
+                            </Transition>
                             <GavelIcon htmlColor='var(--mantine-color-fontColor-text)' />
                             <LanguageIcon htmlColor='var(--mantine-color-fontColor-text)' />
                         </Flex>
@@ -95,14 +97,18 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                     timingFunction='ease'
                 >
                     {(styles) => (
-                        <Flex direction='column' style={styles}>
+                        <Flex direction='column' style={styles} className='navbar__content'>
                             {navbarContent}
                         </Flex>
                     )}
                 </Transition>
             </AppShell.Navbar>
 
-            <AppShell.Main pl={isNavbarOpened ? NAVBAR_WIDTH : 0}>{children}</AppShell.Main>
+            <AppShell.Main pl={isNavbarOpened ? NAVBAR_WIDTH : 0}>
+                <Group px='lg' py='md' w='100%'>
+                    {children}
+                </Group>
+            </AppShell.Main>
         </AppShell>
     );
 };
