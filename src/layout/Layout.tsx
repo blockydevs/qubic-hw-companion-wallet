@@ -1,5 +1,14 @@
 import { useLayoutEffect, type PropsWithChildren } from 'react';
-import { AppShell, Burger, Center, Flex, Grid, Group, Transition } from '@mantine/core';
+import {
+    AppShell,
+    Burger,
+    Center,
+    Flex,
+    Grid,
+    Group,
+    Transition,
+    useMantineTheme,
+} from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
@@ -21,7 +30,9 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const [isNavbarOpened, { open: openNavbar, close: closeNavbar, toggle: toggleNavbar }] =
         useDisclosure();
     const { pathname } = useLocation();
-    const isSm = useMediaQuery('(min-width: 48em)');
+
+    const { breakpoints } = useMantineTheme();
+    const isSm = useMediaQuery(`(min-width: ${breakpoints.sm})`);
 
     const isWalletDashboard = pathname.startsWith('/wallet');
 
