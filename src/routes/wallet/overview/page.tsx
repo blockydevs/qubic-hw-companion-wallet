@@ -6,7 +6,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import { use, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AddressCard } from '../../../components/address-card';
-import { AddressCardBalance } from '../../../components/address-card-balance';
+import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
 import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
 import { DashboardContext } from '../../../providers/DashboardContextProvider';
 import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';

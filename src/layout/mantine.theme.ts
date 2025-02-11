@@ -71,7 +71,7 @@ export const mantineTheme: MantineProviderProps['theme'] = {
         buttonLightHover: colorsTuple('#2b3641'),
         buttonLightColor: colorsTuple('#ffffff'),
 
-        cardBackground: colorsTuple('#192531'),
+        cardBackground: colorsTuple('#151e27'),
         cardBoxShadow: colorsTuple('1px 1px 1px 0px rgba(63, 62, 62, 1)'),
         carorderColor: colorsTuple('#192531'),
     },
