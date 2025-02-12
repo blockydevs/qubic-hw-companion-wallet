@@ -35,10 +35,6 @@ body {
                 @mixin dark {
                     background-color: rgba(255, 255, 255, 0.2);
                 }
-
-                @mixin light {
-                    background-color: rgba(0, 0, 0, 0.2);
-                }
             }
         }
 
@@ -54,10 +50,6 @@ body {
 
                     @mixin dark {
                         background-color: rgba(255, 255, 255, 0.3);
-                    }
-
-                    @mixin light {
-                        background-color: rgba(0, 0, 0, 0.3);
                     }
                 }
             }
@@ -104,17 +96,17 @@ body {
     }
 }
 
-:root {
-    --navbar-width: 249px;
-    --max-app-shell-width: 1920px;
-}
-
 .mantine-AppShell-navbar {
     position: fixed;
     border: unset !important;
+    background: transparent !important;
+    user-select: none;
 
     .navbar__content {
+        background-color: var(--mantine-color-body-filled);
         transition-property: opacity, transform !important;
+        transition-duration: var(--mantine-navbar-transition-duration) !important;
+        transition-timing-function: var(--mantine-navbar-transition-timing-function) !important;
         border-right: 1px solid;
         border-color: var(--mantine-color-borderColor-filled);
         height: 100%;
@@ -123,7 +115,7 @@ body {
     @media (min-width: 1920px) {
         overflow: hidden;
         left: calc(
-            50% - calc(calc(var(--max-app-shell-width) - var(--navbar-width)) / 2)
+            50% - calc(calc(var(--mantine-max-app-width) - var(--mantine-navbar-width)) / 2)
         ) !important;
         transform: translateX(-50%) !important;
 

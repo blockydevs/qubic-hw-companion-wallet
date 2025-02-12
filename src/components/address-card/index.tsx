@@ -20,6 +20,7 @@ export interface AddressCardProps
 export const AddressCard = ({
     accountDetails: {
         address,
+        accountName,
         isSelected,
         isAddressVerified,
         showCopyAddressButton = true,
@@ -46,6 +47,7 @@ export const AddressCard = ({
         >
             <Stack>
                 <AddressCardAccountDetails
+                    accountName={accountName}
                     isSelected={isSelected}
                     address={address}
                     isAddressVerified={isAddressVerified}

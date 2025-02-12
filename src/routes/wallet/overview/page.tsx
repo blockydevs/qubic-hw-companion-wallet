@@ -86,6 +86,7 @@ export const WalletOverviewPage = () => {
                     shadow='none'
                     maw='600px'
                     accountDetails={{
+                        accountName: 'Account 1',
                         address: selectedAddress.address,
                         isSelected: true,
                         isAddressVerified: isAddressVerified,
@@ -129,9 +130,8 @@ export const WalletOverviewPage = () => {
                         {
                             component: <ExploreIcon htmlColor='var(--mantine-color-brand-text)' />,
                             label: 'Explorer',
-                            onClick: () => {
-                                alert('explorer');
-                            },
+                            isExternalLink: true,
+                            to: `https://explorer.qubic.org/network/address/${selectedAddress.address}`,
                         },
                     ]}
                 />

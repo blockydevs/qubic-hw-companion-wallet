@@ -10,6 +10,7 @@ export interface AddressCardAccountDetailsProps {
     onVerifyAddressClick?: () => void;
     isSelected: boolean;
     address: string;
+    accountName: string;
     isAddressVerified: boolean;
 }
 
@@ -17,6 +18,7 @@ export const AddressCardAccountDetails = ({
     address,
     isAddressVerified,
     isSelected,
+    accountName,
     onAccountNameAndAddressClick,
     onCopyAddressClick,
     onVerifyAddressClick,
@@ -34,7 +36,7 @@ export const AddressCardAccountDetails = ({
                 onClick={onAccountNameAndAddressClick}
                 className={onAccountNameAndAddressClick ? 'hover-text-underline' : undefined}
             >
-                <Text>Account 1</Text>
+                <Text>{accountName}</Text>
 
                 <TruncatedText size='sm' c='grey'>
                     ({address})
