@@ -13,7 +13,7 @@ import {
 import { useViewportSize } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useRef, useState, useEffect } from 'react';
-import KaspaQrCode from '../../../components/kaspa-qrcode';
+import { QrCode } from '../../../components/qr-code';
 import SendForm from '../../../components/send-form';
 import MessageForm from '../../../components/message-form';
 import {
@@ -33,7 +33,7 @@ import {
     getAddress,
     trackUntilConfirmed,
 } from '../../../lib/ledger';
-import { delay } from '../../../lib/util';
+import { delay } from '../../../utils/delay';
 
 import styles from './overview-tab.module.css';
 import { sompiToKas } from '../../../lib/kaspa-util';
@@ -304,7 +304,7 @@ export default function OverviewTab(props: OverviewTabProps) {
                             </Tooltip>
                         </Text>
 
-                        <KaspaQrCode value={selectedAddress.address} />
+                        <QrCode title='Selected address' value={selectedAddress.address} />
 
                         <Group gap={'xs'}>{confirmingOrBalanceSection}</Group>
                     </Stack>
