@@ -1,13 +1,25 @@
 import { useLayoutEffect, type PropsWithChildren } from 'react';
-import { AppShell, Burger, Center, Flex, Grid, Group, Transition } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import {
+    AppShell,
+    Burger,
+    Center,
+    Flex,
+    Grid,
+    Group,
+    Transition,
+    useMantineTheme,
+} from '@mantine/core';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
 import GavelIcon from '@mui/icons-material/Gavel';
 import LanguageIcon from '@mui/icons-material/Language';
-
-const NAVBAR_WIDTH = 249;
-const HEADER_HEIGHT = 64;
+import {
+    HEADER_HEIGHT,
+    NAVBAR_TRANSITION_DURATION,
+    NAVBAR_TRANSITION_TIMING_FUNCTION,
+    NAVBAR_WIDTH,
+} from '../constants';
 
 interface LayoutProps
     extends PropsWithChildren<{
@@ -15,14 +27,22 @@ interface LayoutProps
     }> {}
 
 export const Layout = ({ children, navbarContent }: LayoutProps) => {
-    const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure();
+    const [isNavbarOpened, { open: openNavbar, close: closeNavbar, toggle: toggleNavbar }] =
+        useDisclosure();
     const { pathname } = useLocation();
+
+    const { breakpoints } = useMantineTheme();
+    const isSm = useMediaQuery(`(min-width: ${breakpoints.sm})`);
 
     const isWalletDashboard = pathname.startsWith('/wallet');
 
     useLayoutEffect(() => {
-        if (isWalletDashboard !== isNavbarOpened) {
-            toggleNavbar();
+        if (!isWalletDashboard) {
+            return closeNavbar();
+        }
+
+        if (isWalletDashboard && !isNavbarOpened && isSm) {
+            return openNavbar();
         }
     }, [pathname]);
 
@@ -70,8 +90,8 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                             <Transition
                                 mounted={isWalletDashboard}
                                 transition='fade'
-                                duration={400}
-                                timingFunction='ease'
+                                duration={NAVBAR_TRANSITION_DURATION}
+                                timingFunction={NAVBAR_TRANSITION_TIMING_FUNCTION}
                             >
                                 {(styles) => (
                                     <Link to='/'>
@@ -93,8 +113,8 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                 <Transition
                     mounted={!!navbarContent}
                     transition='fade'
-                    duration={400}
-                    timingFunction='ease'
+                    duration={NAVBAR_TRANSITION_DURATION}
+                    timingFunction={NAVBAR_TRANSITION_TIMING_FUNCTION}
                 >
                     {(styles) => (
                         <Flex direction='column' style={styles} className='navbar__content'>

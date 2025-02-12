@@ -10,7 +10,7 @@ import Home from './routes/home/page';
 import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
-import { mantineTheme } from './layout/mantine.theme';
+import { cssVariablesResolver, mantineTheme } from './layout/mantine.theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VerifiedAddressProvider } from './providers/VerifiedAddressProvider';
 
@@ -21,7 +21,11 @@ export default function App() {
         <>
             <ColorSchemeScript />
 
-            <MantineProvider defaultColorScheme='dark' theme={mantineTheme}>
+            <MantineProvider
+                defaultColorScheme='dark'
+                theme={mantineTheme}
+                cssVariablesResolver={cssVariablesResolver}
+            >
                 <Notifications />
 
                 <Layout navbarContent={<NavbarContent />}>

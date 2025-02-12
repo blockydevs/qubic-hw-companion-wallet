@@ -5,6 +5,8 @@ import {
     Button,
     Card,
     colorsTuple,
+    createTheme,
+    CSSVariablesResolver,
     defaultVariantColorsResolver,
     Divider,
     Paper,
@@ -13,7 +15,14 @@ import {
     Title,
     VariantColorsResolver,
 } from '@mantine/core';
-import { AppShellMain, MantineProviderProps } from '@mantine/core';
+import { AppShellMain } from '@mantine/core';
+import {
+    HEADER_HEIGHT,
+    MAX_APP_WIDTH,
+    NAVBAR_TRANSITION_DURATION,
+    NAVBAR_TRANSITION_TIMING_FUNCTION,
+    NAVBAR_WIDTH,
+} from '../constants';
 
 const variantColorResolver: VariantColorsResolver = (input) => {
     const defaultResolvedColors = defaultVariantColorsResolver(input);
@@ -43,11 +52,32 @@ const variantColorResolver: VariantColorsResolver = (input) => {
     return defaultResolvedColors;
 };
 
-export const mantineTheme: MantineProviderProps['theme'] = {
+export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
+    variables: {
+        '--mantine-max-app-width': theme.other.maxAppWidth,
+        '--mantine-navbar-width': theme.other.navbarWidth,
+        '--mantine-navbar-transition-duration': theme.other.navbarTransitionDuration,
+        '--mantine-navbar-transition-timing-function': theme.other.navbarTransitionTimingFunction,
+        '--mantine-header-height': theme.other.headerHeight,
+    },
+    dark: {},
+    light: {},
+});
+
+export const mantineTheme = createTheme({
     variantColorResolver: variantColorResolver,
     fontFamily: 'Space Grotesk',
 
     fontFamilyMonospace: 'Roboto Mono,Courier New,Courier,monospace',
+
+    other: {
+        maxAppWidth: `${MAX_APP_WIDTH}px`,
+        navbarWidth: `${NAVBAR_WIDTH}px`,
+        navbarTransitionDuration: `${NAVBAR_TRANSITION_DURATION}ms`,
+        navbarTransitionTimingFunction: NAVBAR_TRANSITION_TIMING_FUNCTION,
+        headerHeight: `${HEADER_HEIGHT}px`,
+    },
+
     colors: {
         body: colorsTuple('#101820'),
         background: colorsTuple('#101820'),
@@ -80,13 +110,13 @@ export const mantineTheme: MantineProviderProps['theme'] = {
             styles: {
                 header: {
                     margin: '0 auto',
-                    maxWidth: '1920px',
+                    maxWidth: 'var(--mantine-max-app-width)',
                 },
                 root: {
                     overflow: 'hidden',
                     position: 'relative',
                     margin: '0 auto',
-                    maxWidth: '1920px',
+                    maxWidth: 'var(--mantine-max-app-width)',
                 },
             },
             classNames: {
@@ -99,7 +129,7 @@ export const mantineTheme: MantineProviderProps['theme'] = {
                 bg: 'background',
             },
             classNames: {
-                header: '.border-color',
+                header: 'border-color',
             },
         }),
         AppShellMain: AppShellMain.extend({
@@ -151,4 +181,4 @@ export const mantineTheme: MantineProviderProps['theme'] = {
             },
         }),
     },
-};
+});
