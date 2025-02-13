@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '../../../components/truncated-text';
 import { copyAddress } from '../../../utils/copy';
 import { formatTimestamp } from '../../../utils/date';
-import { HistoryTransactionCollapseElement } from './single-transaction-collapse-element';
+import { HistoryTransactionCollapseElement } from './history-transaction-collapse-element';
 import styles from './transaction.module.css';
 
 interface HistoryTransactionProps {
