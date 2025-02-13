@@ -1,4 +1,3 @@
-import styles from './single-transaction.module.css';
 import {
     Anchor,
     Badge,
@@ -11,17 +10,18 @@ import {
     Text,
     Tooltip,
 } from '@mantine/core';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '../../../components/truncated-text';
 import { copyAddress } from '../../../utils/copy';
 import { formatTimestamp } from '../../../utils/date';
-import CheckIcon from '@mui/icons-material/Check';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { HistoryTransactionCollapseElement } from './single-transaction-collapse-element';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import styles from './transaction.module.css';
 
 interface HistoryTransactionProps {
     transactionId: string;

@@ -4,7 +4,8 @@ import PublishedWithChangesRoundedIcon from '@mui/icons-material/PublishedWithCh
 import { TruncatedText } from '../../../components/truncated-text';
 import { sompiToKas } from '../../../lib/kaspa-util';
 import { copyAddress } from '../../../utils/copy';
-import styles from './single-transaction.module.css';
+import styles from './transaction.module.css';
+
 interface PendingTransactionProps {
     transactionId: string;
     sentAmount: bigint;
