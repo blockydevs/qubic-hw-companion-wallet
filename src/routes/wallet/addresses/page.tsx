@@ -115,7 +115,7 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Payment',
                                         onClick: () => {
-                                            alert('payment');
+                                            navigate('/wallet/overview');
                                         },
                                     },
                                     {

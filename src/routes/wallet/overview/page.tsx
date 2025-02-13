@@ -1,31 +1,171 @@
-import OverviewTab from './overview-tab';
+import { Divider, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
+import ExploreIcon from '@mui/icons-material/Explore';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import { use, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import { AddressCard } from '../../../components/address-card';
+import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
+import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
 import { DashboardContext } from '../../../providers/DashboardContextProvider';
-import React, { use } from 'react';
+import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
+import { ConfirmingSection } from './confirming-section';
+import MessageForm from './message-form';
+import { MissingSelectedAddressView } from './missing-selected-address-view';
+import { useMyOverviewPage } from './page.hooks';
+import { ReplacingTransactionSection } from './replacting-transaction-section';
+import SendForm from './send-form';
+import { useQrCodeModal } from '../../../hooks/qr-code';
+import { QrCodeModal } from '../../../components/qr-code-modal';
+
+const WALLET_ACTIONS = ['Transaction', 'Message'];
 
 export const WalletOverviewPage = () => {
+    const navigate = useNavigate();
+
+    const { selectedAddress, setMempoolEntryToReplace, mempoolEntryToReplace, deviceType } =
+        use(DashboardContext);
+
+    const { isAddressVerified, verifyAddress } = use(VerifiedAddressContext);
+
     const {
-        addresses,
-        setAddresses,
-        selectedAddress,
-        setSelectedAddress,
-        deviceType,
-        setMempoolEntryToReplace,
-        mempoolEntryToReplace,
-        setPendingTxId,
-    } = use(DashboardContext);
+        data: qubicPriceInUSD,
+        error: qubicPriceInUSDError,
+        isLoading: isQubicPriceInUSDLoading,
+    } = useQubicPriceFromCoingecko();
+
+    const {
+        showConfirmingSection,
+        acceptingTxId,
+        confirmingTxId,
+        confirmationCount,
+        updateAddressDetails,
+    } = useMyOverviewPage();
+
+    const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
+        useQrCodeModal(selectedAddress?.address ?? '');
+
+    const [selectedTab, setSelectedTab] = useState<(typeof WALLET_ACTIONS)[number]>('Transaction');
+
+    const tabContent = useMemo(() => {
+        switch (selectedTab) {
+            case 'Transaction':
+                return (
+                    <SendForm
+                        onSuccess={updateAddressDetails}
+                        addressContext={selectedAddress}
+                        mempoolEntryToReplace={mempoolEntryToReplace}
+                    />
+                );
+            case 'Message':
+                return <MessageForm selectedAddress={selectedAddress} deviceType={deviceType} />;
+            default:
+                return null;
+        }
+    }, [selectedTab, selectedAddress, deviceType, mempoolEntryToReplace, updateAddressDetails]);
+
+    if (!selectedAddress) {
+        return <MissingSelectedAddressView />;
+    }
 
     return (
-        <OverviewTab
-            addresses={addresses}
-            selectedAddress={selectedAddress}
-            setSelectedAddress={setSelectedAddress}
-            setMempoolEntryToReplace={setMempoolEntryToReplace}
-            setAddresses={setAddresses}
-            containerWidth={1}
-            containerHeight={1}
-            deviceType={deviceType}
-            mempoolEntryToReplace={mempoolEntryToReplace}
-            setPendingTxId={setPendingTxId}
-        />
+        <>
+            <QrCodeModal
+                isQrCodeModalOpened={isQrCodeModalOpened}
+                closeQrCodeModal={closeQrCodeModal}
+                qrCodeAddress={qrCodeAddress}
+            />
+
+            <Stack w='100%'>
+                <Title size='h2'>Overview</Title>
+
+                <AddressCard
+                    bg='transparent'
+                    p='0'
+                    shadow='none'
+                    maw='600px'
+                    accountDetails={{
+                        accountName: 'Account 1',
+                        address: selectedAddress.address,
+                        isSelected: true,
+                        isAddressVerified: isAddressVerified,
+                        onVerifyAddressClick: () => verifyAddress(selectedAddress),
+                    }}
+                    afterAccountDetails={
+                        showConfirmingSection ? (
+                            <ConfirmingSection
+                                acceptingTxId={acceptingTxId}
+                                confirmingTxId={confirmingTxId}
+                                confirmationCount={confirmationCount}
+                            />
+                        ) : (
+                            <AddressCardBalance
+                                balance={selectedAddress.balance.toString()}
+                                balanceUSD={{
+                                    isLoading: isQubicPriceInUSDLoading,
+                                    value: qubicPriceInUSD,
+                                    error: qubicPriceInUSDError,
+                                }}
+                            />
+                        )
+                    }
+                    buttons={[
+                        {
+                            component: (
+                                <ContactsOutlinedIcon htmlColor='var(--mantine-color-brand-text)' />
+                            ),
+                            label: 'Select another address',
+                            onClick: () => {
+                                navigate('/wallet/addresses');
+                            },
+                        },
+                        {
+                            component: <QrCodeIcon htmlColor='var(--mantine-color-brand-text)' />,
+                            label: 'QR Code',
+                            onClick: () => {
+                                handleOpenQrCodeModal(selectedAddress.address);
+                            },
+                        },
+                        {
+                            component: <ExploreIcon htmlColor='var(--mantine-color-brand-text)' />,
+                            label: 'Explorer',
+                            isExternalLink: true,
+                            to: `https://explorer.qubic.org/network/address/${selectedAddress.address}`,
+                        },
+                    ]}
+                />
+
+                <Divider />
+
+                <Paper p='lg' radius='sm'>
+                    <SegmentedControl
+                        data={WALLET_ACTIONS}
+                        value={selectedTab}
+                        onChange={setSelectedTab}
+                        fullWidth
+                    />
+
+                    <Stack py='2rem' w='100%'>
+                        {tabContent}
+                    </Stack>
+
+                    {mempoolEntryToReplace ? (
+                        <ReplacingTransactionSection
+                            onCloseNotification={() => {
+                                setMempoolEntryToReplace(null);
+                                notifications.show({
+                                    message: 'RBF cancelled',
+                                    autoClose: 3000,
+                                });
+                            }}
+                            transactionId={
+                                mempoolEntryToReplace.transaction.verboseData.transactionId
+                            }
+                        />
+                    ) : null}
+                </Paper>
+            </Stack>
+        </>
     );
 };

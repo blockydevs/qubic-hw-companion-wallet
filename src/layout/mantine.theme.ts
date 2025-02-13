@@ -4,13 +4,16 @@ import {
     AppShellNavbar,
     Button,
     Card,
+    Checkbox,
     colorsTuple,
     createTheme,
     CSSVariablesResolver,
     defaultVariantColorsResolver,
     Divider,
+    Input,
     Paper,
     parseThemeColor,
+    SegmentedControl,
     Text,
     Title,
     VariantColorsResolver,
@@ -98,7 +101,7 @@ export const mantineTheme = createTheme({
         buttonLightHover: colorsTuple('#2b3641'),
         buttonLightColor: colorsTuple('#ffffff'),
 
-        cardBackground: colorsTuple('#192531'),
+        cardBackground: colorsTuple('#151e27'),
         cardBoxShadow: colorsTuple('1px 1px 1px 0px rgba(63, 62, 62, 1)'),
         carorderColor: colorsTuple('#192531'),
     },
@@ -178,6 +181,22 @@ export const mantineTheme = createTheme({
                 root: {
                     fontWeight: 'normal',
                 },
+            },
+        }),
+        Input: Input.extend({
+            classNames: {
+                input: 'qubic__input',
+            },
+        }),
+        Checkbox: Checkbox.extend({
+            classNames: {
+                input: 'qubic__checkbox',
+            },
+        }),
+        SegmentedControl: SegmentedControl.extend({
+            classNames: {
+                indicator: 'qubic__segmented-control__indicator',
+                control: 'qubic__segmented-control__control',
             },
         }),
     },
