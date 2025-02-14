@@ -204,7 +204,7 @@ export default function TransactionsTab(props: TransactionsTabProps) {
                         </Group>
 
                         <Anchor
-                            href={`https://explorer.kaspa.org/txs/${row.transactionId}`}
+                            href={`https://explorer.qubic.org/network/tx/${row.transactionId}`}
                             target='_blank'
                             className={styles.transaction}
                             ff={'Roboto Mono,Courier New,Courier,monospace'}
