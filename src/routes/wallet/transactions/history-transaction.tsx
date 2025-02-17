@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '../../../components/truncated-text';
 import { copyAddress } from '../../../utils/copy';
 import { formatTimestamp } from '../../../utils/date';
-import { HistoryTransactionDetailItem } from './history-transaction-collapse-element';
+import { HistoryTransactionDetailItem } from './history-transaction-detail-item';
 import styles from './transaction.module.css';
 
 interface HistoryTransactionProps {
@@ -40,9 +40,8 @@ export const HistoryTransaction = ({
     const shouldShowTransactionHashInCollapse = useMediaQuery(`(min-width: ${em(1024)})`);
 
     const transactionType = amount <= 0 ? 'outgoing' : 'incoming';
-    const arrowDirection = transactionType === 'outgoing' ? 'up' : 'down';
 
-    const ArrowIcon = arrowDirection === 'up' ? ArrowUpwardIcon : ArrowDownwardIcon;
+    const ArrowIcon = transactionType === 'outgoing' ? ArrowUpwardIcon : ArrowDownwardIcon;
 
     return (
         <Group className={styles.transaction}>
