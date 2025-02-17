@@ -20,7 +20,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '../../../components/truncated-text';
 import { copyAddress } from '../../../utils/copy';
 import { formatTimestamp } from '../../../utils/date';
-import { HistoryTransactionCollapseElement } from './history-transaction-collapse-element';
+import { HistoryTransactionDetailItem } from './history-transaction-collapse-element';
 import styles from './transaction.module.css';
 
 interface HistoryTransactionProps {
@@ -144,7 +144,7 @@ export const HistoryTransaction = ({
 
                 <Stack gap='sm'>
                     {shouldShowTransactionHashInCollapse && (
-                        <HistoryTransactionCollapseElement
+                        <HistoryTransactionDetailItem
                             label='TX ID'
                             component={
                                 <>
@@ -170,7 +170,7 @@ export const HistoryTransaction = ({
                         />
                     )}
 
-                    <HistoryTransactionCollapseElement
+                    <HistoryTransactionDetailItem
                         label='Timestamp'
                         component={<Text>{formatTimestamp(timestamp)}</Text>}
                     />
