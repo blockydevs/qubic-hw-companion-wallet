@@ -1,4 +1,4 @@
-import { use, useCallback } from 'react';
+import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
@@ -13,13 +13,13 @@ export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
-    const { initApp } = use(QubicLedgerContext);
+    const { initApp, app, reset } = use(QubicLedgerContext);
 
     const handleConnect = useCallback(
-        async (type: 'usb' | 'demo') => {
-            const app = await initApp();
+        async (type: 'usb') => {
+            const qubicLedgerApp = app ?? (await initApp());
 
-            const isAppDataPrepared = await prepareAppData(type, app.transport);
+            const isAppDataPrepared = await prepareAppData(type, qubicLedgerApp.transport);
 
             if (isAppDataPrepared) {
                 setDeviceType(type);
@@ -28,6 +28,15 @@ export default function Home() {
         },
         [navigate, setDeviceType, initApp],
     );
+
+    const handleConnectToDemo = useCallback(() => {
+        setDeviceType('demo');
+        navigate(`/wallet/addresses`, { replace: true });
+    }, [navigate, setDeviceType]);
+
+    useEffect(() => {
+        reset();
+    }, []);
 
     return (
         <Flex align='center' direction='column' w='100%'>
@@ -61,7 +70,7 @@ export default function Home() {
                                 rightSection={<span />}
                                 variant='button-light'
                                 justify='space-between'
-                                onClick={() => handleConnect('demo')}
+                                onClick={handleConnectToDemo}
                             >
                                 Go to demo mode
                             </Button>

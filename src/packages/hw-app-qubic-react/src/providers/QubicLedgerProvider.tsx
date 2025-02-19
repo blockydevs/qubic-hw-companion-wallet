@@ -12,6 +12,7 @@ export interface IQubicLedgerContext {
     initApp: () => Promise<HWAppQubic>;
     addNewAddress: (generatedAddressData: IQubicLedgerAddress) => void;
     setSelectedAddressIndex: (index: number) => void;
+    reset: () => void;
 }
 
 export const QubicLedgerContext = createContext<IQubicLedgerContext | null>(null);
@@ -75,6 +76,12 @@ const QubicLedgerProviderWithoutWebHIDProvider = ({
         [setGeneratedAddresses, selectedAddress],
     );
 
+    const reset = useCallback(() => {
+        setApp(null);
+        setGeneratedAddresses([]);
+        setSelectedAddressIndex(null);
+    }, []);
+
     useEffect(() => {
         if (init && !app) {
             initApp();
@@ -91,6 +98,7 @@ const QubicLedgerProviderWithoutWebHIDProvider = ({
                 initApp,
                 addNewAddress,
                 setSelectedAddressIndex,
+                reset,
             }}
         >
             {children}
