@@ -3,6 +3,8 @@ import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
 import { QubicLedgerContext } from '../packages/hw-app-qubic-react/src/providers/QubicLedgerProvider';
 import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
+import { Loader, LoadingOverlay, Stack, Text } from '@mantine/core';
+import { DeviceTypeContext } from './DeviceTypeProvider';
 
 interface IVerifiedAddressContext {
     verifiedIdentities: string[];
@@ -15,24 +17,30 @@ export const VerifiedAddressContext = createContext<IVerifiedAddressContext>({
 });
 
 export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
+    const { deviceType } = use(DeviceTypeContext);
     const [verifiedIdentities, setVerifiedIdentities] = useState<string[]>([]);
+    const [isVerificationInProgress, setVerificationInProgress] = useState(false);
 
     const { app, selectedAddress } = use(QubicLedgerContext);
 
     const verifyAddress = useCallback(
         async (qubicAddressToVerify: IQubicLedgerAddress) => {
+            if (deviceType === 'demo') {
+                notifications.show({
+                    title: 'Demo mode',
+                    message: 'Verification is not available in demo mode',
+                    autoClose: true,
+                });
+                return;
+            }
+
             const isAddressVerified = verifiedIdentities.includes(qubicAddressToVerify.identity);
 
             if (selectedAddress?.identity === qubicAddressToVerify.identity && isAddressVerified) {
                 return;
             }
 
-            const notifId = notifications.show({
-                title: 'Action Required',
-                message: 'Please verify the address on your device',
-                loading: true,
-                autoClose: false,
-            });
+            setVerificationInProgress(true);
 
             try {
                 const publicKey = await app.getPublicKey(
@@ -76,7 +84,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
                     prev.filter((identity) => identity !== qubicAddressToVerify.identity),
                 );
             } finally {
-                notifications.hide(notifId);
+                setVerificationInProgress(false);
             }
         },
         [app, verifiedIdentities, selectedAddress],
@@ -87,11 +95,32 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
             return;
         }
 
-        verifyAddress(selectedAddress);
-    }, [selectedAddress]);
+        if (deviceType !== 'demo') {
+            verifyAddress(selectedAddress);
+        }
+    }, [selectedAddress, deviceType, verifyAddress]);
 
     return (
         <VerifiedAddressContext value={{ verifiedIdentities, verifyAddress }}>
+            <LoadingOverlay
+                visible={isVerificationInProgress}
+                zIndex={1000}
+                loaderProps={{
+                    children: (
+                        <Stack justify='center' align='center' gap='xl'>
+                            <Loader size='lg' />
+                            <Stack gap='sm' justify='center' align='center'>
+                                <Text size='h2'>Action required</Text>
+                                <Text>Please verify the address on your device</Text>
+                            </Stack>
+                        </Stack>
+                    ),
+                }}
+                overlayProps={{
+                    radius: 'sm',
+                    blur: 2,
+                }}
+            />
             {children}
         </VerifiedAddressContext>
     );
