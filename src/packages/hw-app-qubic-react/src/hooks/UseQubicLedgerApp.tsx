@@ -20,7 +20,6 @@ export const useQubicLedgerApp = () => {
     }, [ctx?.app]);
 
     const deriveNewAddress = useCallback(async () => {
-        console.log({ app: ctx?.app });
         if (!ctx?.app) {
             throw new Error('QubicLedgerApp not initialized');
         }
