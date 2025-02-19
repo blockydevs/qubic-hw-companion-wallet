@@ -1,28 +1,29 @@
 import { notifications } from '@mantine/notifications';
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
-import { getAddress } from '../lib/ledger';
-import { DashboardContext } from './DashboardContextProvider';
-import type { ISelectedAddress } from '../types';
+import { QubicLedgerContext } from '../packages/hw-app-qubic-react/src/providers/QubicLedgerProvider';
+import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
 
 interface IVerifiedAddressContext {
-    isAddressVerified: boolean;
-    verifyAddress: (addressToVerify: ISelectedAddress) => Promise<void>;
+    verifiedIdentities: string[];
+    verifyAddress: (qubicAddressToVerify: IQubicLedgerAddress) => Promise<void>;
 }
 
 export const VerifiedAddressContext = createContext<IVerifiedAddressContext>({
-    isAddressVerified: false,
+    verifiedIdentities: [],
     verifyAddress: async (_) => {},
 });
 
 export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
-    const [isAddressVerified, setIsAddressVerified] = useState(false);
+    const [verifiedIdentities, setVerifiedIdentities] = useState<string[]>([]);
 
-    const { selectedAddress } = use(DashboardContext);
+    const { app, selectedAddress } = use(QubicLedgerContext);
 
     const verifyAddress = useCallback(
-        async (addressToVerify: ISelectedAddress) => {
-            if (selectedAddress?.address === addressToVerify.address && isAddressVerified) {
+        async (qubicAddressToVerify: IQubicLedgerAddress) => {
+            const isAddressVerified = verifiedIdentities.includes(qubicAddressToVerify.identity);
+
+            if (selectedAddress?.identity === qubicAddressToVerify.identity && isAddressVerified) {
                 return;
             }
 
@@ -34,20 +35,27 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
             });
 
             try {
-                const { address } = await getAddress(addressToVerify.derivationPath, true);
+                const publicKey = await app.getPublicKey(
+                    qubicAddressToVerify.addressDerivationPath,
+                    true,
+                );
 
-                if (address === addressToVerify.address) {
+                const publicKeyHex = publicKey.toString('hex');
+
+                if (publicKeyHex === qubicAddressToVerify.publicKey) {
                     notifications.show({
                         title: 'Success',
                         message: 'Address verified!',
                     });
-                    setIsAddressVerified(true);
+                    setVerifiedIdentities((prev) => [...prev, qubicAddressToVerify.identity]);
                 } else {
                     notifications.show({
                         title: 'Address not verified',
                         message: 'Address does not match',
                     });
-                    setIsAddressVerified(false);
+                    setVerifiedIdentities((prev) =>
+                        prev.filter((identity) => identity !== qubicAddressToVerify.identity),
+                    );
                 }
             } catch (e) {
                 if (e.statusText === 'CONDITIONS_OF_USE_NOT_SATISFIED' && e.message) {
@@ -64,17 +72,18 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
                     });
                 }
 
-                setIsAddressVerified(false);
+                setVerifiedIdentities((prev) =>
+                    prev.filter((identity) => identity !== qubicAddressToVerify.identity),
+                );
             } finally {
                 notifications.hide(notifId);
             }
         },
-        [isAddressVerified, selectedAddress],
+        [app, verifiedIdentities, selectedAddress],
     );
 
     useEffect(() => {
         if (!selectedAddress) {
-            setIsAddressVerified(false);
             return;
         }
 
@@ -82,7 +91,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
     }, [selectedAddress]);
 
     return (
-        <VerifiedAddressContext value={{ isAddressVerified, verifyAddress }}>
+        <VerifiedAddressContext value={{ verifiedIdentities, verifyAddress }}>
             {children}
         </VerifiedAddressContext>
     );

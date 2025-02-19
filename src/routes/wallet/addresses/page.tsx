@@ -1,29 +1,38 @@
 import { use } from 'react';
 import { useNavigate } from 'react-router';
-import { Button, Center, Flex, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
+import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ExploreIcon from '@mui/icons-material/Explore';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { AddressCard } from '../../../components/address-card';
 import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
-import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
-import { DashboardContext } from '../../../providers/DashboardContextProvider';
-import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
-import { shouldShowClearSelectedAddressButton } from './page.utils';
-import { useQrCodeModal } from '../../../hooks/qr-code';
 import { QrCodeModal } from '../../../components/qr-code-modal';
+import { useQrCodeModal } from '../../../hooks/qr-code';
+import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
+import { useQubicLedgerApp } from '../../../packages/hw-app-qubic-react';
+import { DeviceTypeContext } from '../../../providers/DeviceTypeProvider';
+import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
 
-    const { addresses, selectedAddress, setSelectedAddress, generateNewAddress, enableGenerate } =
-        use(DashboardContext);
+    const {
+        generatedAddresses,
+        deriveNewAddress,
+        clearSelectedAddress,
+        selectAddressByIndex,
+        selectedAddress,
+        isGeneratingAddress,
+    } = useQubicLedgerApp();
 
-    const { isAddressVerified, verifyAddress } = use(VerifiedAddressContext);
+    const { verifiedIdentities, verifyAddress } = use(VerifiedAddressContext);
+
+    const { deviceType } = use(DeviceTypeContext);
 
     const {
         data: qubicPriceInUSD,
@@ -32,15 +41,9 @@ export const WalletAddressesPage = () => {
     } = useQubicPriceFromCoingecko();
 
     const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
-        useQrCodeModal(selectedAddress?.address ?? '');
+        useQrCodeModal(selectedAddress?.identity ?? '');
 
-    const clearSelectedAddressHandler = () => {
-        if (addresses?.length <= 1) {
-            return;
-        }
-
-        setSelectedAddress(null);
-    };
+    const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
 
     return (
         <>
@@ -53,7 +56,8 @@ export const WalletAddressesPage = () => {
             <Group w='100%'>
                 <Flex w='100%' justify='space-between'>
                     <Title order={1} size='h2'>
-                        Addresses
+                        Addresses{' '}
+                        {generatedAddresses?.length ? `(${generatedAddresses.length})` : ''}
                     </Title>
 
                     <Stack gap='0' align='flex-end'>
@@ -66,10 +70,10 @@ export const WalletAddressesPage = () => {
                     <Center>
                         <Button
                             leftSection={<AddCircleIcon sx={{ fontSize: '0.875rem' }} />}
-                            onClick={generateNewAddress}
-                            disabled={!enableGenerate}
+                            onClick={deriveNewAddress}
+                            disabled={isGenerateNewAddressButtonDisabled}
                         >
-                            Generate New Address
+                            {isGeneratingAddress ? 'Generating...' : 'Generate New Address'}
                         </Button>
                     </Center>
 
@@ -82,25 +86,26 @@ export const WalletAddressesPage = () => {
                     </Stack>
                 </Flex>
 
-                {addresses?.length >= 1 ? (
+                {generatedAddresses?.length >= 1 ? (
                     <Flex wrap='wrap' gap='md'>
-                        {addresses.map((address, index) => (
+                        {generatedAddresses.map((address, index) => (
                             <AddressCard
-                                key={address.address}
+                                key={address.identity}
                                 w='385px'
                                 h='auto'
                                 accountDetails={{
                                     accountName: `Account ${index + 1}`,
-                                    address: address.address,
-                                    isSelected: selectedAddress?.address === address.address,
-                                    isAddressVerified: isAddressVerified,
-                                    onAccountNameAndAddressClick: () =>
-                                        navigate('/wallet/overview'),
+                                    address: address.identity,
+                                    isSelected: selectedAddress?.identity === address.identity,
+                                    isAddressVerified: verifiedIdentities.includes(
+                                        address.identity,
+                                    ),
+                                    onAccountNameAndAddressClick: () => selectAddressByIndex(index),
                                     onVerifyAddressClick: () => verifyAddress(address),
                                 }}
                                 afterAccountDetails={
                                     <AddressCardBalance
-                                        balance={address.balance.toString()}
+                                        balance='0'
                                         balanceUSD={{
                                             isLoading: isQubicPriceInUSDLoading,
                                             value: qubicPriceInUSD,
@@ -109,6 +114,25 @@ export const WalletAddressesPage = () => {
                                     />
                                 }
                                 buttons={[
+                                    selectedAddress?.identity === address.identity
+                                        ? {
+                                              component: (
+                                                  <CheckCircleOutlineIcon htmlColor='var(--mantine-color-brand-text)' />
+                                              ),
+                                              label: 'Clear address selection',
+                                              onClick: () => {
+                                                  clearSelectedAddress();
+                                              },
+                                          }
+                                        : {
+                                              component: (
+                                                  <RadioButtonUncheckedIcon htmlColor='var(--mantine-color-brand-text)' />
+                                              ),
+                                              label: 'Select address',
+                                              onClick: () => {
+                                                  selectAddressByIndex(index);
+                                              },
+                                          },
                                     {
                                         component: (
                                             <CreditCardIcon htmlColor='var(--mantine-color-brand-text)' />
@@ -133,7 +157,7 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'QR Code',
                                         onClick: () => {
-                                            handleOpenQrCodeModal(address.address);
+                                            handleOpenQrCodeModal(address.identity);
                                         },
                                     },
                                     {
@@ -142,24 +166,8 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Explorer',
                                         isExternalLink: true,
-                                        to: `https://explorer.qubic.org/network/address/${address.address}`,
+                                        to: `https://explorer.qubic.org/network/address/${address.identity}`,
                                     },
-                                    ...(shouldShowClearSelectedAddressButton({
-                                        address: address.address,
-                                        hasMultipleAddresses: addresses.length > 1,
-                                        selectedAddress: selectedAddress?.address ?? '',
-                                    })
-                                        ? [
-                                              {
-                                                  component: (
-                                                      <Tooltip label='Clear Address'>
-                                                          <DeleteForeverIcon htmlColor='var(--mantine-color-brand-text)' />
-                                                      </Tooltip>
-                                                  ),
-                                                  onClick: clearSelectedAddressHandler,
-                                              },
-                                          ]
-                                        : []),
                                 ]}
                             />
                         ))}

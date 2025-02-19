@@ -7,22 +7,26 @@ import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import { IS_DEMO_MODE } from '../../constants';
+import { QubicLedgerContext } from '../../packages/hw-app-qubic-react/src/providers/QubicLedgerProvider';
 
 export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
+    const { initApp } = use(QubicLedgerContext);
 
     const handleConnect = useCallback(
         async (type: 'usb' | 'demo') => {
-            const isAppDataPrepared = await prepareAppData(type);
+            const app = await initApp();
+
+            const isAppDataPrepared = await prepareAppData(type, app.transport);
 
             if (isAppDataPrepared) {
                 setDeviceType(type);
                 navigate(`/wallet/addresses`, { replace: true });
             }
         },
-        [navigate, setDeviceType],
+        [navigate, setDeviceType, initApp],
     );
 
     return (

@@ -27,7 +27,7 @@ export const WalletOverviewPage = () => {
     const { selectedAddress, setMempoolEntryToReplace, mempoolEntryToReplace, deviceType } =
         use(DashboardContext);
 
-    const { isAddressVerified, verifyAddress } = use(VerifiedAddressContext);
+    const { verifiedIdentities } = use(VerifiedAddressContext);
 
     const {
         data: qubicPriceInUSD,
@@ -89,8 +89,8 @@ export const WalletOverviewPage = () => {
                         accountName: 'Account 1',
                         address: selectedAddress.address,
                         isSelected: true,
-                        isAddressVerified: isAddressVerified,
-                        onVerifyAddressClick: () => verifyAddress(selectedAddress),
+                        isAddressVerified: verifiedIdentities.includes(selectedAddress.address),
+                        onVerifyAddressClick: () => console.log('verify address'),
                     }}
                     afterAccountDetails={
                         showConfirmingSection ? (

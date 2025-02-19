@@ -1,21 +1,20 @@
 import { LockedDeviceError } from '@ledgerhq/errors';
+import { notifications } from '@mantine/notifications';
 import sha256 from 'crypto-js/sha256';
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useEffect, useState } from 'react';
-import { IAddressData, ISelectedAddress } from '../types';
 import KaspaBIP32 from '../lib/bip32';
-import SettingsStore from '../lib/settings-store';
 import type { IMempoolEntry } from '../lib/kaspa-rpc/kaspa';
-import { getAddress, initTransport } from '../lib/ledger';
+import { getAddress } from '../lib/ledger';
+import SettingsStore from '../lib/settings-store';
+import { IAddressData, ISelectedAddress } from '../types';
 import { delay } from '../utils/delay';
 import {
     demoLoadAddress,
     getDemoXPub,
-    getXPubFromLedger,
     loadAddressDetails,
     loadOrScanAddressBatch,
 } from './DashboardContextProvider.utils';
-import { notifications } from '@mantine/notifications';
 import { DeviceTypeContext } from './DeviceTypeProvider';
 
 interface IDashboarContext {
@@ -148,33 +147,7 @@ export const DashboardContextProvider = ({ children }: PropsWithChildren) => {
             return () => {};
         }
 
-        let unloaded = false;
-
-        initTransport(deviceType)
-            .then(() => {
-                if (!unloaded) {
-                    setTransportInitialized(true);
-
-                    return getXPubFromLedger().then((xpub) =>
-                        setBIP32Base(new KaspaBIP32(xpub.compressedPublicKey, xpub.chainCode)),
-                    );
-                }
-
-                return null;
-            })
-            .catch((e) => {
-                notifications.show({
-                    title: 'Error',
-                    color: 'red',
-                    message: 'Please make sure your device is unlocked and the Qubic app is open',
-                    autoClose: false,
-                });
-                console.error(e);
-            });
-
-        return () => {
-            unloaded = true;
-        };
+        return () => {};
     }, [isTransportInitialized, deviceType, bip32base]);
 
     useEffect(() => {
