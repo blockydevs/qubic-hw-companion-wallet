@@ -51,16 +51,12 @@ export class HWAppQubic {
     }
 
     async getPublicKey(derivationPath = "m/44'/1'/0'/0/0", withConfirm = false): Promise<any> {
-        const response = await this.sendToDevice({
+        return await this.sendToDevice({
             instruction: INS.GET_PUBLIC_KEY,
             p1: withConfirm ? P1.CONFIRM : P1.NON_CONFIRM,
             p2: P2.LAST,
             payload: convertDerivationPathToBuffer(derivationPath),
         });
-
-        const publicKey = response.toString('hex');
-
-        return publicKey;
     }
 
     async signTransaction(transaction: IQubicTransaction): Promise<IQubicTransaction> {
