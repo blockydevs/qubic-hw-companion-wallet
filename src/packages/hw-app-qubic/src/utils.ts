@@ -1,4 +1,4 @@
-export const convertDerivationPathToBuffer = (derivationPath: string): Buffer => {
+export const convertDerivationPathToBuffer = (derivationPath: string) => {
     const split = derivationPath.split('/');
 
     if (split[0] !== 'm') {
