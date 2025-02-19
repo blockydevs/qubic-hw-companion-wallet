@@ -1,21 +1,8 @@
-import { use, useCallback, useState } from 'react';
+import { use, useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import {
-    Alert,
-    Button,
-    Center,
-    Divider,
-    Flex,
-    Group,
-    Image,
-    Stack,
-    Text,
-    Title,
-    Transition,
-} from '@mantine/core';
+import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
-import { prepareAppData, getSiteHostName } from './page.utils';
-import InfoIcon from '@mui/icons-material/Info';
+import { prepareAppData } from './page.utils';
 import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
@@ -25,51 +12,21 @@ export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
-    const siteHostname = getSiteHostName();
 
-    const [showVerifyUrlAlert, setShowVerifyUrlAlert] = useState(true);
+    const handleConnect = useCallback(
+        async (type: 'usb' | 'demo') => {
+            const isAppDataPrepared = await prepareAppData(type);
 
-    const handleConnectWithUsb = useCallback(async () => {
-        const isAppDataPrepared = await prepareAppData('usb');
-
-        if (isAppDataPrepared) {
-            setDeviceType('usb');
-            navigate(`/wallet/addresses`, { replace: true });
-        }
-    }, [navigate, setDeviceType]);
-
-    const handleGoToDemoMode = useCallback(async () => {
-        const isAppDataPrepared = await prepareAppData('demo');
-
-        if (isAppDataPrepared) {
-            setDeviceType('demo');
-            navigate(`/wallet/addresses`, { replace: true });
-        }
-    }, [navigate, setDeviceType]);
+            if (isAppDataPrepared) {
+                setDeviceType(type);
+                navigate(`/wallet/addresses`, { replace: true });
+            }
+        },
+        [navigate, setDeviceType],
+    );
 
     return (
         <Flex align='center' direction='column' w='100%'>
-            <Transition
-                mounted={showVerifyUrlAlert}
-                transition='fade'
-                duration={400}
-                timingFunction='ease'
-            >
-                {(styles) => (
-                    <Alert
-                        variant='light'
-                        color='brand'
-                        withCloseButton
-                        onClose={() => setShowVerifyUrlAlert(false)}
-                        title='Verify URL'
-                        icon={<InfoIcon />}
-                        style={styles}
-                    >
-                        Your verify URL is <code>{siteHostname}</code>
-                    </Alert>
-                )}
-            </Transition>
-
             <Group py='4rem'>
                 <Image src='/Qubic-Symbol-White.svg' alt='Qubic' width={180} height={180} />
             </Group>
@@ -100,7 +57,7 @@ export default function Home() {
                                 rightSection={<span />}
                                 variant='button-light'
                                 justify='space-between'
-                                onClick={handleGoToDemoMode}
+                                onClick={() => handleConnect('demo')}
                             >
                                 Go to demo mode
                             </Button>
@@ -124,7 +81,7 @@ export default function Home() {
                         leftSection={<UsbIcon fontSize='small' />}
                         justify='space-between'
                         variant='button-light'
-                        onClick={handleConnectWithUsb}
+                        onClick={() => handleConnect('usb')}
                     >
                         Connect with USB
                     </Button>

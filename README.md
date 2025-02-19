@@ -5,8 +5,9 @@ Qubic HW Companion Wallet is a simple frontend interface for your Ledger device.
 ## Compatible Browsers
 
 The browser needs to support WebUSB/WebHID so it can interact with the Ledger device. These are the known compatible browsers:
-- Edge
-- Chrome
+
+-   Edge
+-   Chrome
 
 ## Development and Running Locally
 
@@ -18,4 +19,4 @@ First, run the development server:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to start using or developing KasVault locally.
+Open [http://localhost:3000](http://localhost:3000) with your browser to start using or developing Qubic locally.
