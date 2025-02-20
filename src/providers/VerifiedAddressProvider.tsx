@@ -111,7 +111,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
         <VerifiedAddressContext value={{ verifiedIdentities, verifyAddress }}>
             <LoadingOverlay
                 visible={isVerificationInProgress}
-                zIndex={1000}
+                pos='fixed'
                 transitionProps={{ transition: 'fade', duration: 0.3 }}
                 loaderProps={{
                     children: (
