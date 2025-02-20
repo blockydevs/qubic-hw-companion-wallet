@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
+import qubic from '@qubic-lib/qubic-ts-library';
 import { useQubicLedgerAppContext } from './UseQubicLedgerAppContext';
 import { generateDerivationPathForGivenIndex } from '../utils/derivation-path';
-import qubic from '@qubic-lib/qubic-ts-library';
-
-const MAX_ADDRESS_INDEX = 255;
+import { MAX_ADDRESS_INDEX } from '../constants';
 
 export const useQubicLedgerApp = () => {
     const {
