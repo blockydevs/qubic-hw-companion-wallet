@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQubicLedgerAppContext } from '../hooks/UseQubicLedgerAppContext';
 
 interface QubicLedgerDemoModeProviderProps {
@@ -11,6 +11,7 @@ export const QubicLedgerDemoModeProvider = ({
     enabled = true,
 }: PropsWithChildren<QubicLedgerDemoModeProviderProps>) => {
     const { generatedAddresses, addNewAddress } = useQubicLedgerAppContext();
+    const isInitialized = useRef(false);
 
     const generateDemoAddress = async () => {
         const newAddressIndex = generatedAddresses ? generatedAddresses.length + 1 : 1;
@@ -34,10 +35,14 @@ export const QubicLedgerDemoModeProvider = ({
     };
 
     useEffect(() => {
-        if (enabled) {
-            generateDemoAddress();
+        if (isInitialized.current || !enabled) {
+            return;
         }
-    }, [enabled]);
+
+        isInitialized.current = true;
+
+        generateDemoAddress();
+    }, [generateDemoAddress]);
 
     return children;
 };
