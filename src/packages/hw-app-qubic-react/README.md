@@ -57,6 +57,7 @@ const {
     deriveNewAddress,
     selectAddressByIndex,
     clearSelectedAddress,
+    reset,
 } = useQubicLedgerApp();
 ```
 
@@ -121,6 +122,7 @@ const getVersionHandler = async () => {
 -   **`deriveNewAddress`**: Generates a new address using the derivation path.
 -   **`selectAddressByIndex`**: Selects an address from `generatedAddresses` by index.
 -   **`clearSelectedAddress`**: Clears the currently selected address.
+-   **`reset`**: Reset generated addresses (and selected address).
 
 ## Known Limitations
 
