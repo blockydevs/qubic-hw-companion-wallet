@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useQubicLedgerApp, QubicLedgerProvider } from '../';
+import { useQubicLedgerApp, QubicLedgerAppProvider } from '../';
 
 const INIT_STATUS_MAP = {
     idle: 'HW Qubic App is not initialized', // Default state
@@ -9,9 +9,9 @@ const INIT_STATUS_MAP = {
 };
 
 export const TestPage = () => (
-    <QubicLedgerProvider derivationPath='' init={false}>
+    <QubicLedgerAppProvider derivationPath='' init={false}>
         <TestPageContent />
-    </QubicLedgerProvider>
+    </QubicLedgerAppProvider>
 );
 
 export const TestPageContent = () => {

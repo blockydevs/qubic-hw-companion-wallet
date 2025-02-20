@@ -17,11 +17,11 @@ npm install qubic-hw-app-react
 First, wrap your application with the `QubicLedgerProvider`. This ensures that the Qubic Ledger context is available throughout your application.
 
 ```tsx
-import { QubicLedgerProvider } from 'qubic-hw-app-react';
+import { QubicLedgerAppProvider } from 'qubic-hw-app-react';
 
-<QubicLedgerProvider derivationPath="m/44'/4218'/0'/0'">
+<QubicLedgerAppProvider derivationPath="m/44'/4218'/0'/0'">
     {/* Your components go here */}
-</QubicLedgerProvider>;
+</QubicLedgerAppProvider>;
 ```
 
 ### Using Demo Mode
@@ -29,14 +29,33 @@ import { QubicLedgerProvider } from 'qubic-hw-app-react';
 To enable demo mode (for testing without a physical device), wrap your components with `QubicLedgerDemoModeProvider`. This generates dummy addresses when the device type is set to `demo`.
 
 ```tsx
-import { QubicLedgerProvider, QubicLedgerDemoModeProvider } from 'qubic-hw-app-react';
+import { QubicLedgerAppProvider, QubicLedgerDemoModeProvider } from 'qubic-hw-app-react';
 
 // Inside your component tree:
-<QubicLedgerProvider derivationPath="m/44'/4218'/0'/0'">
+<QubicLedgerAppProvider derivationPath="m/44'/4218'/0'/0'">
     <QubicLedgerDemoModeProvider>
         {/* Components requiring demo mode */}
     </QubicLedgerDemoModeProvider>
-</QubicLedgerProvider>;
+</QubicLedgerAppProvider>;
+```
+
+### Using Cached Derivered Addressess
+
+The `QubicLedgerAppDeriveredIndexCache` provider automatically manages the caching of derived address indexes in your browser's local storage. When your application initializes, it retrieves the last derived address index from local storage and re-derives all previously generated addresses. This ensures that the full set of addresses is available immediately on load, without requiring the user to re-derive each address manually.
+
+Additionally, as new addresses are generated during your session, the provider updates the cached index to reflect the latest count. This seamless caching mechanism enhances performance and provides a smoother user experience by preserving the derivation state across sessions.
+
+Simply wrap the component tree that requires these cached addresses with the `QubicLedgerAppDeriveredIndexCache` provider, and it will handle the caching logic behind the scenes.
+
+```tsx
+import { QubicLedgerAppProvider, QubicLedgerDemoModeProvider } from 'qubic-hw-app-react';
+
+// Inside your component tree:
+<QubicLedgerAppProvider derivationPath="m/44'/4218'/0'/0'">
+    <QubicLedgerAppDeriveredIndexCache>
+        {/* Components */}
+    </QubicLedgerAppDeriveredIndexCache>
+</QubicLedgerAppProvider>;
 ```
 
 ### Using the Hook
@@ -92,9 +111,6 @@ const deriveAddressHandler = async () => {
 ```tsx
 // Select the first generated address
 selectAddressByIndex(0);
-
-// Clear selection
-clearSelectedAddress();
 ```
 
 #### Getting Version Information

@@ -4,7 +4,7 @@ import { HWAppQubic } from '../../../hw-app-qubic';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress } from '../types';
 
-export interface IQubicLedgerContext {
+export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
     selectedAddress: IQubicLedgerAddress | null;
     generatedAddresses: IQubicLedgerAddress[];
@@ -15,18 +15,18 @@ export interface IQubicLedgerContext {
     reset: () => void;
 }
 
-export const QubicLedgerContext = createContext<IQubicLedgerContext | null>(null);
+export const QubicLedgerAppContext = createContext<IQubicLedgerAppContext | null>(null);
 
-interface QubicLedgerProviderProps {
+interface QubicLedgerAppProviderProps {
     init?: boolean;
     derivationPath: string;
 }
 
-const QubicLedgerProviderWithoutWebHIDProvider = ({
+const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     children,
     derivationPath,
     init,
-}: PropsWithChildren<QubicLedgerProviderProps>) => {
+}: PropsWithChildren<QubicLedgerAppProviderProps>) => {
     const ctx = useContext(LedgerWebHIDContext);
 
     const [app, setApp] = useState<HWAppQubic | null>(null);
@@ -89,7 +89,7 @@ const QubicLedgerProviderWithoutWebHIDProvider = ({
     }, [init, app, initApp]);
 
     return (
-        <QubicLedgerContext.Provider
+        <QubicLedgerAppContext.Provider
             value={{
                 app,
                 selectedAddress,
@@ -102,18 +102,18 @@ const QubicLedgerProviderWithoutWebHIDProvider = ({
             }}
         >
             {children}
-        </QubicLedgerContext.Provider>
+        </QubicLedgerAppContext.Provider>
     );
 };
 
-export const QubicLedgerProvider = ({
+export const QubicLedgerAppProvider = ({
     children,
     init = true,
     derivationPath,
-}: PropsWithChildren<QubicLedgerProviderProps>) => (
+}: PropsWithChildren<QubicLedgerAppProviderProps>) => (
     <LedgerWebHIDProvider init={false}>
-        <QubicLedgerProviderWithoutWebHIDProvider init={init} derivationPath={derivationPath}>
+        <QubicLedgerAppProviderWithoutWebHIDProvider init={init} derivationPath={derivationPath}>
             {children}
-        </QubicLedgerProviderWithoutWebHIDProvider>
+        </QubicLedgerAppProviderWithoutWebHIDProvider>
     </LedgerWebHIDProvider>
 );

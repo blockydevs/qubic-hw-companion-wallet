@@ -1,20 +1,24 @@
+import { Outlet, Route, Routes as RouterRoutes } from 'react-router';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Outlet, Route, Routes as RouterRoutes } from 'react-router';
 import { Layout } from './layout/Layout';
 import { cssVariablesResolver, mantineTheme } from './layout/mantine.theme';
 import { NavbarContent } from './layout/NavbarContent';
-import { QubicLedgerProvider } from './packages/hw-app-qubic-react';
+import {
+    QubicLedgerAppDeriveredIndexCache,
+    QubicLedgerAppProvider,
+    QubicLedgerDemoModeProvider,
+} from './packages/hw-app-qubic-react';
 import { DashboardContextProvider } from './providers/DashboardContextProvider';
 import { DeviceTypeProvider } from './providers/DeviceTypeProvider';
+import { OverlayForLoadingAddressesFromCacheProvider } from './providers/OverlayForLoadingAddressesFromCacheProvider';
 import { RequireDeviceTypeProvider } from './providers/RequireDeviceTypeProvider';
 import { VerifiedAddressProvider } from './providers/VerifiedAddressProvider';
 import Home from './routes/home/page';
 import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
-import { QubicLedgerDemoModeProvider } from './packages/hw-app-qubic-react/src/providers/QubicLedgerDemoModeProvider';
 
 const queryClient = new QueryClient();
 
@@ -32,7 +36,7 @@ export default function App() {
 
                 <Layout navbarContent={<NavbarContent />}>
                     <DeviceTypeProvider>
-                        <QubicLedgerProvider
+                        <QubicLedgerAppProvider
                             init={false}
                             derivationPath={process.env.REACT_APP_QUBIC_DERIVATION_PATH}
                         >
@@ -46,9 +50,13 @@ export default function App() {
                                             <RequireDeviceTypeProvider>
                                                 <DashboardContextProvider>
                                                     <QubicLedgerDemoModeProvider>
-                                                        <VerifiedAddressProvider>
-                                                            <Outlet />
-                                                        </VerifiedAddressProvider>
+                                                        <QubicLedgerAppDeriveredIndexCache>
+                                                            <OverlayForLoadingAddressesFromCacheProvider>
+                                                                <VerifiedAddressProvider>
+                                                                    <Outlet />
+                                                                </VerifiedAddressProvider>
+                                                            </OverlayForLoadingAddressesFromCacheProvider>
+                                                        </QubicLedgerAppDeriveredIndexCache>
                                                     </QubicLedgerDemoModeProvider>
                                                 </DashboardContextProvider>
                                             </RequireDeviceTypeProvider>
@@ -63,7 +71,7 @@ export default function App() {
                                     </Route>
                                 </RouterRoutes>
                             </QueryClientProvider>
-                        </QubicLedgerProvider>
+                        </QubicLedgerAppProvider>
                     </DeviceTypeProvider>
                 </Layout>
             </MantineProvider>

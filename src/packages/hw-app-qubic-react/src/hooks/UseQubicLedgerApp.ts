@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { useQubicLedgerContext } from './UseQubicLedgerContext';
-import { getAddressFromDerivationPathByIndex } from '../utils/derivation-path';
+import { useQubicLedgerAppContext } from './UseQubicLedgerAppContext';
+import { generateDerivationPathForGivenIndex } from '../utils/derivation-path';
 import qubic from '@qubic-lib/qubic-ts-library';
 
 const MAX_ADDRESS_INDEX = 255;
@@ -15,7 +15,7 @@ export const useQubicLedgerApp = () => {
         derivationPath,
         setSelectedAddressIndex,
         addNewAddress,
-    } = useQubicLedgerContext();
+    } = useQubicLedgerAppContext();
 
     const [isGeneratingAddress, setIsGeneratingAddress] = useState(false);
     const isAppInitialized = Boolean(app);
@@ -28,45 +28,50 @@ export const useQubicLedgerApp = () => {
         return await app.getVersion();
     }, [app]);
 
-    const deriveNewAddress = useCallback(async () => {
-        if (!app) {
-            throw new Error('QubicLedgerApp not initialized');
-        }
-
-        setIsGeneratingAddress(true);
-
-        try {
-            const newAddressIndex = generatedAddresses.length;
-
-            if (newAddressIndex > MAX_ADDRESS_INDEX) {
-                throw new Error('Maximum address index reached');
+    const deriveNewAddress = useCallback(
+        async (newAddressIndex = generatedAddresses.length) => {
+            if (!app) {
+                throw new Error('QubicLedgerApp not initialized');
             }
 
-            const addressDerivationPath = getAddressFromDerivationPathByIndex(
-                derivationPath,
-                newAddressIndex,
-            );
+            setIsGeneratingAddress(true);
 
-            const publicKey = await app.getPublicKey(addressDerivationPath);
+            try {
+                if (newAddressIndex > MAX_ADDRESS_INDEX) {
+                    throw new Error('Maximum address index reached');
+                }
 
-            const identity = await new qubic.QubicHelper().getIdentity(publicKey);
+                if (newAddressIndex < generatedAddresses.length) {
+                    throw new Error('Address with this index already exists');
+                }
 
-            const generatedAddressData = {
-                identity,
-                publicKey: Buffer.from(publicKey).toString('hex'),
-                addressDerivationPath,
-                addressIndex: newAddressIndex,
-            };
+                const addressDerivationPath = generateDerivationPathForGivenIndex(
+                    derivationPath,
+                    newAddressIndex,
+                );
 
-            addNewAddress(generatedAddressData);
+                const publicKey = await app.getPublicKey(addressDerivationPath);
 
-            return generatedAddressData;
-        } catch (error) {
-            throw new Error(`Error generating new address: ${error.message}`);
-        } finally {
-            setIsGeneratingAddress(false);
-        }
-    }, [app, addNewAddress, generatedAddresses]);
+                const identity = await new qubic.QubicHelper().getIdentity(publicKey);
+
+                const generatedAddressData = {
+                    identity,
+                    publicKey: Buffer.from(publicKey).toString('hex'),
+                    addressDerivationPath,
+                    addressIndex: newAddressIndex,
+                };
+
+                addNewAddress(generatedAddressData);
+
+                return generatedAddressData;
+            } catch (error) {
+                throw new Error(`Error generating new address: ${error.message}`);
+            } finally {
+                setIsGeneratingAddress(false);
+            }
+        },
+        [app, addNewAddress, generatedAddresses, derivationPath, setIsGeneratingAddress],
+    );
 
     const selectAddressByIndex = useCallback(
         (index: number) => {

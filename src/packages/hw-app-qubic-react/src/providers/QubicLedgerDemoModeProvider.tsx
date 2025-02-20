@@ -1,16 +1,16 @@
 import type { PropsWithChildren } from 'react';
 import { use, useEffect } from 'react';
-import { QubicLedgerContext } from './QubicLedgerProvider';
 import { DeviceTypeContext } from '../../../../providers/DeviceTypeProvider';
+import { useQubicLedgerAppContext } from '../hooks/UseQubicLedgerAppContext';
 
 export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => {
-    const ctx = use(QubicLedgerContext);
+    const { generatedAddresses, addNewAddress } = useQubicLedgerAppContext();
     const { deviceType } = use(DeviceTypeContext);
 
     const isDemoMode = deviceType === 'demo';
 
     const generateDemoAddress = async () => {
-        const newAddressIndex = ctx?.generatedAddresses ? ctx.generatedAddresses.length + 1 : 1;
+        const newAddressIndex = generatedAddresses ? generatedAddresses.length + 1 : 1;
 
         const addressDerivationPath = "m/44'/4218'/0'/0'/" + newAddressIndex;
 
@@ -25,7 +25,7 @@ export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => 
             addressIndex: newAddressIndex,
         };
 
-        ctx?.addNewAddress(generatedAddressData);
+        addNewAddress(generatedAddressData);
 
         return generatedAddressData;
     };
@@ -35,10 +35,6 @@ export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => 
             generateDemoAddress();
         }
     }, [isDemoMode]);
-
-    if (!ctx) {
-        throw new Error('QubicLedgerContext not found');
-    }
 
     return children;
 };

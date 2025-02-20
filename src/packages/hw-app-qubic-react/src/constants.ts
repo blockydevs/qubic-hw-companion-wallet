@@ -1,0 +1,1 @@
+export const QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY = 'qubic-ledger-wallet_CACHED_INDEXES';

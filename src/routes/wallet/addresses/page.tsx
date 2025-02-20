@@ -126,7 +126,7 @@ export const WalletAddressesPage = () => {
                     <Center>
                         <Button
                             leftSection={<AddCircleIcon sx={{ fontSize: '0.875rem' }} />}
-                            onClick={deriveNewAddress}
+                            onClick={async () => await deriveNewAddress()}
                             disabled={isGenerateNewAddressButtonDisabled}
                         >
                             {isGeneratingAddress ? 'Generating...' : 'Generate New Address'}
