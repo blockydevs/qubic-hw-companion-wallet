@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY } from '../constants';
 import { useQubicLedgerApp } from '../hooks/UseQubicLedgerApp';
 import { getCache, setCache } from '../utils/local-storage-cache';
@@ -14,6 +14,7 @@ export const QubicLedgerAppDeriveredIndexCacheContext =
 export const QubicLedgerAppDeriveredIndexCache = ({ children }: PropsWithChildren) => {
     const { generatedAddresses, deriveNewAddress } = useQubicLedgerApp();
     const [isLoadingAddressesFromCache, setIsLoadingAddressesFromCache] = useState(false);
+    const isInitialized = useRef(false);
 
     const deriveCachedAddresses = useCallback(async () => {
         const lastDeriveredAddressFromCache =
@@ -46,8 +47,14 @@ export const QubicLedgerAppDeriveredIndexCache = ({ children }: PropsWithChildre
     }, [generatedAddresses, setCache]);
 
     useEffect(() => {
+        if (isInitialized.current) {
+            return;
+        }
+
+        isInitialized.current = true;
+
         deriveCachedAddresses();
-    }, []);
+    }, [deriveCachedAddresses]);
 
     useEffect(() => {
         if (isLoadingAddressesFromCache) {
@@ -55,11 +62,7 @@ export const QubicLedgerAppDeriveredIndexCache = ({ children }: PropsWithChildre
         }
 
         updateLastDeriveredAddressIndexInLocalStorage();
-    }, [
-        generatedAddresses,
-        isLoadingAddressesFromCache,
-        updateLastDeriveredAddressIndexInLocalStorage,
-    ]);
+    }, [updateLastDeriveredAddressIndexInLocalStorage, isLoadingAddressesFromCache]);
 
     return (
         <QubicLedgerAppDeriveredIndexCacheContext value={{ isLoadingAddressesFromCache }}>
