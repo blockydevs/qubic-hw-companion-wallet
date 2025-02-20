@@ -1,4 +1,4 @@
-import { use } from 'react';
+import { use, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -17,6 +17,8 @@ import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
 import { useQubicLedgerApp } from '../../../packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '../../../providers/DeviceTypeProvider';
 import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
+import { notifications } from '@mantine/notifications';
+import { IQubicLedgerAddress } from '@/src/packages/hw-app-qubic-react/src/types';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -44,6 +46,60 @@ export const WalletAddressesPage = () => {
         useQrCodeModal(selectedAddress?.identity ?? '');
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
+
+    const handleSelectAddress = useCallback(
+        async (address: IQubicLedgerAddress) => {
+            if (verifiedIdentities.includes(address.identity)) {
+                selectAddressByIndex(address.addressIndex);
+
+                return;
+            }
+
+            try {
+                const isAddressVerified = await verifyAddress(address);
+
+                if (isAddressVerified) {
+                    selectAddressByIndex(address.addressIndex);
+
+                    notifications.show({
+                        title: 'Success',
+                        message: 'Address verified successfully and used as selected address',
+                    });
+                }
+            } catch (error) {
+                notifications.show({
+                    title: 'Error',
+                    message:
+                        error instanceof Error
+                            ? error.message
+                            : 'Failed to verify address (Unknown reason)',
+                });
+            }
+        },
+        [selectAddressByIndex, verifiedIdentities, verifyAddress],
+    );
+
+    const handleVerifyAddress = useCallback(
+        async (address: IQubicLedgerAddress) => {
+            try {
+                await verifyAddress(address);
+
+                notifications.show({
+                    title: 'Success',
+                    message: 'Address verified successfully',
+                });
+            } catch (error) {
+                notifications.show({
+                    title: 'Error',
+                    message:
+                        error instanceof Error
+                            ? error.message
+                            : 'Failed to verify address (Unknown reason)',
+                });
+            }
+        },
+        [verifyAddress],
+    );
 
     return (
         <>
@@ -100,8 +156,10 @@ export const WalletAddressesPage = () => {
                                     isAddressVerified: verifiedIdentities.includes(
                                         address.identity,
                                     ),
-                                    onAccountNameAndAddressClick: () => selectAddressByIndex(index),
-                                    onVerifyAddressClick: () => verifyAddress(address),
+                                    onAccountNameAndAddressClick: async () =>
+                                        await handleSelectAddress(address),
+                                    onVerifyAddressClick: async () =>
+                                        await handleVerifyAddress(address),
                                 }}
                                 afterAccountDetails={
                                     <AddressCardBalance
@@ -129,8 +187,8 @@ export const WalletAddressesPage = () => {
                                                   <RadioButtonUncheckedIcon htmlColor='var(--mantine-color-brand-text)' />
                                               ),
                                               label: 'Select address',
-                                              onClick: () => {
-                                                  selectAddressByIndex(index);
+                                              onClick: async () => {
+                                                  await handleSelectAddress(address);
                                               },
                                           },
                                     {
