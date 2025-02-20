@@ -27,7 +27,7 @@ export const useQubicLedgerApp = () => {
         setIsGeneratingAddress(true);
 
         try {
-            const newAddressIndex = ctx.generatedAddresses.length + 1;
+            const newAddressIndex = ctx.generatedAddresses.length;
 
             if (newAddressIndex > MAX_ADDRESS_INDEX) {
                 throw new Error('Maximum address index reached');
