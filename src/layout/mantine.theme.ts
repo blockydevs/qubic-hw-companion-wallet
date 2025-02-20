@@ -102,6 +102,7 @@ export const mantineTheme = createTheme({
         buttonLightColor: colorsTuple('#ffffff'),
 
         cardBackground: colorsTuple('#151e27'),
+        cardActiveBackground: colorsTuple('#1b2733'),
         cardBoxShadow: colorsTuple('1px 1px 1px 0px rgba(63, 62, 62, 1)'),
         carorderColor: colorsTuple('#192531'),
     },
