@@ -11,7 +11,7 @@ import {
     QubicLedgerDemoModeProvider,
 } from './packages/hw-app-qubic-react';
 import { DashboardContextProvider } from './providers/DashboardContextProvider';
-import { DeviceTypeProvider } from './providers/DeviceTypeProvider';
+import { DeviceTypeContext, DeviceTypeProvider } from './providers/DeviceTypeProvider';
 import { OverlayForLoadingAddressesFromCacheProvider } from './providers/OverlayForLoadingAddressesFromCacheProvider';
 import { RequireDeviceTypeProvider } from './providers/RequireDeviceTypeProvider';
 import { VerifiedAddressProvider } from './providers/VerifiedAddressProvider';
@@ -49,15 +49,23 @@ export default function App() {
                                         element={
                                             <RequireDeviceTypeProvider>
                                                 <DashboardContextProvider>
-                                                    <QubicLedgerDemoModeProvider>
-                                                        <QubicLedgerAppDeriveredIndexCache>
-                                                            <OverlayForLoadingAddressesFromCacheProvider>
-                                                                <VerifiedAddressProvider>
-                                                                    <Outlet />
-                                                                </VerifiedAddressProvider>
-                                                            </OverlayForLoadingAddressesFromCacheProvider>
-                                                        </QubicLedgerAppDeriveredIndexCache>
-                                                    </QubicLedgerDemoModeProvider>
+                                                    <DeviceTypeContext.Consumer>
+                                                        {({ deviceType }) => (
+                                                            <QubicLedgerDemoModeProvider
+                                                                enabled={deviceType === 'demo'}
+                                                            >
+                                                                <QubicLedgerAppDeriveredIndexCache
+                                                                    enabled={deviceType !== 'demo'}
+                                                                >
+                                                                    <OverlayForLoadingAddressesFromCacheProvider>
+                                                                        <VerifiedAddressProvider>
+                                                                            <Outlet />
+                                                                        </VerifiedAddressProvider>
+                                                                    </OverlayForLoadingAddressesFromCacheProvider>
+                                                                </QubicLedgerAppDeriveredIndexCache>
+                                                            </QubicLedgerDemoModeProvider>
+                                                        )}
+                                                    </DeviceTypeContext.Consumer>
                                                 </DashboardContextProvider>
                                             </RequireDeviceTypeProvider>
                                         }

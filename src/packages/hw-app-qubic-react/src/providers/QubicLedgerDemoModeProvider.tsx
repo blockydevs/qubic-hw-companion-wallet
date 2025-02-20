@@ -1,13 +1,16 @@
 import type { PropsWithChildren } from 'react';
-import { use, useEffect } from 'react';
-import { DeviceTypeContext } from '../../../../providers/DeviceTypeProvider';
+import { useEffect } from 'react';
 import { useQubicLedgerAppContext } from '../hooks/UseQubicLedgerAppContext';
 
-export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => {
-    const { generatedAddresses, addNewAddress } = useQubicLedgerAppContext();
-    const { deviceType } = use(DeviceTypeContext);
+interface QubicLedgerDemoModeProviderProps {
+    enabled?: boolean;
+}
 
-    const isDemoMode = deviceType === 'demo';
+export const QubicLedgerDemoModeProvider = ({
+    children,
+    enabled = true,
+}: PropsWithChildren<QubicLedgerDemoModeProviderProps>) => {
+    const { generatedAddresses, addNewAddress } = useQubicLedgerAppContext();
 
     const generateDemoAddress = async () => {
         const newAddressIndex = generatedAddresses ? generatedAddresses.length + 1 : 1;
@@ -31,10 +34,10 @@ export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => 
     };
 
     useEffect(() => {
-        if (isDemoMode) {
+        if (enabled) {
             generateDemoAddress();
         }
-    }, [isDemoMode]);
+    }, [enabled]);
 
     return children;
 };
