@@ -1,44 +1,53 @@
-import { use, useCallback, useState } from 'react';
-import { QubicLedgerContext } from '../providers/QubicLedgerProvider';
+import { useCallback, useState } from 'react';
+import { useQubicLedgerContext } from './UseQubicLedgerContext';
 import { getAddressFromDerivationPathByIndex } from '../utils/derivation-path';
 import qubic from '@qubic-lib/qubic-ts-library';
 
 const MAX_ADDRESS_INDEX = 255;
 
 export const useQubicLedgerApp = () => {
-    const ctx = use(QubicLedgerContext);
+    const {
+        app,
+        initApp,
+        reset,
+        generatedAddresses,
+        selectedAddress,
+        derivationPath,
+        setSelectedAddressIndex,
+        addNewAddress,
+    } = useQubicLedgerContext();
 
     const [isGeneratingAddress, setIsGeneratingAddress] = useState(false);
-    const isAppInitialized = Boolean(ctx?.app);
+    const isAppInitialized = Boolean(app);
 
     const getVersion = useCallback(async () => {
-        if (!ctx?.app) {
+        if (!app) {
             return null;
         }
 
-        return await ctx.app.getVersion();
-    }, [ctx?.app]);
+        return await app.getVersion();
+    }, [app]);
 
     const deriveNewAddress = useCallback(async () => {
-        if (!ctx?.app) {
+        if (!app) {
             throw new Error('QubicLedgerApp not initialized');
         }
 
         setIsGeneratingAddress(true);
 
         try {
-            const newAddressIndex = ctx.generatedAddresses.length;
+            const newAddressIndex = generatedAddresses.length;
 
             if (newAddressIndex > MAX_ADDRESS_INDEX) {
                 throw new Error('Maximum address index reached');
             }
 
             const addressDerivationPath = getAddressFromDerivationPathByIndex(
-                ctx.derivationPath,
+                derivationPath,
                 newAddressIndex,
             );
 
-            const publicKey = await ctx.app.getPublicKey(addressDerivationPath);
+            const publicKey = await app.getPublicKey(addressDerivationPath);
 
             const identity = await new qubic.QubicHelper().getIdentity(publicKey);
 
@@ -46,10 +55,10 @@ export const useQubicLedgerApp = () => {
                 identity,
                 publicKey: Buffer.from(publicKey).toString('hex'),
                 addressDerivationPath,
-                addressindex: newAddressIndex,
+                addressIndex: newAddressIndex,
             };
 
-            ctx.addNewAddress(generatedAddressData);
+            addNewAddress(generatedAddressData);
 
             return generatedAddressData;
         } catch (error) {
@@ -57,43 +66,38 @@ export const useQubicLedgerApp = () => {
         } finally {
             setIsGeneratingAddress(false);
         }
-    }, [ctx?.app, ctx?.addNewAddress, ctx?.generatedAddresses]);
+    }, [app, addNewAddress, generatedAddresses]);
 
     const selectAddressByIndex = useCallback(
         (index: number) => {
-            if (!ctx?.generatedAddresses.length) {
+            if (!generatedAddresses.length) {
                 throw new Error('No generated addresses. Generate address first.');
             }
 
-            if (index < 0 || index > ctx.generatedAddresses.length - 1) {
+            if (index < 0 || index > generatedAddresses.length - 1) {
                 throw new Error('Selected address index is out of bounds');
             }
 
-            ctx.setSelectedAddressIndex(index);
+            setSelectedAddressIndex(index);
         },
-        [ctx?.generatedAddresses, ctx?.setSelectedAddressIndex],
+        [generatedAddresses, setSelectedAddressIndex],
     );
 
     const clearSelectedAddress = useCallback(() => {
-        ctx.setSelectedAddressIndex(null);
-    }, [ctx?.setSelectedAddressIndex]);
-
-    if (!ctx) {
-        throw new Error('The "useQubicLedgerApp" is used outside of the "QubicLedgerProvider"');
-    }
-
-    const { app, initApp } = ctx;
+        setSelectedAddressIndex(null);
+    }, [setSelectedAddressIndex]);
 
     return {
         app,
         isAppInitialized,
-        generatedAddresses: ctx.generatedAddresses,
-        selectedAddress: ctx.selectedAddress,
+        generatedAddresses,
+        selectedAddress,
         isGeneratingAddress,
         selectAddressByIndex,
         initApp,
         getVersion,
         deriveNewAddress,
         clearSelectedAddress,
+        reset,
     };
 };

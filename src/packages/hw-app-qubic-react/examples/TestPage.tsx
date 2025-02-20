@@ -85,7 +85,7 @@ export const TestPageContent = () => {
                     <ul>
                         {generatedAddresses.map((address, index) => (
                             <li key={index}>
-                                <p>Address Index: {address.addressindex}</p>
+                                <p>Address Index: {address.addressIndex}</p>
                                 <p>Public Key: {address.publicKey}</p>
                                 <p>Identity: {address.identity}</p>
                                 <p>Derivation Path: {address.addressDerivationPath}</p>

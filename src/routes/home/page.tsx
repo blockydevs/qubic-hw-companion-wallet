@@ -7,13 +7,14 @@ import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import { IS_DEMO_MODE } from '../../constants';
-import { QubicLedgerContext } from '../../packages/hw-app-qubic-react/src/providers/QubicLedgerProvider';
+import { useQubicLedgerApp } from '../../packages/hw-app-qubic-react';
 
 export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
-    const { initApp, app, reset } = use(QubicLedgerContext);
+
+    const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
     const handleConnect = useCallback(
         async (type: 'usb') => {
@@ -34,9 +35,15 @@ export default function Home() {
         navigate(`/wallet/addresses`, { replace: true });
     }, [navigate, setDeviceType]);
 
+    const resetIfAddressesExistHandler = useCallback(() => {
+        if (generatedAddresses.length) {
+            reset();
+        }
+    }, [generatedAddresses]);
+
     useEffect(() => {
-        reset();
-    }, []);
+        resetIfAddressesExistHandler();
+    }, [resetIfAddressesExistHandler]);
 
     return (
         <Flex align='center' direction='column' w='100%'>

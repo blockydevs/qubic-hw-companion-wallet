@@ -22,7 +22,7 @@ export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => 
             identity,
             publicKey,
             addressDerivationPath,
-            addressindex: newAddressIndex,
+            addressIndex: newAddressIndex,
         };
 
         ctx?.addNewAddress(generatedAddressData);

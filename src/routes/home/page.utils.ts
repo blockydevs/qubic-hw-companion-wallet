@@ -8,8 +8,8 @@ export const prepareAppData = async (deviceType = 'usb', transport: Transport) =
         return true;
     }
 
-    if (deviceType !== 'usb' && deviceType !== 'bluetooth') {
-        throw new Error(`Invalid device type: ${deviceType} - must be "usb" or "bluetooth"`);
+    if (deviceType !== 'usb') {
+        throw new Error(`Unsupported device type: ${deviceType}. Please use "usb" or "demo" mode.`);
     }
 
     try {
@@ -20,7 +20,7 @@ export const prepareAppData = async (deviceType = 'usb', transport: Transport) =
         } else {
             notifications.show({
                 title: 'Action Required',
-                message: 'Please open the Kaspa app on your device.',
+                message: 'Please open the Qubic app on your device.',
             });
             return false;
         }
