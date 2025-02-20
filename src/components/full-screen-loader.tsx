@@ -17,7 +17,7 @@ export const FullScreenLoader = ({
             loaderProps={{
                 children: (
                     <Paper bg='cardBackgroundTransaprent'>
-                        <Stack justify='center' align='center' maw='645px' p='md'>
+                        <Stack justify='center' align='center' maw='625px' p='md'>
                             <Loader size='lg' />
                             <Stack gap='xs'>
                                 <Title ta='center' component='p' size='h2'>

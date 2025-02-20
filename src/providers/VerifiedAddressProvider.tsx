@@ -32,7 +32,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
     const overlayMessage =
         verifiedIdentities.length > 0
             ? `Please verify the ${addressInVerificationProcess} address on your device.`
-            : `Before continuing to interact with the app, verify the ${addressInVerificationProcess} address on your device.`;
+            : `Before continuing to interact with the app, verify the first address (${addressInVerificationProcess}) on your device.`;
 
     const verifyAddress = useCallback(
         async (qubicAddressToVerify: IQubicLedgerAddress) => {
