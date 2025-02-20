@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
-import { QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY } from '../constants';
+import { QUBIC_WALLET_LAST_CACHED_INDEXES_LOCAL_STORAGE_KEY } from '../constants';
 import { useQubicLedgerApp } from '../hooks/UseQubicLedgerApp';
 import { getCache, setCache } from '../utils/local-storage-cache';
 
@@ -25,7 +25,7 @@ export const QubicLedgerAppDeriveredIndexCache = ({
 
     const deriveCachedAddresses = useCallback(async () => {
         const lastDeriveredAddressFromCache =
-            getCache<string>(QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY) || 0;
+            getCache<string>(QUBIC_WALLET_LAST_CACHED_INDEXES_LOCAL_STORAGE_KEY) || 0;
 
         if (!lastDeriveredAddressFromCache) {
             return;
@@ -44,13 +44,13 @@ export const QubicLedgerAppDeriveredIndexCache = ({
         const lastDeriveredAddressIndex = generatedAddresses.length;
 
         const lastDeriveredAddressFromCache =
-            getCache<number>(QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY) || 0;
+            getCache<number>(QUBIC_WALLET_LAST_CACHED_INDEXES_LOCAL_STORAGE_KEY) || 0;
 
         if (lastDeriveredAddressIndex <= lastDeriveredAddressFromCache) {
             return;
         }
 
-        setCache(QUBIC_WALLET_CACHED_INDEXES_LOCAL_STORAGE_KEY, lastDeriveredAddressIndex);
+        setCache(QUBIC_WALLET_LAST_CACHED_INDEXES_LOCAL_STORAGE_KEY, lastDeriveredAddressIndex);
     }, [generatedAddresses, setCache]);
 
     useEffect(() => {
