@@ -81,11 +81,11 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
     );
 
     const verifyFirstDerivedAddressHandler = useCallback(async () => {
-        if (!selectedAddress) {
+        if (!selectedAddress || deviceType === 'demo') {
             return;
         }
 
-        if (deviceType !== 'demo' && selectedAddress && !verifiedIdentities.length) {
+        if (selectedAddress && !verifiedIdentities.length) {
             try {
                 await verifyAddress(selectedAddress);
 
