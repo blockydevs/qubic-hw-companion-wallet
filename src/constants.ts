@@ -9,3 +9,5 @@ export const NAVBAR_TRANSITION_TIMING_FUNCTION = 'ease';
 export const HEADER_HEIGHT = 64;
 
 export const MAX_APP_WIDTH = 1920;
+
+export const TRANSACTIONS_PAGE_SIZE = 10;
