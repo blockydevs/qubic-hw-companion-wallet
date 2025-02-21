@@ -12,6 +12,7 @@
             "jsx": true
         }
     },
+    "ignorePatterns": ["src/packages/"],
     "env": {
         "es6": true
     }

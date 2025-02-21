@@ -1,29 +1,26 @@
-import { notifications } from '@mantine/notifications';
 import { TransportOpenUserCancelled } from '@ledgerhq/errors';
-import { getAppAndVersion, initTransport } from '../../lib/ledger';
+import type Transport from '@ledgerhq/hw-transport';
+import { notifications } from '@mantine/notifications';
+import { getAppAndVersion } from '../../lib/ledger';
 
-export const prepareAppData = async (deviceType = 'usb') => {
+export const prepareAppData = async (deviceType = 'usb', transport: Transport) => {
     if (deviceType === 'demo') {
         return true;
     }
 
-    if (deviceType !== 'usb' && deviceType !== 'bluetooth') {
-        throw new Error(`Invalid device type: ${deviceType} - must be "usb" or "bluetooth"`);
+    if (deviceType !== 'usb') {
+        throw new Error(`Unsupported device type: ${deviceType}. Please use "usb" or "demo" mode.`);
     }
 
     try {
-        /**
-         * @type {Transport}
-         */
-        const transport = await initTransport(deviceType);
         const { name } = await getAppAndVersion(transport);
 
-        if (name == 'Kaspa') {
+        if (name == 'Qubic') {
             return true;
         } else {
             notifications.show({
                 title: 'Action Required',
-                message: 'Please open the Kaspa app on your device.',
+                message: 'Please open the Qubic app on your device.',
             });
             return false;
         }

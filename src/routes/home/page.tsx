@@ -1,4 +1,4 @@
-import { use, useCallback } from 'react';
+import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
@@ -7,23 +7,43 @@ import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import UsbIcon from '@mui/icons-material/Usb';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import { IS_DEMO_MODE } from '../../constants';
+import { useQubicLedgerApp } from '../../packages/hw-app-qubic-react';
 
 export default function Home() {
     const navigate = useNavigate();
 
     const { setDeviceType } = use(DeviceTypeContext);
 
+    const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
+
     const handleConnect = useCallback(
-        async (type: 'usb' | 'demo') => {
-            const isAppDataPrepared = await prepareAppData(type);
+        async (type: 'usb') => {
+            const qubicLedgerApp = app ?? (await initApp());
+
+            const isAppDataPrepared = await prepareAppData(type, qubicLedgerApp.transport);
 
             if (isAppDataPrepared) {
                 setDeviceType(type);
                 navigate(`/wallet/addresses`, { replace: true });
             }
         },
-        [navigate, setDeviceType],
+        [navigate, setDeviceType, initApp],
     );
+
+    const handleConnectToDemo = useCallback(() => {
+        setDeviceType('demo');
+        navigate(`/wallet/addresses`, { replace: true });
+    }, [navigate, setDeviceType]);
+
+    const resetIfAddressesExistHandler = useCallback(() => {
+        if (generatedAddresses.length) {
+            reset();
+        }
+    }, [generatedAddresses]);
+
+    useEffect(() => {
+        resetIfAddressesExistHandler();
+    }, [resetIfAddressesExistHandler]);
 
     return (
         <Flex align='center' direction='column' w='100%'>
@@ -57,7 +77,7 @@ export default function Home() {
                                 rightSection={<span />}
                                 variant='button-light'
                                 justify='space-between'
-                                onClick={() => handleConnect('demo')}
+                                onClick={handleConnectToDemo}
                             >
                                 Go to demo mode
                             </Button>
