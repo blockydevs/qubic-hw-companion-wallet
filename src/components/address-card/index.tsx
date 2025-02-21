@@ -43,6 +43,7 @@ export const AddressCard = ({
             }}
             pb='1rem'
             component='div'
+            bg={isSelected ? 'cardActiveBackground' : undefined}
             {...paperProps}
         >
             <Stack>
