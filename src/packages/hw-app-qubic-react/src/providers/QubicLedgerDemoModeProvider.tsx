@@ -1,16 +1,20 @@
 import type { PropsWithChildren } from 'react';
-import { use, useEffect } from 'react';
-import { QubicLedgerContext } from './QubicLedgerProvider';
-import { DeviceTypeContext } from '../../../../providers/DeviceTypeProvider';
+import { useEffect, useRef } from 'react';
+import { useQubicLedgerAppContext } from '../hooks/UseQubicLedgerAppContext';
 
-export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => {
-    const ctx = use(QubicLedgerContext);
-    const { deviceType } = use(DeviceTypeContext);
+interface QubicLedgerDemoModeProviderProps {
+    enabled?: boolean;
+}
 
-    const isDemoMode = deviceType === 'demo';
+export const QubicLedgerDemoModeProvider = ({
+    children,
+    enabled = true,
+}: PropsWithChildren<QubicLedgerDemoModeProviderProps>) => {
+    const { generatedAddresses, addNewAddress } = useQubicLedgerAppContext();
+    const isInitialized = useRef(false);
 
     const generateDemoAddress = async () => {
-        const newAddressIndex = ctx?.generatedAddresses ? ctx.generatedAddresses.length + 1 : 1;
+        const newAddressIndex = generatedAddresses ? generatedAddresses.length + 1 : 1;
 
         const addressDerivationPath = "m/44'/4218'/0'/0'/" + newAddressIndex;
 
@@ -25,20 +29,20 @@ export const QubicLedgerDemoModeProvider = ({ children }: PropsWithChildren) => 
             addressIndex: newAddressIndex,
         };
 
-        ctx?.addNewAddress(generatedAddressData);
+        addNewAddress(generatedAddressData);
 
         return generatedAddressData;
     };
 
     useEffect(() => {
-        if (isDemoMode) {
-            generateDemoAddress();
+        if (isInitialized.current || !enabled) {
+            return;
         }
-    }, [isDemoMode]);
 
-    if (!ctx) {
-        throw new Error('QubicLedgerContext not found');
-    }
+        isInitialized.current = true;
+
+        generateDemoAddress();
+    }, [generateDemoAddress]);
 
     return children;
 };

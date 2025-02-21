@@ -1,10 +1,11 @@
-import { notifications } from '@mantine/notifications';
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
-import { QubicLedgerContext } from '../packages/hw-app-qubic-react/src/providers/QubicLedgerProvider';
+import { notifications } from '@mantine/notifications';
 import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
-import { Loader, LoadingOverlay, Paper, Stack, Text, Title } from '@mantine/core';
 import { DeviceTypeContext } from './DeviceTypeProvider';
+import { useQubicLedgerAppContext } from '../packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
+import { useQubicLedgerAppDeriveredIndexCacheContext } from '../packages/hw-app-qubic-react';
+import { FullScreenLoader } from '../components/full-screen-loader';
 
 interface IVerifiedAddressContext {
     verifiedIdentities: string[];
@@ -25,12 +26,13 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
 
     const isVerificationInProgress = Boolean(addressInVerificationProcess);
 
-    const { app, selectedAddress } = use(QubicLedgerContext);
+    const { app, selectedAddress } = useQubicLedgerAppContext();
+    const { isLoadingAddressesFromCache } = useQubicLedgerAppDeriveredIndexCacheContext();
 
     const overlayMessage =
         verifiedIdentities.length > 0
             ? `Please verify the ${addressInVerificationProcess} address on your device.`
-            : `Before continuing to interact with the app, verify the ${addressInVerificationProcess} address on your device.`;
+            : `Before continuing to interact with the app, verify the first address (${addressInVerificationProcess}) on your device.`;
 
     const verifyAddress = useCallback(
         async (qubicAddressToVerify: IQubicLedgerAddress) => {
@@ -104,45 +106,19 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
     }, [selectedAddress, deviceType, verifiedIdentities.length, verifyAddress, verifiedIdentities]);
 
     useEffect(() => {
-        verifyFirstDerivedAddressHandler();
-    }, [verifyFirstDerivedAddressHandler]);
+        if (!isLoadingAddressesFromCache) {
+            verifyFirstDerivedAddressHandler();
+        }
+    }, [verifyFirstDerivedAddressHandler, isLoadingAddressesFromCache]);
 
     return (
         <VerifiedAddressContext value={{ verifiedIdentities, verifyAddress }}>
-            <LoadingOverlay
+            <FullScreenLoader
                 visible={isVerificationInProgress}
-                pos='fixed'
-                transitionProps={{ transition: 'fade', duration: 0.3 }}
-                loaderProps={{
-                    children: (
-                        <Paper bg='cardBackgroundTransaprent'>
-                            <Stack justify='center' align='center' maw='645px' p='md'>
-                                <Loader size='lg' />
-                                <Stack gap='xs'>
-                                    <Title ta='center' component='p' size='h2'>
-                                        Action required
-                                    </Title>
-                                    <Text
-                                        ta='center'
-                                        style={{
-                                            overflowWrap: 'anywhere',
-                                        }}
-                                    >
-                                        {overlayMessage}
-                                    </Text>
-                                </Stack>
-                            </Stack>
-                        </Paper>
-                    ),
-                }}
-                overlayProps={{
-                    color: 'black',
-                    radius: 'sm',
-                    blur: 2,
-                    zIndex: 399, // to be behind notification toasts
-                    p: 'sm',
-                }}
+                message={overlayMessage}
+                title='Action required'
             />
+
             {children}
         </VerifiedAddressContext>
     );
