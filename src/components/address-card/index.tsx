@@ -1,12 +1,12 @@
-import type { PaperProps, PolymorphicComponentProps } from '@mantine/core';
-import { Button, Flex, Paper, Stack, Tooltip } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
-import { copyAddress } from '../../utils/copy';
-import type { AddressCardAccountDetailsProps } from './address-card-account-details';
-import { AddressCardAccountDetails } from './address-card-account-details';
-import type { AddressCardButtonProps } from './address-card-button';
-import { AddressCardButtonWrapper } from './address-card-button-wrapper';
+import type { PaperProps, PolymorphicComponentProps } from '@mantine/core';
+import { Button, Flex, Paper, Stack, Tooltip } from '@mantine/core';
+import { copyAddress } from '@/utils/copy';
+import type { AddressCardAccountDetailsProps } from '@/components/address-card/address-card-account-details';
+import { AddressCardAccountDetails } from '@/components/address-card/address-card-account-details';
+import type { AddressCardButtonProps } from '@/components/address-card/address-card-button';
+import { AddressCardButtonWrapper } from '@/components/address-card/address-card-button-wrapper';
 
 export interface AddressCardProps
     extends Omit<PolymorphicComponentProps<'paper', PaperProps>, 'component' | 'children'> {

@@ -1,4 +1,4 @@
-import { UtxoInfo } from './lib/ledger';
+import { UtxoInfo } from '@/lib/ledger';
 
 export interface IAddressData {
     key: string;

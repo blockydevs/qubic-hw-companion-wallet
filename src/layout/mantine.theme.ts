@@ -25,7 +25,7 @@ import {
     NAVBAR_TRANSITION_DURATION,
     NAVBAR_TRANSITION_TIMING_FUNCTION,
     NAVBAR_WIDTH,
-} from '../constants';
+} from '@/constants';
 
 const variantColorResolver: VariantColorsResolver = (input) => {
     const defaultResolvedColors = defaultVariantColorsResolver(input);

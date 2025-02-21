@@ -1,23 +1,23 @@
+import { use, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Divider, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import ExploreIcon from '@mui/icons-material/Explore';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { use, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { AddressCard } from '../../../components/address-card';
-import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
-import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
-import { DashboardContext } from '../../../providers/DashboardContextProvider';
-import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
-import { ConfirmingSection } from './confirming-section';
-import MessageForm from './message-form';
-import { MissingSelectedAddressView } from './missing-selected-address-view';
-import { useMyOverviewPage } from './page.hooks';
-import { ReplacingTransactionSection } from './replacting-transaction-section';
-import SendForm from './send-form';
-import { useQrCodeModal } from '../../../hooks/qr-code';
-import { QrCodeModal } from '../../../components/qr-code-modal';
+import { AddressCard } from '@/components/address-card';
+import { AddressCardBalance } from '@/components/address-card/address-card-balance';
+import { QrCodeModal } from '@/components/qr-code-modal';
+import { useQrCodeModal } from '@/hooks/qr-code';
+import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
+import { DashboardContext } from '@/providers/DashboardContextProvider';
+import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
+import { ConfirmingSection } from '@/routes/wallet/overview/confirming-section';
+import MessageForm from '@/routes/wallet/overview/message-form';
+import { MissingSelectedAddressView } from '@/routes/wallet/overview/missing-selected-address-view';
+import { useMyOverviewPage } from '@/routes/wallet/overview/page.hooks';
+import { ReplacingTransactionSection } from '@/routes/wallet/overview/replacting-transaction-section';
+import SendForm from '@/routes/wallet/overview/send-form';
 
 const WALLET_ACTIONS = ['Transaction', 'Message'];
 

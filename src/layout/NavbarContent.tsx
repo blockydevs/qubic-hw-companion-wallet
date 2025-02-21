@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router';
-import { NavbarLink } from '../components/navbar-link';
 import { Divider } from '@mantine/core';
+import { NavbarLink } from '@/components/navbar-link';
 
 export const NavbarContent = () => {
     const { pathname } = useLocation();

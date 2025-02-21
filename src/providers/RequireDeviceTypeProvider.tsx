@@ -1,8 +1,8 @@
-import { notifications } from '@mantine/notifications';
 import type { PropsWithChildren } from 'react';
 import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { DeviceTypeContext } from './DeviceTypeProvider';
+import { notifications } from '@mantine/notifications';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 
 export const RequireDeviceTypeProvider = ({ children }: PropsWithChildren) => {
     const { deviceType } = use(DeviceTypeContext);

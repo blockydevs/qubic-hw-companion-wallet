@@ -1,10 +1,10 @@
 import { Anchor, Badge, Button, Group, Loader, Text, Tooltip } from '@mantine/core';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PublishedWithChangesRoundedIcon from '@mui/icons-material/PublishedWithChangesRounded';
-import { TruncatedText } from '../../../components/truncated-text';
-import { sompiToKas } from '../../../lib/kaspa-util';
-import { copyAddress } from '../../../utils/copy';
-import styles from './transaction.module.css';
+import { TruncatedText } from '@/components/truncated-text';
+import { sompiToKas } from '@/lib/kaspa-util';
+import styles from '@/routes/wallet/transactions/transaction.module.css';
+import { copyAddress } from '@/utils/copy';
 
 interface PendingTransactionProps {
     transactionId: string;

@@ -17,11 +17,11 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { TruncatedText } from '../../../components/truncated-text';
-import { copyAddress } from '../../../utils/copy';
-import { formatTimestamp } from '../../../utils/date';
-import { HistoryTransactionDetailItem } from './history-transaction-detail-item';
-import styles from './transaction.module.css';
+import { TruncatedText } from '@/components/truncated-text';
+import { copyAddress } from '@/utils/copy';
+import { formatTimestamp } from '@/utils/date';
+import { HistoryTransactionDetailItem } from '@/routes/wallet/transactions/history-transaction-detail-item';
+import styles from '@/routes/wallet/transactions/transaction.module.css';
 
 interface HistoryTransactionProps {
     transactionId: string;
