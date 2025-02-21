@@ -23,14 +23,14 @@ export const AddressCardAccountDetails = ({
     onCopyAddressClick,
     onVerifyAddressClick,
 }: AddressCardAccountDetailsProps) => (
-    <Stack gap='0'>
+    <Stack gap='0' pos='relative'>
         {isSelected ? (
-            <Text size='sm' c='brand'>
+            <Text size='sm' c='brand' pos='absolute'>
                 Selected account
             </Text>
         ) : null}
 
-        <Group gap='sm'>
+        <Group gap='sm' pt='1rem'>
             <Group
                 gap='sm'
                 onClick={onAccountNameAndAddressClick}
