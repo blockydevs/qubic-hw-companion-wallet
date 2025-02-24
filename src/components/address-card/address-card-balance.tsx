@@ -4,6 +4,7 @@ import { balanceToUSD } from '@/utils/balance';
 
 interface AddressCardBalanceProps {
     balance: string;
+    isLoading?: boolean;
     balanceUSD: {
         isLoading: boolean;
         error: null | Error;
@@ -11,12 +12,25 @@ interface AddressCardBalanceProps {
     };
 }
 
-export const AddressCardBalance = ({ balance, balanceUSD }: AddressCardBalanceProps) => {
+export const AddressCardBalance = ({ balance, balanceUSD, isLoading }: AddressCardBalanceProps) => {
     return (
         <>
-            <Text my='1.25rem' c='brand' fw='bold' size='2.2rem'>
+            <LoadableText
+                my='1.25rem'
+                c='brand'
+                fw='bold'
+                size='2.2rem'
+                skeletonProps={{
+                    w: '4rem',
+                    h: '2.8rem',
+                    my: '1.25rem',
+                }}
+                isDataLoading={isLoading}
+                hasError={false}
+                errorText=''
+            >
                 {balance} QUBIC
-            </Text>
+            </LoadableText>
 
             <LoadableText
                 isDataLoading={balanceUSD.isLoading}

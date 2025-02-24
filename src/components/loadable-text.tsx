@@ -1,6 +1,6 @@
 import React from 'react';
 import { Skeleton, Text } from '@mantine/core';
-import type { PolymorphicComponentProps, TextProps } from '@mantine/core';
+import type { PolymorphicComponentProps, SkeletonProps, TextProps } from '@mantine/core';
 
 export const LoadableText = ({
     children,
@@ -8,15 +8,23 @@ export const LoadableText = ({
     isDataLoading,
     errorColor = 'red',
     errorText = 'Error fetching data',
+    skeletonProps,
     ...textProps
 }: {
     hasError: boolean;
     errorColor?: string;
     errorText?: string;
     isDataLoading: boolean;
-} & PolymorphicComponentProps<'text', TextProps>) => {
+    skeletonProps?: PolymorphicComponentProps<'div', SkeletonProps>;
+} & PolymorphicComponentProps<'p', TextProps>) => {
     if (isDataLoading) {
-        return <Skeleton w='3rem' h='1rem' />;
+        return (
+            <Skeleton
+                w={skeletonProps?.w ?? '6rem'}
+                h={skeletonProps?.h ?? '1rem'}
+                {...skeletonProps}
+            />
+        );
     }
 
     if (hasError) {
