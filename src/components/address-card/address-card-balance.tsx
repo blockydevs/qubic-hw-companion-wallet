@@ -1,4 +1,3 @@
-import { Text } from '@mantine/core';
 import { LoadableText } from '@/components/loadable-text';
 import { balanceToUSD } from '@/utils/balance';
 
