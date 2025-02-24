@@ -32,6 +32,7 @@ export const WalletAddressesPage = () => {
         selectAddressByIndex,
         selectedAddress,
         isGeneratingAddress,
+        areBalanceLoading,
     } = useQubicLedgerApp();
 
     const { verifiedIdentities, verifyAddress } = use(VerifiedAddressContext);
@@ -147,7 +148,8 @@ export const WalletAddressesPage = () => {
                                 afterAccountDetails={
                                     <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
                                         <AddressCardBalance
-                                            balance='0'
+                                            isLoading={areBalanceLoading}
+                                            balance={address.balance}
                                             balanceUSD={{
                                                 isLoading: isQubicPriceInUSDLoading,
                                                 value: qubicPriceInUSD,
