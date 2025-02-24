@@ -1,21 +1,21 @@
+import type { PropsWithChildren } from 'react';
+import { createContext, use, useEffect, useState } from 'react';
 import { LockedDeviceError } from '@ledgerhq/errors';
 import { notifications } from '@mantine/notifications';
 import sha256 from 'crypto-js/sha256';
-import type { PropsWithChildren } from 'react';
-import { createContext, use, useEffect, useState } from 'react';
-import KaspaBIP32 from '../lib/bip32';
-import type { IMempoolEntry } from '../lib/kaspa-rpc/kaspa';
-import { getAddress } from '../lib/ledger';
-import SettingsStore from '../lib/settings-store';
-import { IAddressData, ISelectedAddress } from '../types';
-import { delay } from '../utils/delay';
+import KaspaBIP32 from '@/lib/bip32';
+import type { IMempoolEntry } from '@/lib/kaspa-rpc/kaspa';
+import { getAddress } from '@/lib/ledger';
+import SettingsStore from '@/lib/settings-store';
 import {
     demoLoadAddress,
     getDemoXPub,
     loadAddressDetails,
     loadOrScanAddressBatch,
-} from './DashboardContextProvider.utils';
-import { DeviceTypeContext } from './DeviceTypeProvider';
+} from '@/providers/DashboardContextProvider.utils';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { IAddressData, ISelectedAddress } from '@/types';
+import { delay } from '@/utils/delay';
 
 interface IDashboarContext {
     addresses: IAddressData[];
@@ -61,6 +61,7 @@ export const DashboardContextProvider = ({ children }: PropsWithChildren) => {
 
     async function generateNewAddress() {
         setEnableGenerate(false);
+
         try {
             const newReceiveAddressIndex = userSettings.getSetting('lastReceiveIndex') + 1;
 

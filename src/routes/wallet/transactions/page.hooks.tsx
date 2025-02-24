@@ -1,7 +1,7 @@
 import { use, useEffect, useState, useCallback } from 'react';
-import { TRANSACTIONS_PAGE_SIZE } from '../../../constants';
-import { IMempoolEntry } from '../../../lib/kaspa-rpc/kaspa';
-import { fetchTransactionCount, findTransactionsInMempool } from '../../../lib/ledger';
+import { TRANSACTIONS_PAGE_SIZE } from '@/constants';
+import { IMempoolEntry } from '@/lib/kaspa-rpc/kaspa';
+import { fetchTransactionCount, findTransactionsInMempool } from '@/lib/ledger';
 import { DashboardContext } from '../../../providers/DashboardContextProvider';
 import { loadAddressTransactions, preparePendingTranasactionHistoryRowData } from './page.utils';
 

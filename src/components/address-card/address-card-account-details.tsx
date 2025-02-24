@@ -2,7 +2,7 @@ import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { TruncatedText } from '../truncated-text';
+import { TruncatedText } from '@/components/truncated-text';
 
 export interface AddressCardAccountDetailsProps {
     onAccountNameAndAddressClick?: () => void;

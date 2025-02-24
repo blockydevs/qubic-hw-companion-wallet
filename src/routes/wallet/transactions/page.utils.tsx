@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
-import { fetchTransactions } from '../../../lib/ledger';
-import { TRANSACTIONS_PAGE_SIZE } from '../../../constants';
-import type { ISelectedAddress } from '@/src/types';
-import type { IMempoolEntry } from '@/src/lib/kaspa-rpc/kaspa';
+import type { IMempoolEntry } from '@/lib/kaspa-rpc/kaspa';
+import { fetchTransactions } from '@/lib/ledger';
+import { TRANSACTIONS_PAGE_SIZE } from '@/constants';
+import type { ISelectedAddress } from '@/types';
 
 export const loadAddressTransactions = async (
     selectedAddress: ISelectedAddress,

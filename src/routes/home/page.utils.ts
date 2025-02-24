@@ -1,7 +1,7 @@
 import { TransportOpenUserCancelled } from '@ledgerhq/errors';
 import type Transport from '@ledgerhq/hw-transport';
 import { notifications } from '@mantine/notifications';
-import { getAppAndVersion } from '../../lib/ledger';
+import { getAppAndVersion } from '@/lib/ledger';
 
 export const prepareAppData = async (deviceType = 'usb', transport: Transport) => {
     if (deviceType === 'demo') {

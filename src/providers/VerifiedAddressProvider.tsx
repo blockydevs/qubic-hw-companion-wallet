@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useEffect, useState } from 'react';
 import { notifications } from '@mantine/notifications';
-import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
-import { DeviceTypeContext } from './DeviceTypeProvider';
-import { useQubicLedgerAppContext } from '../packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
-import { useQubicLedgerAppDeriveredIndexCacheContext } from '../packages/hw-app-qubic-react';
-import { FullScreenLoader } from '../components/full-screen-loader';
+import { FullScreenLoader } from '@/components/full-screen-loader';
+import { useQubicLedgerAppDeriveredIndexCacheContext } from '@/packages/hw-app-qubic-react';
+import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
+import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 
 interface IVerifiedAddressContext {
     verifiedIdentities: string[];

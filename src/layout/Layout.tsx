@@ -19,7 +19,7 @@ import {
     NAVBAR_TRANSITION_DURATION,
     NAVBAR_TRANSITION_TIMING_FUNCTION,
     NAVBAR_WIDTH,
-} from '../constants';
+} from '@/constants';
 
 interface LayoutProps
     extends PropsWithChildren<{

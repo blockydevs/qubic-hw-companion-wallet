@@ -1,25 +1,25 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
     Anchor,
     Button,
     Checkbox,
     Group,
-    TextInput,
     Modal,
+    NumberInput,
     Stack,
     Text,
-    NumberInput,
+    TextInput,
     UnstyledButton,
 } from '@mantine/core';
-import { useTimeout, useDisclosure, useViewportSize } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
-import { useState, useEffect } from 'react';
-import { createTransaction, sendAmount, selectUtxos, SendAmountResult } from '../../../lib/ledger';
-import { TruncatedText } from '../../../components/truncated-text';
 import { useForm } from '@mantine/form';
-import { kasToSompi, sompiToKas, NETWORK_UTXO_LIMIT } from '../../../lib/kaspa-util';
-import { IMempoolEntry } from '../../../lib/kaspa-rpc/kaspa';
+import { useDisclosure, useTimeout, useViewportSize } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import { IMempoolEntry } from '@/lib/kaspa-rpc/kaspa';
+import { kasToSompi, NETWORK_UTXO_LIMIT, sompiToKas } from '@/lib/kaspa-util';
+import { createTransaction, selectUtxos, sendAmount, SendAmountResult } from '@/lib/ledger';
+import { TruncatedText } from '@/components/truncated-text';
 
 interface SendFormProps {
     // TODO: set correct typing
