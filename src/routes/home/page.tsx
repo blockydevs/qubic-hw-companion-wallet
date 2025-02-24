@@ -1,7 +1,6 @@
 import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
-import BluetoothIcon from '@mui/icons-material/Bluetooth';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
@@ -85,16 +84,6 @@ export default function Home() {
                             <Divider />
                         </>
                     ) : null}
-
-                    <Button
-                        disabled
-                        variant='button-light'
-                        rightSection={<span />}
-                        justify='space-between'
-                        leftSection={<BluetoothIcon fontSize='small' />}
-                    >
-                        Connect with Bluetooth
-                    </Button>
 
                     <Button
                         rightSection={<span />}
