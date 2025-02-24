@@ -47,41 +47,19 @@ export const WalletAddressesPage = () => {
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
 
-    const handleSelectAddress = useCallback(
-        async (address: IQubicLedgerAddress) => {
-            if (verifiedIdentities.includes(address.identity)) {
-                selectAddressByIndex(address.addressIndex);
-
-                return;
-            }
-
-            try {
-                const isAddressVerified = await verifyAddress(address);
-
-                if (isAddressVerified) {
-                    selectAddressByIndex(address.addressIndex);
-
-                    notifications.show({
-                        title: 'Success',
-                        message: 'Address verified successfully and used as selected address',
-                    });
-                }
-            } catch (error) {
-                notifications.show({
-                    title: 'Error',
-                    message:
-                        error instanceof Error
-                            ? error.message
-                            : 'Failed to verify address (Unknown reason)',
-                });
-            }
-        },
-        [selectAddressByIndex, verifiedIdentities, verifyAddress],
-    );
-
     const handleVerifyAddress = useCallback(
         async (address: IQubicLedgerAddress) => {
             try {
+                if (verifiedIdentities.includes(address.identity)) {
+                    notifications.show({
+                        title: 'Warning',
+                        color: 'orange',
+                        message: 'Address already verified',
+                    });
+
+                    return;
+                }
+
                 await verifyAddress(address);
 
                 notifications.show({
@@ -91,6 +69,7 @@ export const WalletAddressesPage = () => {
             } catch (error) {
                 notifications.show({
                     title: 'Error',
+                    color: 'red',
                     message:
                         error instanceof Error
                             ? error.message
@@ -156,8 +135,8 @@ export const WalletAddressesPage = () => {
                                     isAddressVerified: verifiedIdentities.includes(
                                         address.identity,
                                     ),
-                                    onAccountNameAndAddressClick: async () =>
-                                        await handleSelectAddress(address),
+                                    onAccountNameAndAddressClick: () =>
+                                        selectAddressByIndex(address.addressIndex),
                                     onVerifyAddressClick: async () =>
                                         await handleVerifyAddress(address),
                                 }}
@@ -187,8 +166,8 @@ export const WalletAddressesPage = () => {
                                                   <RadioButtonUncheckedIcon htmlColor='var(--mantine-color-brand-text)' />
                                               ),
                                               label: 'Select address',
-                                              onClick: async () => {
-                                                  await handleSelectAddress(address);
+                                              onClick: () => {
+                                                  selectAddressByIndex(address.addressIndex);
                                               },
                                           },
                                     {
