@@ -194,7 +194,9 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Refresh',
                                         onClick: async () => {
-                                            await refetchBalances();
+                                            if (deviceType !== 'demo') {
+                                                await refetchBalances();
+                                            }
                                         },
                                     },
                                     {
