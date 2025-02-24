@@ -3,14 +3,17 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { HWAppQubic } from '../../../hw-app-qubic';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress } from '../types';
+import { getBalance } from '../utils/rpc';
 
 export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
     selectedAddress: IQubicLedgerAddress | null;
     generatedAddresses: IQubicLedgerAddress[];
+    areBalanceLoading: boolean;
     derivationPath: string;
     initApp: () => Promise<HWAppQubic>;
     addNewAddress: (generatedAddressData: IQubicLedgerAddress) => void;
+    refetchBalances: () => Promise<void>;
     setSelectedAddressIndex: (index: number) => void;
     reset: () => void;
 }
@@ -32,6 +35,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     const [app, setApp] = useState<HWAppQubic | null>(null);
     const [generatedAddresses, setGeneratedAddresses] = useState<IQubicLedgerAddress[]>([]);
     const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | null>(null);
+    const [areBalanceLoading, setAreBalanceLoading] = useState(false);
 
     const selectedAddress = useMemo(() => {
         if (selectedAddressIndex === null) {
@@ -76,6 +80,36 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         [setGeneratedAddresses, selectedAddress],
     );
 
+    const refetchBalances = useCallback(async () => {
+        if (!app) {
+            throw new Error('QubicLedgerApp not initialized');
+        }
+
+        if (areBalanceLoading) {
+            return;
+        }
+
+        setAreBalanceLoading(true);
+
+        const updatedAddresses = await Promise.all(
+            generatedAddresses.map(async (address) => {
+                try {
+                    const balanceResponse = await getBalance(address.identity);
+
+                    return {
+                        ...address,
+                        balance: balanceResponse?.balance ?? '0',
+                    };
+                } catch {
+                    return address;
+                }
+            }),
+        );
+
+        setGeneratedAddresses(updatedAddresses);
+        setAreBalanceLoading(false);
+    }, [app, generatedAddresses, areBalanceLoading]);
+
     const reset = useCallback(() => {
         setApp(null);
         setGeneratedAddresses([]);
@@ -95,8 +129,10 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
                 selectedAddress,
                 generatedAddresses,
                 derivationPath,
+                areBalanceLoading,
                 initApp,
                 addNewAddress,
+                refetchBalances,
                 setSelectedAddressIndex,
                 reset,
             }}

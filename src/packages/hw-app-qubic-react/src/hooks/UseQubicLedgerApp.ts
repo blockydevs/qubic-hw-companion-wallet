@@ -26,6 +26,8 @@ export const useQubicLedgerApp = () => {
         derivationPath,
         setSelectedAddressIndex,
         addNewAddress,
+        refetchBalances,
+        areBalanceLoading,
     } = useQubicLedgerAppContext();
 
     const [isGeneratingAddress, setIsGeneratingAddress] = useState(false);
@@ -112,7 +114,9 @@ export const useQubicLedgerApp = () => {
         generatedAddresses,
         selectedAddress,
         isGeneratingAddress,
+        areBalanceLoading,
         selectAddressByIndex,
+        refetchBalances,
         initApp,
         getVersion,
         deriveNewAddress,

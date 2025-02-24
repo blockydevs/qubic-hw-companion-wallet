@@ -32,6 +32,7 @@ export const WalletAddressesPage = () => {
         selectAddressByIndex,
         selectedAddress,
         isGeneratingAddress,
+        refetchBalances,
         areBalanceLoading,
     } = useQubicLedgerApp();
 
@@ -192,8 +193,10 @@ export const WalletAddressesPage = () => {
                                             <RefreshIcon htmlColor='var(--mantine-color-brand-text)' />
                                         ),
                                         label: 'Refresh',
-                                        onClick: () => {
-                                            alert('refresh');
+                                        onClick: async () => {
+                                            if (deviceType !== 'demo') {
+                                                await refetchBalances();
+                                            }
                                         },
                                     },
                                     {
