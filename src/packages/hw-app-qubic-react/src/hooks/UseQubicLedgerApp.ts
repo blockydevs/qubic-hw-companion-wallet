@@ -6,6 +6,16 @@ import { getBalance } from '../utils/rpc';
 import { MAX_ADDRESS_INDEX } from '../constants';
 import type { IQubicLedgerAddress } from '../types';
 
+const getBalanceHandler = async (identity: string) => {
+    try {
+        const balanceResponse = await getBalance(identity);
+
+        return balanceResponse.balance;
+    } catch {
+        return '0';
+    }
+};
+
 export const useQubicLedgerApp = () => {
     const {
         app,
@@ -55,12 +65,7 @@ export const useQubicLedgerApp = () => {
 
                 const identity = await new qubic.QubicHelper().getIdentity(publicKey);
 
-                let balance = '0';
-                try {
-                    const balanceResponse = await getBalance(identity);
-
-                    balance = balanceResponse.balance;
-                } catch {}
+                const balance = await getBalanceHandler(identity);
 
                 const generatedAddressData: IQubicLedgerAddress = {
                     identity,
