@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import { useQubicLedgerAppDeriveredIndexCacheContext } from '../packages/hw-app-qubic-react';
-import { FullScreenLoader } from '../components/full-screen-loader';
+import { useQubicLedgerAppDeriveredIndexCacheContext } from '@/packages/hw-app-qubic-react';
+import { FullScreenLoader } from '@/components/full-screen-loader';
 
 export const OverlayForLoadingAddressesFromCacheProvider = ({ children }: PropsWithChildren) => {
     const { isLoadingAddressesFromCache } = useQubicLedgerAppDeriveredIndexCacheContext();

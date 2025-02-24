@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, Modal } from '@mantine/core';
-import { QrCode } from './qr-code';
+import { QrCode } from '@/components/qr-code';
 
 interface QrCodeModalProps {
     isQrCodeModalOpened: boolean;

@@ -1,6 +1,7 @@
 import { use, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -9,16 +10,15 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { AddressCard } from '../../../components/address-card';
-import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
-import { QrCodeModal } from '../../../components/qr-code-modal';
-import { useQrCodeModal } from '../../../hooks/qr-code';
-import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
-import { useQubicLedgerApp } from '../../../packages/hw-app-qubic-react';
-import { DeviceTypeContext } from '../../../providers/DeviceTypeProvider';
-import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
-import { notifications } from '@mantine/notifications';
-import { IQubicLedgerAddress } from '@/src/packages/hw-app-qubic-react/src/types';
+import { AddressCard } from '@/components/address-card';
+import { AddressCardBalance } from '@/components/address-card/address-card-balance';
+import { QrCodeModal } from '@/components/qr-code-modal';
+import { useQrCodeModal } from '@/hooks/qr-code';
+import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
+import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();

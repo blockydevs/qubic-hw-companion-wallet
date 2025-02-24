@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useState } from 'react';
-import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
-import { DeviceTypeContext } from './DeviceTypeProvider';
-import { useQubicLedgerAppContext } from '../packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
-import { FullScreenLoader } from '../components/full-screen-loader';
+import { FullScreenLoader } from '@/components/full-screen-loader';
+import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
 
 interface IVerifiedAddressContext {
     verifiedIdentities: string[];

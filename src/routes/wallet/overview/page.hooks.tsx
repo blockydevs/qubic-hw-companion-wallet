@@ -1,14 +1,14 @@
 import { use, useCallback, useState } from 'react';
-import { sompiToKas } from '../../../lib/kaspa-util';
+import { sompiToKas } from '@/lib/kaspa-util';
 import {
     SendAmountResult,
     confirmationsSinceDaaScore,
     fetchAddressDetails,
     fetchBlock,
     trackUntilConfirmed,
-} from '../../../lib/ledger';
-import { DashboardContext } from '../../../providers/DashboardContextProvider';
-import { delay } from '../../../utils/delay';
+} from '@/lib/ledger';
+import { DashboardContext } from '@/providers/DashboardContextProvider';
+import { delay } from '@/utils/delay';
 
 export const useMyOverviewPage = () => {
     const {

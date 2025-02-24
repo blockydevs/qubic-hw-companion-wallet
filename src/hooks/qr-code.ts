@@ -1,5 +1,5 @@
-import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
+import { useDisclosure } from '@mantine/hooks';
 
 export const useQrCodeModal = (initialAddress: string) => {
     const [isQrCodeModalOpened, { open: openQrCodeModal, close: closeQrCodeModal }] =

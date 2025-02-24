@@ -1,6 +1,7 @@
 // Both these packages are expected to be included by react-app-rewired
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
+const path = require('path');
 
 module.exports = function override(config, env) {
     if (env === 'production') {
@@ -30,6 +31,12 @@ module.exports = function override(config, env) {
         zlib: false, // require.resolve("browserify-zlib") can be polyfilled here if needed
     });
     config.resolve.fallback = fallback;
+
+    config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': path.resolve(__dirname, 'src'),
+    };
+
     config.plugins = (config.plugins || []).concat([
         new webpack.ProvidePlugin({
             process: 'process/browser',

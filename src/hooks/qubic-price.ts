@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getTokensPriceFromCoingecko } from '../lib/coingecko';
+import { getTokensPriceFromCoingecko } from '@/lib/coingecko';
 
 export const useQubicPriceFromCoingecko = () => {
     const { data, isLoading, isFetching, isPending, isError, isLoadingError, error } = useQuery({

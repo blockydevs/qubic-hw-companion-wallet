@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react';
 import type { SetStateAction, PropsWithChildren, Dispatch } from 'react';
-import type { DeviceType } from '../types';
+import type { DeviceType } from '@/types';
 
 interface IDeviceTypeContext {
     deviceType: DeviceType | null;
