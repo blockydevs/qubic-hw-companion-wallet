@@ -1,8 +1,8 @@
 import { Divider, Group, Loader, Pagination, Stack, Text, Title } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { useTransactionsPage } from './page.hooks';
-import { PendingTransaction } from './pending-transaction';
-import { HistoryTransaction } from './history-transaction';
+import { useTransactionsPage } from '@/routes/wallet/transactions/page.hooks';
+import { PendingTransaction } from '@/routes/wallet/transactions/pending-transaction';
+import { HistoryTransaction } from '@/routes/wallet/transactions/history-transaction';
 
 export const WalletTransactionsPage = () => {
     const {

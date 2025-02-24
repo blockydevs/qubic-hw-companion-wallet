@@ -1,6 +1,6 @@
 import { Button, Tooltip } from '@mantine/core';
 import type { ReactNode } from 'react';
-import { AddressCardButtonWrapper } from './address-card-button-wrapper';
+import { AddressCardButtonWrapper } from '@/components/address-card/address-card-button-wrapper';
 
 interface AddressCardButtonWithOnClickProps {
     isExternalLink?: false;

@@ -2,13 +2,13 @@ import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 
-import { publicKeyToAddress, addressToScriptPublicKey } from './kaspa-util';
+import { publicKeyToAddress, addressToScriptPublicKey } from '@/lib/kaspa-util';
 
 import { TransactionInput, TransactionOutput, Transaction } from 'hw-app-kaspa';
 import Kaspa from 'hw-app-kaspa';
 
-import * as kaspa from './kaspa-rpc';
-import kaspaWasmUrl from './kaspa-rpc/kaspa_bg.wasm';
+import * as kaspa from '@/lib/kaspa-rpc';
+import kaspaWasmUrl from '@/lib/kaspa-rpc/kaspa_bg.wasm';
 
 axiosRetry(axios, { retries: 3 });
 

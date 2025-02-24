@@ -1,11 +1,9 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, use, useCallback, useEffect, useState } from 'react';
-import { notifications } from '@mantine/notifications';
-import { IQubicLedgerAddress } from '../packages/hw-app-qubic-react/src/types';
-import { DeviceTypeContext } from './DeviceTypeProvider';
-import { useQubicLedgerAppContext } from '../packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
-import { useQubicLedgerAppDeriveredIndexCacheContext } from '../packages/hw-app-qubic-react';
-import { FullScreenLoader } from '../components/full-screen-loader';
+import { createContext, use, useCallback, useState } from 'react';
+import { FullScreenLoader } from '@/components/full-screen-loader';
+import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
 
 interface IVerifiedAddressContext {
     verifiedIdentities: string[];
@@ -27,7 +25,6 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
     const isVerificationInProgress = Boolean(addressInVerificationProcess);
 
     const { app, selectedAddress } = useQubicLedgerAppContext();
-    const { isLoadingAddressesFromCache } = useQubicLedgerAppDeriveredIndexCacheContext();
 
     const overlayMessage =
         verifiedIdentities.length > 0
@@ -81,35 +78,6 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
         },
         [app, verifiedIdentities, selectedAddress],
     );
-
-    const verifyFirstDerivedAddressHandler = useCallback(async () => {
-        if (!selectedAddress || deviceType === 'demo') {
-            return;
-        }
-
-        if (selectedAddress && !verifiedIdentities.length) {
-            try {
-                await verifyAddress(selectedAddress);
-
-                notifications.show({
-                    title: 'Success',
-                    message: 'Address verified successfully',
-                });
-            } catch (e) {
-                notifications.show({
-                    title: 'Error',
-                    message:
-                        e instanceof Error ? e.message : 'Failed to verify address on the device',
-                });
-            }
-        }
-    }, [selectedAddress, deviceType, verifiedIdentities.length, verifyAddress, verifiedIdentities]);
-
-    useEffect(() => {
-        if (!isLoadingAddressesFromCache) {
-            verifyFirstDerivedAddressHandler();
-        }
-    }, [verifyFirstDerivedAddressHandler, isLoadingAddressesFromCache]);
 
     return (
         <VerifiedAddressContext value={{ verifiedIdentities, verifyAddress }}>
