@@ -15,6 +15,7 @@ import { DeviceTypeContext, DeviceTypeProvider } from '@/providers/DeviceTypePro
 import { OverlayForLoadingAddressesFromCacheProvider } from '@/providers/OverlayForLoadingAddressesFromCacheProvider';
 import { RequireDeviceTypeProvider } from '@/providers/RequireDeviceTypeProvider';
 import { VerifiedAddressProvider } from '@/providers/VerifiedAddressProvider';
+import { HideSensitiveDataProvider } from '@/providers/SensitiveDataHiddenProvider';
 import Home from '@/routes/home/page';
 import { WalletAddressesPage } from '@/routes/wallet/addresses/page';
 import { WalletOverviewPage } from '@/routes/wallet/overview/page';
@@ -59,7 +60,9 @@ export default function App() {
                                                                 >
                                                                     <OverlayForLoadingAddressesFromCacheProvider>
                                                                         <VerifiedAddressProvider>
-                                                                            <Outlet />
+                                                                            <HideSensitiveDataProvider>
+                                                                                <Outlet />
+                                                                            </HideSensitiveDataProvider>
                                                                         </VerifiedAddressProvider>
                                                                     </OverlayForLoadingAddressesFromCacheProvider>
                                                                 </QubicLedgerAppDeriveredIndexCache>

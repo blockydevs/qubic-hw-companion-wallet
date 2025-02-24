@@ -19,6 +19,8 @@ import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
+import { SensitiveDataWrapper } from '@/components/SensitiveDataWrapper';
+import { useHideSensitiveDataContext } from '@/hooks/hide-sensitive-data';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -33,6 +35,7 @@ export const WalletAddressesPage = () => {
     } = useQubicLedgerApp();
 
     const { verifiedIdentities, verifyAddress } = use(VerifiedAddressContext);
+    const { isSensitiveDataHidden, toggleSensitiveDataHidden } = useHideSensitiveDataContext();
 
     const { deviceType } = use(DeviceTypeContext);
 
@@ -113,11 +116,20 @@ export const WalletAddressesPage = () => {
                     </Center>
 
                     <Stack gap='0' align='flex-end'>
-                        <Group c='grey' gap='0.5rem' align='center'>
+                        <Group c='grey' gap='0.125rem' align='center'>
                             <Text c='grey'>Balance in USD</Text>
-                            <VisibilityOffOutlinedIcon sx={{ fontSize: '1.25rem' }} />
+
+                            <Button variant='touch' onClick={toggleSensitiveDataHidden}>
+                                <VisibilityOffOutlinedIcon
+                                    sx={{ fontSize: '1.25rem' }}
+                                    htmlColor='grey'
+                                />
+                            </Button>
                         </Group>
-                        <Text pt='0.25rem'>0 QUBIC / $0</Text>
+
+                        <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
+                            <Text pt='0.25rem'>0 QUBIC / $0</Text>
+                        </SensitiveDataWrapper>
                     </Stack>
                 </Flex>
 
@@ -141,14 +153,16 @@ export const WalletAddressesPage = () => {
                                         await handleVerifyAddress(address),
                                 }}
                                 afterAccountDetails={
-                                    <AddressCardBalance
-                                        balance='0'
-                                        balanceUSD={{
-                                            isLoading: isQubicPriceInUSDLoading,
-                                            value: qubicPriceInUSD,
-                                            error: qubicPriceInUSDError,
-                                        }}
-                                    />
+                                    <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
+                                        <AddressCardBalance
+                                            balance='0'
+                                            balanceUSD={{
+                                                isLoading: isQubicPriceInUSDLoading,
+                                                value: qubicPriceInUSD,
+                                                error: qubicPriceInUSDError,
+                                            }}
+                                        />
+                                    </SensitiveDataWrapper>
                                 }
                                 buttons={[
                                     selectedAddress?.identity === address.identity
