@@ -19,6 +19,7 @@ import Home from './routes/home/page';
 import { WalletAddressesPage } from './routes/wallet/addresses/page';
 import { WalletOverviewPage } from './routes/wallet/overview/page';
 import { WalletTransactionsPage } from './routes/wallet/transactions/page';
+import { HideSensitiveDataProvider } from './providers/SensitiveDataHiddenProvider';
 
 const queryClient = new QueryClient();
 
@@ -59,7 +60,9 @@ export default function App() {
                                                                 >
                                                                     <OverlayForLoadingAddressesFromCacheProvider>
                                                                         <VerifiedAddressProvider>
-                                                                            <Outlet />
+                                                                            <HideSensitiveDataProvider>
+                                                                                <Outlet />
+                                                                            </HideSensitiveDataProvider>
                                                                         </VerifiedAddressProvider>
                                                                     </OverlayForLoadingAddressesFromCacheProvider>
                                                                 </QubicLedgerAppDeriveredIndexCache>
