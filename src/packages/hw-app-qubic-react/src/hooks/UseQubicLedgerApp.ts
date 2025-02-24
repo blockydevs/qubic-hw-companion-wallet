@@ -2,7 +2,9 @@ import { useCallback, useState } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
 import { useQubicLedgerAppContext } from './UseQubicLedgerAppContext';
 import { generateDerivationPathForGivenIndex } from '../utils/derivation-path';
+import { getBalance } from '../utils/rpc';
 import { MAX_ADDRESS_INDEX } from '../constants';
+import type { IQubicLedgerAddress } from '../types';
 
 export const useQubicLedgerApp = () => {
     const {
@@ -53,11 +55,19 @@ export const useQubicLedgerApp = () => {
 
                 const identity = await new qubic.QubicHelper().getIdentity(publicKey);
 
-                const generatedAddressData = {
+                let balance = '0';
+                try {
+                    const balanceResponse = await getBalance(identity);
+
+                    balance = balanceResponse.balance;
+                } catch {}
+
+                const generatedAddressData: IQubicLedgerAddress = {
                     identity,
                     publicKey: Buffer.from(publicKey).toString('hex'),
                     addressDerivationPath,
                     addressIndex: newAddressIndex,
+                    balance,
                 };
 
                 addNewAddress(generatedAddressData);
