@@ -12,8 +12,6 @@ import {
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, useLocation } from 'react-router';
 import LockIcon from '@mui/icons-material/Lock';
-import GavelIcon from '@mui/icons-material/Gavel';
-import LanguageIcon from '@mui/icons-material/Language';
 import {
     HEADER_HEIGHT,
     NAVBAR_TRANSITION_DURATION,
@@ -102,8 +100,6 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                                     </Link>
                                 )}
                             </Transition>
-                            <GavelIcon htmlColor='var(--mantine-color-fontColor-text)' />
-                            <LanguageIcon htmlColor='var(--mantine-color-fontColor-text)' />
                         </Flex>
                     </Grid.Col>
                 </Grid>
