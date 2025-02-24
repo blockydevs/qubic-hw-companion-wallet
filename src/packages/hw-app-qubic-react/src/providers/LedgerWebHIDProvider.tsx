@@ -34,10 +34,15 @@ export const LedgerWebHIDProvider = ({
 
             return transporterWebHIDInstance;
         } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
             notifications.show({
                 title: 'Error',
-                message: error instanceof Error ? error.message : 'Unknown error',
                 color: 'red',
+                message:
+                    errorMessage === 'Access denied to use Ledger device'
+                        ? 'No Ledger wallet selected'
+                        : errorMessage,
             });
 
             return null;
