@@ -92,17 +92,9 @@ export const WalletAddressesPage = () => {
             />
 
             <Group w='100%'>
-                <Flex w='100%' justify='space-between'>
-                    <Title order={1} size='h2'>
-                        Addresses{' '}
-                        {generatedAddresses?.length ? `(${generatedAddresses.length})` : ''}
-                    </Title>
-
-                    <Stack gap='0' align='flex-end'>
-                        <Text>$1,670 / bQUBIC</Text>
-                        <Text c='grey'>~ $220,306,398 MC</Text>
-                    </Stack>
-                </Flex>
+                <Title order={1} size='h2'>
+                    Addresses {generatedAddresses?.length ? `(${generatedAddresses.length})` : ''}
+                </Title>
 
                 <Flex w='100%' justify='space-between'>
                     <Center>
