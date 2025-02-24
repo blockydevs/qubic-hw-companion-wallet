@@ -1,6 +1,7 @@
 import { use, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -9,16 +10,17 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { AddressCard } from '../../../components/address-card';
-import { AddressCardBalance } from '../../../components/address-card/address-card-balance';
-import { QrCodeModal } from '../../../components/qr-code-modal';
-import { useQrCodeModal } from '../../../hooks/qr-code';
-import { useQubicPriceFromCoingecko } from '../../../hooks/qubic-price';
-import { useQubicLedgerApp } from '../../../packages/hw-app-qubic-react';
-import { DeviceTypeContext } from '../../../providers/DeviceTypeProvider';
-import { VerifiedAddressContext } from '../../../providers/VerifiedAddressProvider';
-import { notifications } from '@mantine/notifications';
-import { IQubicLedgerAddress } from '@/src/packages/hw-app-qubic-react/src/types';
+import { AddressCard } from '@/components/address-card';
+import { AddressCardBalance } from '@/components/address-card/address-card-balance';
+import { QrCodeModal } from '@/components/qr-code-modal';
+import { useQrCodeModal } from '@/hooks/qr-code';
+import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
+import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
+import { SensitiveDataWrapper } from '@/components/SensitiveDataWrapper';
+import { useHideSensitiveDataContext } from '@/hooks/hide-sensitive-data';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -33,6 +35,7 @@ export const WalletAddressesPage = () => {
     } = useQubicLedgerApp();
 
     const { verifiedIdentities, verifyAddress } = use(VerifiedAddressContext);
+    const { isSensitiveDataHidden, toggleSensitiveDataHidden } = useHideSensitiveDataContext();
 
     const { deviceType } = use(DeviceTypeContext);
 
@@ -47,41 +50,19 @@ export const WalletAddressesPage = () => {
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
 
-    const handleSelectAddress = useCallback(
-        async (address: IQubicLedgerAddress) => {
-            if (verifiedIdentities.includes(address.identity)) {
-                selectAddressByIndex(address.addressIndex);
-
-                return;
-            }
-
-            try {
-                const isAddressVerified = await verifyAddress(address);
-
-                if (isAddressVerified) {
-                    selectAddressByIndex(address.addressIndex);
-
-                    notifications.show({
-                        title: 'Success',
-                        message: 'Address verified successfully and used as selected address',
-                    });
-                }
-            } catch (error) {
-                notifications.show({
-                    title: 'Error',
-                    message:
-                        error instanceof Error
-                            ? error.message
-                            : 'Failed to verify address (Unknown reason)',
-                });
-            }
-        },
-        [selectAddressByIndex, verifiedIdentities, verifyAddress],
-    );
-
     const handleVerifyAddress = useCallback(
         async (address: IQubicLedgerAddress) => {
             try {
+                if (verifiedIdentities.includes(address.identity)) {
+                    notifications.show({
+                        title: 'Warning',
+                        color: 'orange',
+                        message: 'Address already verified',
+                    });
+
+                    return;
+                }
+
                 await verifyAddress(address);
 
                 notifications.show({
@@ -91,6 +72,7 @@ export const WalletAddressesPage = () => {
             } catch (error) {
                 notifications.show({
                     title: 'Error',
+                    color: 'red',
                     message:
                         error instanceof Error
                             ? error.message
@@ -110,17 +92,9 @@ export const WalletAddressesPage = () => {
             />
 
             <Group w='100%'>
-                <Flex w='100%' justify='space-between'>
-                    <Title order={1} size='h2'>
-                        Addresses{' '}
-                        {generatedAddresses?.length ? `(${generatedAddresses.length})` : ''}
-                    </Title>
-
-                    <Stack gap='0' align='flex-end'>
-                        <Text>$1,670 / bQUBIC</Text>
-                        <Text c='grey'>~ $220,306,398 MC</Text>
-                    </Stack>
-                </Flex>
+                <Title order={1} size='h2'>
+                    Addresses {generatedAddresses?.length ? `(${generatedAddresses.length})` : ''}
+                </Title>
 
                 <Flex w='100%' justify='space-between'>
                     <Center>
@@ -134,11 +108,20 @@ export const WalletAddressesPage = () => {
                     </Center>
 
                     <Stack gap='0' align='flex-end'>
-                        <Group c='grey' gap='0.5rem' align='center'>
+                        <Group c='grey' gap='0.125rem' align='center'>
                             <Text c='grey'>Balance in USD</Text>
-                            <VisibilityOffOutlinedIcon sx={{ fontSize: '1.25rem' }} />
+
+                            <Button variant='touch' onClick={toggleSensitiveDataHidden}>
+                                <VisibilityOffOutlinedIcon
+                                    sx={{ fontSize: '1.25rem' }}
+                                    htmlColor='grey'
+                                />
+                            </Button>
                         </Group>
-                        <Text pt='0.25rem'>0 QUBIC / $0</Text>
+
+                        <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
+                            <Text pt='0.25rem'>0 QUBIC / $0</Text>
+                        </SensitiveDataWrapper>
                     </Stack>
                 </Flex>
 
@@ -156,20 +139,22 @@ export const WalletAddressesPage = () => {
                                     isAddressVerified: verifiedIdentities.includes(
                                         address.identity,
                                     ),
-                                    onAccountNameAndAddressClick: async () =>
-                                        await handleSelectAddress(address),
+                                    onAccountNameAndAddressClick: () =>
+                                        selectAddressByIndex(address.addressIndex),
                                     onVerifyAddressClick: async () =>
                                         await handleVerifyAddress(address),
                                 }}
                                 afterAccountDetails={
-                                    <AddressCardBalance
-                                        balance='0'
-                                        balanceUSD={{
-                                            isLoading: isQubicPriceInUSDLoading,
-                                            value: qubicPriceInUSD,
-                                            error: qubicPriceInUSDError,
-                                        }}
-                                    />
+                                    <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
+                                        <AddressCardBalance
+                                            balance='0'
+                                            balanceUSD={{
+                                                isLoading: isQubicPriceInUSDLoading,
+                                                value: qubicPriceInUSD,
+                                                error: qubicPriceInUSDError,
+                                            }}
+                                        />
+                                    </SensitiveDataWrapper>
                                 }
                                 buttons={[
                                     selectedAddress?.identity === address.identity
@@ -187,8 +172,8 @@ export const WalletAddressesPage = () => {
                                                   <RadioButtonUncheckedIcon htmlColor='var(--mantine-color-brand-text)' />
                                               ),
                                               label: 'Select address',
-                                              onClick: async () => {
-                                                  await handleSelectAddress(address);
+                                              onClick: () => {
+                                                  selectAddressByIndex(address.addressIndex);
                                               },
                                           },
                                     {

@@ -1,12 +1,12 @@
+import { IS_DEMO_MODE } from '@/constants';
+import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
+import DeveloperIcon from '@mui/icons-material/DeveloperMode';
+import UsbIcon from '@mui/icons-material/Usb';
 import { use, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
-import { DeviceTypeContext } from '../../providers/DeviceTypeProvider';
-import { prepareAppData } from './page.utils';
-import UsbIcon from '@mui/icons-material/Usb';
-import DeveloperIcon from '@mui/icons-material/DeveloperMode';
-import { IS_DEMO_MODE } from '../../constants';
-import { useQubicLedgerApp } from '../../packages/hw-app-qubic-react';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { prepareAppData } from '@/routes/home/page.utils';
 
 export default function Home() {
     const navigate = useNavigate();

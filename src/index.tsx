@@ -1,4 +1,4 @@
-import './dist.css';
+import '@/dist.css';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 

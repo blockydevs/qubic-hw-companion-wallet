@@ -1,8 +1,8 @@
 import { notifications } from '@mantine/notifications';
-import { IAddressData } from '../types';
-import { fetchAddressBalance, fetchAddressDetails, getAddress } from '../lib/ledger';
-import { kasToSompi, NETWORK_UTXO_LIMIT, sompiToKas } from '../lib/kaspa-util';
-import { delay } from '../utils/delay';
+import { IAddressData } from '@/types';
+import { fetchAddressBalance, fetchAddressDetails, getAddress } from '@/lib/ledger';
+import { kasToSompi, NETWORK_UTXO_LIMIT, sompiToKas } from '@/lib/kaspa-util';
+import { delay } from '@/utils/delay';
 
 let loadingAddressBatch = false;
 let addressInitialized = false;

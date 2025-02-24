@@ -1,7 +1,6 @@
 import { Text } from '@mantine/core';
-import React from 'react';
-import { LoadableText } from '../loadable-text';
-import { balanceToUSD } from '../../utils/balance';
+import { LoadableText } from '@/components/loadable-text';
+import { balanceToUSD } from '@/utils/balance';
 
 interface AddressCardBalanceProps {
     balance: string;

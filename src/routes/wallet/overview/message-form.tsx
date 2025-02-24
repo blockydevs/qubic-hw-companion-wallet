@@ -1,12 +1,11 @@
-import { Box, Group, Textarea, Button } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { Box, Button, Group, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useState, useEffect } from 'react';
-import { signMessage } from '../../../lib/ledger';
-
-import MessageModal from './message-modal';
 import { notifications } from '@mantine/notifications';
-import { ISelectedAddress } from '../../../types';
+import { signMessage } from '@/lib/ledger';
+import MessageModal from '@/routes/wallet/overview/message-modal';
+import type { ISelectedAddress } from '@/types';
 
 export default function MessageForm(props: {
     selectedAddress: ISelectedAddress;
