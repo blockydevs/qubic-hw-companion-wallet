@@ -30,7 +30,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     derivationPath,
     init,
 }: PropsWithChildren<QubicLedgerAppProviderProps>) => {
-    const ctx = useContext(LedgerWebHIDContext);
+    const ledgerWebHIDContext = useContext(LedgerWebHIDContext);
 
     const [app, setApp] = useState<HWAppQubic | null>(null);
     const [generatedAddresses, setGeneratedAddresses] = useState<IQubicLedgerAddress[]>([]);
@@ -46,17 +46,17 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     }, [selectedAddressIndex, generatedAddresses]);
 
     const initApp = useCallback(async () => {
-        if (!ctx) {
-            throw new Error('WebHIDContext not initialized');
+        if (!ledgerWebHIDContext) {
+            throw new Error('LedgerWebHIDContext not initialized');
         }
 
         if (app) {
             throw new Error('Qubic HW App is already initialized');
         }
 
-        const transportForHwAppQubic = ctx?.transport
-            ? ctx.transport
-            : await ctx.initLedgerTransportHandler();
+        const transportForHwAppQubic = ledgerWebHIDContext?.transport
+            ? ledgerWebHIDContext.transport
+            : await ledgerWebHIDContext.initLedgerTransportHandler();
 
         if (!transportForHwAppQubic) {
             throw new Error('Cannot get transport for initializing Qubic HW App');
@@ -67,7 +67,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         setApp(newApp);
 
         return newApp;
-    }, [ctx, app]);
+    }, [ledgerWebHIDContext, app]);
 
     const addNewAddress = useCallback(
         (generatedAddressData: IQubicLedgerAddress) => {
@@ -111,11 +111,11 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     }, [app, generatedAddresses, areBalanceLoading]);
 
     const reset = useCallback(async () => {
-        await ctx?.resetTransport();
+        await ledgerWebHIDContext?.resetTransport();
         setApp(null);
         setGeneratedAddresses([]);
         setSelectedAddressIndex(null);
-    }, [app, ctx, setApp]);
+    }, [app, ledgerWebHIDContext, setApp]);
 
     useEffect(() => {
         if (init && !app) {
