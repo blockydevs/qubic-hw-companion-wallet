@@ -15,7 +15,7 @@ export interface IQubicLedgerAppContext {
     addNewAddress: (generatedAddressData: IQubicLedgerAddress) => void;
     refetchBalances: () => Promise<void>;
     setSelectedAddressIndex: (index: number) => void;
-    reset: () => void;
+    reset: () => Promise<void>;
 }
 
 export const QubicLedgerAppContext = createContext<IQubicLedgerAppContext | null>(null);
@@ -110,11 +110,12 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         setAreBalanceLoading(false);
     }, [app, generatedAddresses, areBalanceLoading]);
 
-    const reset = useCallback(() => {
+    const reset = useCallback(async () => {
+        ctx?.resetTransport();
         setApp(null);
         setGeneratedAddresses([]);
         setSelectedAddressIndex(null);
-    }, []);
+    }, [app, ctx, setApp]);
 
     useEffect(() => {
         if (init && !app) {
