@@ -66,12 +66,6 @@ export default function Home() {
                 <Image src='/Qubic-Symbol-White.svg' alt='Qubic' width={180} height={180} />
             </Group>
 
-            <Group>
-                <Text>Is app: {Boolean(app).toString()}</Text>
-
-                <Button onClick={reset}>Reset</Button>
-            </Group>
-
             <Stack gap='xl'>
                 <Stack gap='md'>
                     <Title order={1} size='h2' ta='center'>
