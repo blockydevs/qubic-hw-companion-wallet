@@ -111,7 +111,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     }, [app, generatedAddresses, areBalanceLoading]);
 
     const reset = useCallback(async () => {
-        ctx?.resetTransport();
+        await ctx?.resetTransport();
         setApp(null);
         setGeneratedAddresses([]);
         setSelectedAddressIndex(null);

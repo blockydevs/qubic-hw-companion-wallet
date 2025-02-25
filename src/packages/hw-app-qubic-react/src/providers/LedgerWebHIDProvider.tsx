@@ -6,7 +6,7 @@ import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 interface ILedgerWebHIDContext {
     transport: Transport | null;
     initLedgerTransportHandler: () => Promise<Transport | null>;
-    resetTransport: () => void;
+    resetTransport: () => Promise<void>;
 }
 
 export interface LedgerWebHIDProviderProps {
@@ -33,9 +33,9 @@ export const LedgerWebHIDProvider = ({
         return transporterWebHIDInstance;
     }, [transport]);
 
-    const resetTransport = useCallback(() => {
+    const resetTransport = useCallback(async () => {
         if (transport) {
-            transport.close();
+            await transport.close();
             setTransport(null);
         }
     }, [transport]);
