@@ -16,36 +16,34 @@ export default function Home() {
 
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
-    const handleConnect = useCallback(
-        async (type: 'usb') => {
-            try {
-                const qubicLedgerApp = app ?? (await initApp());
+    const handleConnectWithUsb = useCallback(async () => {
+        try {
+            const qubicLedgerApp = app ?? (await initApp());
 
-                await checkIfQubicAppIsOpenOnLedger(type, qubicLedgerApp.transport);
+            await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
 
-                setDeviceType(type);
-                navigate(`/wallet/addresses`, { replace: true });
-            } catch (e) {
-                if (e instanceof Error) {
-                    notifications.show({
-                        title: 'Action required',
-                        message:
-                            e.message === 'Access denied to use Ledger device'
-                                ? 'No Ledger wallet selected'
-                                : e.message,
-                    });
-                } else {
-                    notifications.show({
-                        title: 'Error',
-                        message: 'Could not connect to Ledger device',
-                    });
-                }
+            setDeviceType('usb');
+            navigate(`/wallet/addresses`, { replace: true });
+        } catch (e) {
+            if (e instanceof Error) {
+                const isAccessDeniedMessage = e.message === 'Access denied to use Ledger device';
 
-                await reset();
+                notifications.show({
+                    title: 'Action required',
+                    message: isAccessDeniedMessage ? 'No Ledger wallet selected' : e.message,
+                    c: isAccessDeniedMessage ? 'orange' : 'blue',
+                });
+            } else {
+                notifications.show({
+                    title: 'Error',
+                    c: 'red',
+                    message: 'Could not connect to Ledger device',
+                });
             }
-        },
-        [navigate, setDeviceType, initApp],
-    );
+
+            await reset();
+        }
+    }, [navigate, setDeviceType, initApp]);
 
     const handleConnectToDemo = useCallback(() => {
         setDeviceType('demo');
@@ -56,7 +54,7 @@ export default function Home() {
         if (generatedAddresses.length) {
             reset();
         }
-    }, [generatedAddresses]);
+    }, [generatedAddresses, reset]);
 
     useEffect(() => {
         resetIfAddressesExistHandler();
@@ -114,7 +112,7 @@ export default function Home() {
                         leftSection={<UsbIcon fontSize='small' />}
                         justify='space-between'
                         variant='button-light'
-                        onClick={() => handleConnect('usb')}
+                        onClick={handleConnectWithUsb}
                     >
                         Connect with USB
                     </Button>

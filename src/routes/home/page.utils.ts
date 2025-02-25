@@ -2,23 +2,15 @@ import { TransportOpenUserCancelled } from '@ledgerhq/errors';
 import type Transport from '@ledgerhq/hw-transport';
 import { getAppAndVersion } from '@/lib/ledger';
 
-export const checkIfQubicAppIsOpenOnLedger = async (deviceType = 'usb', transport: Transport) => {
-    if (deviceType === 'demo') {
-        return true;
-    }
-
-    if (deviceType !== 'usb') {
-        throw new Error(`Unsupported device type: ${deviceType}. Please use "usb" or "demo" mode.`);
-    }
-
+export const checkIfQubicAppIsOpenOnLedger = async (transport: Transport) => {
     try {
         const { name } = await getAppAndVersion(transport);
 
-        if (name == 'Qubic') {
-            return true;
-        } else {
+        if (name !== 'Qubic') {
             throw new Error('Please open the Qubic app on your device.');
         }
+
+        return true;
     } catch (e) {
         if (e instanceof TransportOpenUserCancelled) {
             throw new Error(
