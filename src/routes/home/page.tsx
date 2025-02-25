@@ -6,7 +6,8 @@ import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { prepareAppData } from '@/routes/home/page.utils';
+import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
+import { notifications } from '@mantine/notifications';
 
 export default function Home() {
     const navigate = useNavigate();
@@ -17,13 +18,30 @@ export default function Home() {
 
     const handleConnect = useCallback(
         async (type: 'usb') => {
-            const qubicLedgerApp = app ?? (await initApp());
+            try {
+                const qubicLedgerApp = app ?? (await initApp());
 
-            const isAppDataPrepared = await prepareAppData(type, qubicLedgerApp.transport);
+                await checkIfQubicAppIsOpenOnLedger(type, qubicLedgerApp.transport);
 
-            if (isAppDataPrepared) {
                 setDeviceType(type);
                 navigate(`/wallet/addresses`, { replace: true });
+            } catch (e) {
+                if (e instanceof Error) {
+                    notifications.show({
+                        title: 'Action required',
+                        message:
+                            e.message === 'Access denied to use Ledger device'
+                                ? 'No Ledger wallet selected'
+                                : e.message,
+                    });
+                } else {
+                    notifications.show({
+                        title: 'Error',
+                        message: 'Could not connect to Ledger device',
+                    });
+                }
+
+                await reset();
             }
         },
         [navigate, setDeviceType, initApp],
@@ -48,6 +66,12 @@ export default function Home() {
         <Flex align='center' direction='column' w='100%'>
             <Group py='4rem'>
                 <Image src='/Qubic-Symbol-White.svg' alt='Qubic' width={180} height={180} />
+            </Group>
+
+            <Group>
+                <Text>Is app: {Boolean(app).toString()}</Text>
+
+                <Button onClick={reset}>Reset</Button>
             </Group>
 
             <Stack gap='xl'>
