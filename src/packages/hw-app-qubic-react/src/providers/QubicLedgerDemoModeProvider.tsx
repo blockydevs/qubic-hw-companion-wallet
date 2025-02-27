@@ -24,7 +24,7 @@ export const QubicLedgerDemoModeProvider = ({
 
         const generatedAddressData = {
             identity,
-            publicKey,
+            publicKey: Buffer.from(publicKey),
             addressDerivationPath,
             addressIndex: newAddressIndex,
             balance: '12345678',

@@ -13,3 +13,15 @@ export const qubicBalanceSchema = z.object({
         numberOfOutgoingTransfers: z.number(),
     }),
 });
+
+export const qubicLatestTickSchema = z.object({
+    latestTick: z.number(),
+});
+
+export const qubicTransactionsSchema = z.array(z.any());
+
+export const qubicBroadcastedTransactionResult = z.object({
+    encodedTransaction: z.string(),
+    peersBroadcasted: z.number(),
+    transactionId: z.string(),
+});

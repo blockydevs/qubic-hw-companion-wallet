@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { HWAppQubic } from '../../../hw-app-qubic';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress } from '../types';
-import { getBalance } from '../utils/rpc';
+import { QubicRpcService } from '../services/qubic-rpc';
 
 export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
@@ -94,7 +94,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         const updatedAddresses = await Promise.all(
             generatedAddresses.map(async (address) => {
                 try {
-                    const balanceResponse = await getBalance(address.identity);
+                    const balanceResponse = await QubicRpcService.getBalance(address.identity);
 
                     return {
                         ...address,

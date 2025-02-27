@@ -2,13 +2,13 @@ import { useCallback, useState } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
 import { useQubicLedgerAppContext } from './UseQubicLedgerAppContext';
 import { generateDerivationPathForGivenIndex } from '../utils/derivation-path';
-import { getBalance } from '../utils/rpc';
+import { QubicRpcService } from '../services/qubic-rpc';
 import { MAX_ADDRESS_INDEX } from '../constants';
 import type { IQubicLedgerAddress } from '../types';
 
 const getBalanceHandler = async (identity: string) => {
     try {
-        const balanceResponse = await getBalance(identity);
+        const balanceResponse = await QubicRpcService.getBalance(identity);
 
         return balanceResponse.balance;
     } catch {
@@ -71,7 +71,7 @@ export const useQubicLedgerApp = () => {
 
                 const generatedAddressData: IQubicLedgerAddress = {
                     identity,
-                    publicKey: Buffer.from(publicKey).toString('hex'),
+                    publicKey,
                     addressDerivationPath,
                     addressIndex: newAddressIndex,
                     balance,
