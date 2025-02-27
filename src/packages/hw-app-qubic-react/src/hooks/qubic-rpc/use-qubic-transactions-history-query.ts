@@ -8,20 +8,25 @@ type DeepPartial<T> = {
     [P in keyof T]?: DeepPartial<T[P]>;
 };
 
+interface UseQubicTransactionsHistoryQueryProps {
+    initialTick: number;
+    identity: string;
+    tickInterval?: number;
+}
+
+interface IUseQubicTransactionsHistoryQueryOptions
+    extends Omit<
+        ICustomUseInfiniteQueryOptions<DeepPartial<IQubicTransactionsDTO>>,
+        'placeholderData'
+    > {}
+
 export const useQubicTransactionHistoryQuery = (
     {
         identity,
         initialTick,
         tickInterval = DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
-    }: {
-        initialTick: number;
-        identity: string;
-        tickInterval?: number;
-    },
-    queryOptions?: Omit<
-        ICustomUseInfiniteQueryOptions<DeepPartial<IQubicTransactionsDTO>>,
-        'placeholderData'
-    >,
+    }: UseQubicTransactionsHistoryQueryProps,
+    queryOptions?: IUseQubicTransactionsHistoryQueryOptions,
 ) => {
     const qubicRpcService = useQubicRpcService();
     const [endTick, setEndTick] = useState<number>(0);
