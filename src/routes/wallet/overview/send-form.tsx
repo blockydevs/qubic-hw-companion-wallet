@@ -14,6 +14,8 @@ interface SendFormProps extends Omit<StackProps, 'onSubmit'> {
     isDisabled?: boolean;
     maxAmount: number;
     latestTick: number;
+
+    submitButtonLabel: string;
     onSubmit: (result: {
         amount: number;
         sendTo: string;
@@ -24,6 +26,7 @@ interface SendFormProps extends Omit<StackProps, 'onSubmit'> {
 
 export const SendForm = ({
     onSubmit,
+    submitButtonLabel,
     isDisabled,
     maxAmount,
     latestTick,
@@ -51,7 +54,7 @@ export const SendForm = ({
     };
 
     useEffect(() => {
-        if (form.getValues().tick === 0 && latestTick > 0) {
+        if (latestTick > form.getValues().tick) {
             form.setValues({
                 tick: latestTick + 10,
             });
@@ -91,7 +94,7 @@ export const SendForm = ({
             <NumberInput
                 label='Tick'
                 placeholder='0'
-                min={0}
+                min={latestTick}
                 decimalScale={8}
                 step={1}
                 disabled={isDisabled}
@@ -121,7 +124,7 @@ export const SendForm = ({
                 }
                 disabled={isDisabled || !canSendAmount || !form.isValid()}
             >
-                Sign with Ledger and Send {form.isValid()}
+                {submitButtonLabel}
             </Button>
         </Stack>
     );

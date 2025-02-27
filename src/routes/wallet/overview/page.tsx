@@ -1,4 +1,4 @@
-import { use, useCallback, useState } from 'react';
+import { use, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Divider, Loader, LoadingOverlay, Paper, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -52,6 +52,16 @@ export const WalletOverviewPage = () => {
     const { verifiedIdentities } = useVerifiedAddressContext();
     const { verifyAddress } = useVerifyAddress();
 
+    const isSelectedAddressVerified = useMemo(
+        () => verifiedIdentities.includes(selectedAddress.identity),
+        [selectedAddress, verifiedIdentities],
+    );
+
+    const submitButtonLabel = useMemo(
+        () => (isSelectedAddressVerified ? 'Sign with Ledger and Send' : 'Verify address'),
+        [isSelectedAddressVerified],
+    );
+
     const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
         useQrCodeModal(selectedAddress.identity ?? '');
     const [isSuccessModalOpen, { open: openSuccessModal, close: closeSuccessModal }] =
@@ -63,7 +73,15 @@ export const WalletOverviewPage = () => {
         isLoading: isQubicPriceInUSDLoading,
     } = useQubicPriceFromCoingecko();
 
-    const { data: latestTick } = useQubicCurrentTickQuery();
+    const {
+        data: latestTick,
+        isLoading: isLatestTickLoading,
+        isFetching: isLatestTickFetching,
+        isRefetching: isLatestTickRefetching,
+    } = useQubicCurrentTickQuery();
+
+    const isLatestTickLoaded =
+        !isLatestTickLoading && !isLatestTickFetching && !isLatestTickRefetching;
 
     const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
         useQubicSendTransactionSignedWithLedgerToRpc(latestTick, {
@@ -85,7 +103,7 @@ export const WalletOverviewPage = () => {
             },
         });
 
-    const onSubmitHandler = useCallback(
+    const sendTransactionSignedWithLedgerToRpcHandler = useCallback(
         async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) =>
             await sendTransactionSignedWithLedgerToRpc({
                 amount: values.amount,
@@ -94,12 +112,6 @@ export const WalletOverviewPage = () => {
                 destinationIdentity: values.sendTo,
 
                 isDemoMode: deviceType === 'demo',
-
-                onBeforeCreateTransaction: async () => {
-                    if (!verifiedIdentities.includes(selectedAddress.identity)) {
-                        await verifyAddress(selectedAddress);
-                    }
-                },
 
                 onBeforeSignTransactionWithLedger: () => {
                     setFullScreenLoaderData(fullScreenLoaderDataOptions.confirmTransactionInLedger);
@@ -124,6 +136,25 @@ export const WalletOverviewPage = () => {
             verifiedIdentities,
             verifyAddress,
         ],
+    );
+
+    const onSubmitHandler = useCallback(
+        async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) => {
+            if (!selectedAddress) {
+                throw new Error('No selected address');
+            }
+
+            if (!isSelectedAddressVerified) {
+                try {
+                    await verifyAddress(selectedAddress, true);
+                } catch {
+                    return;
+                }
+            }
+
+            await sendTransactionSignedWithLedgerToRpcHandler(values);
+        },
+        [isSelectedAddressVerified, selectedAddress, sendTransactionSignedWithLedgerToRpcHandler],
     );
 
     if (!selectedAddress) {
@@ -207,7 +238,7 @@ export const WalletOverviewPage = () => {
 
                 <Paper px='lg' py='3rem' radius='sm' pos='relative'>
                     <LoadingOverlay
-                        visible={!latestTick}
+                        visible={!isLatestTickLoaded}
                         loaderProps={{
                             children: (
                                 <Stack align='center'>
@@ -218,12 +249,13 @@ export const WalletOverviewPage = () => {
                         }}
                     />
 
-                    {latestTick ? (
+                    {isLatestTickLoaded ? (
                         <SendForm
                             latestTick={latestTick}
                             onSubmit={onSubmitHandler}
                             isDisabled={isTransactionProcessing}
                             maxAmount={parseInt(selectedAddress.balance)}
+                            submitButtonLabel={submitButtonLabel}
                         />
                     ) : (
                         <SendForm
@@ -231,6 +263,7 @@ export const WalletOverviewPage = () => {
                             onSubmit={() => {}}
                             isDisabled={true}
                             maxAmount={0}
+                            submitButtonLabel={submitButtonLabel}
                         />
                     )}
                 </Paper>

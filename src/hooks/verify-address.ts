@@ -17,7 +17,7 @@ export const useVerifyAddress = () => {
     const { verifyAddress, verifiedIdentities } = useVerifiedAddressContext();
 
     const handleVerifyAddress = useCallback(
-        async (address: IQubicLedgerAddress) => {
+        async (address: IQubicLedgerAddress, throwError = false) => {
             try {
                 if (verifiedIdentities.includes(address.identity)) {
                     notifications.show({
@@ -44,6 +44,10 @@ export const useVerifyAddress = () => {
                             ? error.message
                             : 'Failed to verify address (Unknown reason)',
                 });
+
+                if (throwError) {
+                    throw error;
+                }
             }
         },
         [verifyAddress],

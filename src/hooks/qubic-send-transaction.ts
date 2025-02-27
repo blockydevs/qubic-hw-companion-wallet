@@ -16,7 +16,6 @@ interface QubicSendTransactionSignedWithLedgerToRpcParameters {
 
     isDemoMode?: boolean;
 
-    onBeforeCreateTransaction?: () => Promise<void> | void;
     onBeforeSignTransactionWithLedger?: () => Promise<void> | void;
     onBeforeBroadcastTransactionToRpc?: () => Promise<void> | void;
     onAfterBroadcastTransactionToRpc?: (sentTransactionData: {
@@ -49,15 +48,12 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
             amount,
             tick,
             onAfterBroadcastTransactionToRpc,
-            onBeforeCreateTransaction,
             onBeforeBroadcastTransactionToRpc,
             onBeforeSignTransactionWithLedger,
         }: QubicSendTransactionSignedWithLedgerToRpcParameters) => {
             if (!latestTick) {
                 throw new Error('No latest tick info');
             }
-
-            await onBeforeCreateTransaction?.();
 
             const sourcePublicKey = new qubic.PublicKey(sourceIdentity);
             const destinationPublicKey = new qubic.PublicKey(destinationIdentity);
