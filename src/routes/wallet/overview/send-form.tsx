@@ -46,9 +46,9 @@ export const SendForm = ({
 }: SendFormProps) => {
     const form = useForm({
         initialValues: {
-            amount: 1,
+            amount: 0,
             tick: latestTick + 40,
-            sendTo: 'BSSDLXMWFBFYJFAJIQRGASCGVSNCUWUSBFRDKZCWZBSKIGONPHFIFAVDNNTD',
+            sendTo: '',
         },
         validate: {
             amount: (value) => validateWithZod(value, z.number().int().positive().lte(maxAmount)),
