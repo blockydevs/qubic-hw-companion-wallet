@@ -35,7 +35,7 @@ export const SendForm = ({
     const form = useForm({
         initialValues: {
             amount: 0,
-            tick: latestTick + 10,
+            tick: latestTick + 40,
             sendTo: '',
         },
         validate: {
@@ -56,7 +56,7 @@ export const SendForm = ({
     useEffect(() => {
         if (latestTick > form.getValues().tick) {
             form.setValues({
-                tick: latestTick + 10,
+                tick: latestTick + 40,
             });
         }
     }, [latestTick, form.getValues().tick, form.setValues, form.getValues, form.getValues().tick]);
