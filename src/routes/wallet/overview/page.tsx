@@ -65,13 +65,16 @@ export const WalletOverviewPage = () => {
 
     const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
         useQubicSendTransactionSignedWithLedgerToRpc({
-            onSettled: () => {
-                setisTransactionProcessing(false);
+            onMutate: () => {
+                setisTransactionProcessing(true);
+                return []; // No need to return anything
             },
             onSuccess: () => {
                 setisTransactionProcessing(false);
             },
             onError: (error) => {
+                setisTransactionProcessing(false);
+
                 notifications.show({
                     title: 'Failed to broadcast transaction',
                     message: error instanceof Error ? error.message : 'Unknown Error',

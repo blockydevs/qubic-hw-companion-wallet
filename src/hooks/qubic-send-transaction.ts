@@ -92,7 +92,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
     }: QubicSendTransactionDemoParameters) => {
         await onBeforeBroadcastTransactionToRpc?.();
 
-        new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
             setTimeout(async () => {
                 await onAfterBroadcastTransactionToRpc({
                     sentTo: 'demo-transaction',
@@ -100,7 +100,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
                     sentAmount: 100,
                 });
 
-                resolve(null);
+                resolve(void 0);
             }, 3000);
         });
     };
