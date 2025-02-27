@@ -6,7 +6,8 @@ import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { prepareAppData } from '@/routes/home/page.utils';
+import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
+import { notifications } from '@mantine/notifications';
 
 export default function Home() {
     const navigate = useNavigate();
@@ -15,19 +16,34 @@ export default function Home() {
 
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
-    const handleConnect = useCallback(
-        async (type: 'usb') => {
+    const handleConnectWithUsb = useCallback(async () => {
+        try {
             const qubicLedgerApp = app ?? (await initApp());
 
-            const isAppDataPrepared = await prepareAppData(type, qubicLedgerApp.transport);
+            await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
 
-            if (isAppDataPrepared) {
-                setDeviceType(type);
-                navigate(`/wallet/addresses`, { replace: true });
+            setDeviceType('usb');
+            navigate(`/wallet/addresses`, { replace: true });
+        } catch (e) {
+            if (e instanceof Error) {
+                const isAccessDeniedMessage = e.message === 'Access denied to use Ledger device';
+
+                notifications.show({
+                    title: 'Action required',
+                    message: isAccessDeniedMessage ? 'No Ledger wallet selected' : e.message,
+                    c: isAccessDeniedMessage ? 'orange' : 'blue',
+                });
+            } else {
+                notifications.show({
+                    title: 'Error',
+                    c: 'red',
+                    message: 'Could not connect to Ledger device',
+                });
             }
-        },
-        [navigate, setDeviceType, initApp],
-    );
+
+            await reset();
+        }
+    }, [navigate, setDeviceType, initApp]);
 
     const handleConnectToDemo = useCallback(() => {
         setDeviceType('demo');
@@ -38,7 +54,7 @@ export default function Home() {
         if (generatedAddresses.length) {
             reset();
         }
-    }, [generatedAddresses]);
+    }, [generatedAddresses, reset]);
 
     useEffect(() => {
         resetIfAddressesExistHandler();
@@ -90,7 +106,7 @@ export default function Home() {
                         leftSection={<UsbIcon fontSize='small' />}
                         justify='space-between'
                         variant='button-light'
-                        onClick={() => handleConnect('usb')}
+                        onClick={handleConnectWithUsb}
                     >
                         Connect with USB
                     </Button>
