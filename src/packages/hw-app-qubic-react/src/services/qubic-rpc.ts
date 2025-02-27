@@ -1,7 +1,6 @@
-import { DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS, QUBIC_RPC_URL } from '../constants';
+import { DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS } from '../constants';
 import type { IQubicBroadcastedTransactionDTO } from '../types';
-import type { IFetcherArgs } from '../utils/fetcher';
-import { fetcher } from '../utils/fetcher';
+import { Fetcher } from '../utils/fetcher';
 import {
     qubicBalanceSchema,
     qubicBroadcastedTransactionResult,
@@ -10,63 +9,56 @@ import {
 } from '../utils/validation-schemas';
 import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/QubicTransaction';
 
-interface IQubicRpcFetcherArgs<Data, Return = Data>
-    extends Omit<IFetcherArgs<Data, Return>, 'url'> {
-    endpoint: string;
-}
+export class QubicRpcService {
+    constructor(public rpcUrl: string) {
+        this.rpcUrl = rpcUrl;
+    }
 
-const qubicRpcFetcher = async <Data, Return = Data>({
-    endpoint,
-    ...rest
-}: IQubicRpcFetcherArgs<Data, Return>) =>
-    await fetcher({
-        url: `${QUBIC_RPC_URL}${endpoint}`,
-        ...rest,
-    });
-
-const getBalance = async (identity: string) =>
-    await qubicRpcFetcher({
-        endpoint: `v1/balances/${identity}`,
-        validation: {
+    async getBalance(identity: string) {
+        return await Fetcher.create({
             schema: qubicBalanceSchema,
             errorMessage: `Invalid balance response data for ${identity} address.`,
-        },
-        transformResponse: (data) => data.balance,
-    });
+            transformResponse: (data) => data.balance,
+        }).fetch(`${this.rpcUrl}v1/balances/${identity}`);
+    }
 
-const getCurrentTick = async () =>
-    await qubicRpcFetcher({
-        endpoint: 'v1/latestTick',
-        validation: {
+    async getCurrentTick() {
+        return await Fetcher.create({
             schema: qubicLatestTickSchema,
             errorMessage: 'Invalid latest tick response data.',
-        },
-        transformResponse: (data) => data.latestTick,
-    });
+            transformResponse: (data) => data.latestTick,
+        }).fetch(`${this.rpcUrl}v1/latestTick`);
+    }
 
-const getTransactions = async ({
-    identity,
-    startTick,
-    endTick = startTick + DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
-}: {
-    identity: string;
-    startTick: number;
-    endTick?: number;
-}) =>
-    await qubicRpcFetcher({
-        endpoint: `v2/identities/${identity}/transfers?startTick=${startTick}&endTick=${endTick}`,
-        validation: {
+    async getTransactions({
+        identity,
+        startTick,
+        endTick = startTick + DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
+    }: {
+        identity: string;
+        startTick: number;
+        endTick?: number;
+    }) {
+        return await Fetcher.create({
             schema: qubicTransactionsSchema,
             errorMessage: `Invalid transactions response data for ${identity} address.`,
-        },
-    });
+        }).fetch(
+            `${this.rpcUrl}v2/identities/${identity}/transfers?startTick=${startTick}&endTick=${endTick}`,
+        );
+    }
 
-const broadcastTransaction = async (
-    transaction: QubicTransaction | string,
-): Promise<IQubicBroadcastedTransactionDTO> =>
-    await qubicRpcFetcher({
-        endpoint: 'v1/broadcast-transaction',
-        requestOptions: {
+    async broadcastTransaction(
+        transaction: QubicTransaction | string,
+    ): Promise<IQubicBroadcastedTransactionDTO> {
+        return await Fetcher.create({
+            schema: qubicBroadcastedTransactionResult,
+            errorMessage: 'Failed to broadcast transaction.',
+            transformResponse: (data) => ({
+                encodedTransaction: data.encodedTransaction,
+                peersBroadcasted: data.peersBroadcasted,
+                transactionId: data.transactionId,
+            }),
+        }).fetch(`${this.rpcUrl}v1/broadcast-transaction`, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -78,16 +70,6 @@ const broadcastTransaction = async (
                         ? transaction
                         : transaction.encodeTransactionToBase64(transaction.getPackageData()),
             }),
-        },
-        validation: {
-            schema: qubicBroadcastedTransactionResult,
-            errorMessage: 'Failed to broadcast transaction.',
-        },
-    });
-
-export const QubicRpcService = {
-    getBalance,
-    getCurrentTick,
-    getTransactions,
-    broadcastTransaction,
-};
+        });
+    }
+}

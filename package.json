@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "npm run watch:css & react-app-rewired start",
+        "dev": "npm run watch:css & HTTPS=true react-app-rewired start",
         "build:css": "postcss src/index.css -o src/dist.css ",
         "watch:css": "postcss src/index.css -o src/dist.css -w",
         "start": "npm run watch:css & react-app-rewired start",
@@ -43,6 +43,7 @@
         "qrcode.react": "^4.2.0",
         "react": "19.0.0",
         "react-dom": "19.0.0",
+        "react-query": "^3.39.3",
         "react-router": "^7.1.5",
         "zod": "^3.24.1"
     },

@@ -17,6 +17,8 @@ npm install qubic-hw-app-react
 
 ### React Query Provider Requirement
 
+> If your app is not going to use any of those hooks, you can skip this requirement.
+
 In case to usage of `useQubicRpcXXX` or `useQubicLedgerXXXMutation` hooks, to handle RPC calls efficiently, the library requires wrapping your application with a React Query provider. Ensure that your app is wrapped with `QueryClientProvider` from `@tanstack/react-query`:
 
 ```tsx
@@ -174,6 +176,14 @@ const handleSignTransaction = async (transaction) => {
 
 > This requires wrapping your application with a QueryClientProvider from @tanstack/react-query.
 
+#### `useQubicRpcService`
+
+This hook give access to single instance of RPC service.
+
+```ts
+const qubicRpcService = useQubicRpcService();
+```
+
 #### `useQubicCurrentTickQuery`
 
 This hook retrieves the latest tick from the Qubic network.
@@ -215,7 +225,7 @@ Transactions are fetched progressively, ensuring that all available transactions
 
 By using these hooks, your application can efficiently interact with the Qubic RPC API while leveraging React Query's caching and state management.
 
-### Qubic RPC Service
+### Qsing the Qubic RPC Service
 
 The library exports `QubicRpcService`, which provides a set of functions for interacting with the Qubic RPC API. This service handles network requests with validation, ensuring that responses match expected schemas. You can build your own hooks using the service.
 

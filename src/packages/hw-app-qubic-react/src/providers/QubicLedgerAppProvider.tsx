@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { HWAppQubic } from '../../../hw-app-qubic';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress } from '../types';
-import { QubicRpcService } from '../services/qubic-rpc';
+import { QubicRpcServiceContext, QubicRpcServiceProvider } from './QubicRpcServiceProvider';
 
 export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
@@ -23,14 +23,16 @@ export const QubicLedgerAppContext = createContext<IQubicLedgerAppContext | null
 interface QubicLedgerAppProviderProps {
     init?: boolean;
     derivationPath: string;
+    rpcUrl: string;
 }
 
 const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     children,
     derivationPath,
     init,
-}: PropsWithChildren<QubicLedgerAppProviderProps>) => {
+}: PropsWithChildren<Omit<QubicLedgerAppProviderProps, 'rpcUrl'>>) => {
     const ledgerWebHIDContext = useContext(LedgerWebHIDContext);
+    const qubicRpcService = useContext(QubicRpcServiceContext);
 
     const [app, setApp] = useState<HWAppQubic | null>(null);
     const [generatedAddresses, setGeneratedAddresses] = useState<IQubicLedgerAddress[]>([]);
@@ -94,7 +96,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         const updatedAddresses = await Promise.all(
             generatedAddresses.map(async (address) => {
                 try {
-                    const balanceResponse = await QubicRpcService.getBalance(address.identity);
+                    const balanceResponse = await qubicRpcService.getBalance(address.identity);
 
                     return {
                         ...address,
@@ -147,10 +149,16 @@ export const QubicLedgerAppProvider = ({
     children,
     init = true,
     derivationPath,
+    rpcUrl,
 }: PropsWithChildren<QubicLedgerAppProviderProps>) => (
     <LedgerWebHIDProvider init={false}>
-        <QubicLedgerAppProviderWithoutWebHIDProvider init={init} derivationPath={derivationPath}>
-            {children}
-        </QubicLedgerAppProviderWithoutWebHIDProvider>
+        <QubicRpcServiceProvider rpcUrl={rpcUrl}>
+            <QubicLedgerAppProviderWithoutWebHIDProvider
+                init={init}
+                derivationPath={derivationPath}
+            >
+                {children}
+            </QubicLedgerAppProviderWithoutWebHIDProvider>
+        </QubicRpcServiceProvider>
     </LedgerWebHIDProvider>
 );

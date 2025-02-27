@@ -1,10 +1,12 @@
-export { useQubicLedgerApp } from './src/hooks/UseQubicLedgerApp';
-export { useQubicLedgerSignTransactionMutation } from './src/hooks/UseQubicLedgerSignTransactionMutation';
-export { useQubicLedgerAppDeriveredIndexCacheContext } from './src/hooks/UseQubicLedgerAppDeriveredIndexCacheContext';
+export { useQubicLedgerApp } from './src/hooks/use-qubic-ledger-app';
+export { useQubicLedgerSignTransactionMutation } from './src/hooks/use-qubic-ledger-sign-transaction-mutation';
+export { useQubicLedgerAppDeriveredIndexCacheContext } from './src/hooks/use-qubic-ledger-app-derivered-index-cache-context';
 
-export { useQubicCurrentTickQuery } from './src/hooks/qubic-rpc/UseQubicCurrentTickQuery';
-export { useQubicRpcBroadcastTransactionMutation } from './src/hooks/qubic-rpc/UseQubicRpcBroadcastTransactionMutation';
-export { useQubicTransactionHistoryQuery } from './src/hooks/qubic-rpc/UseQubicTransactionsHistoryQuery';
+export { useQubicCurrentTickQuery } from './src/hooks/qubic-rpc/use-qubic-current-tick-query';
+export { useQubicRpcBroadcastTransactionMutation } from './src/hooks/qubic-rpc/use-qubic-rpc-broadcast-transaction-mutation';
+export { useQubicTransactionHistoryQuery } from './src/hooks/qubic-rpc/use-qubic-transactions-history-query';
+
+export { useQubicRpcService } from './src/hooks/qubic-rpc/use-qubic-rpc-service';
 
 export { QubicLedgerAppProvider } from './src/providers/QubicLedgerAppProvider';
 export { QubicLedgerAppDeriveredIndexCache } from './src/providers/QubicLedgerAppDeriveredIndexCache';

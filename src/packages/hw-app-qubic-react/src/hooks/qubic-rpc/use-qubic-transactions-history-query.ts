@@ -1,23 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { ICustomUseQueryOptions, IQubicTransactionsDTO } from '../../types';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useQubicCurrentTickQuery } from './UseQubicCurrentTickQuery';
-import { QubicRpcService } from '../../services/qubic-rpc';
-
-const handleGetTransactions = async (identity: string, latestTick?: number) => {
-    if (!identity) {
-        throw new Error('Identity is required');
-    }
-
-    if (!latestTick) {
-        throw new Error('Latest tick is required');
-    }
-
-    return QubicRpcService.getTransactions({
-        identity,
-        startTick: latestTick,
-    });
-};
+import { useQubicCurrentTickQuery } from './use-qubic-current-tick-query';
+import { useQubicRpcService } from './use-qubic-rpc-service';
 
 const generateQueryKey = ({
     identity,
@@ -34,6 +19,7 @@ export const useQubicTransactionHistoryQuery = (
     queryOptions?: Omit<ICustomUseQueryOptions<IQubicTransactionsDTO>, 'placeholderData'>,
 ) => {
     const queryClient = useQueryClient();
+    const qubicRpcService = useQubicRpcService();
     const [page, setPage] = useState(0);
 
     const latestTickQuery = useQubicCurrentTickQuery();
@@ -47,8 +33,8 @@ export const useQubicTransactionHistoryQuery = (
 
     const query = useQuery({
         queryKey,
-        queryFn: async () => await handleGetTransactions(identity, tick),
-        enabled: Boolean(identity) && Boolean(tick),
+        queryFn: () => qubicRpcService.getTransactions({ identity, startTick: tick }),
+        enabled: Boolean(identity && tick),
         placeholderData: keepPreviousData,
         ...queryOptions,
     });

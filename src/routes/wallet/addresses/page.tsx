@@ -1,7 +1,6 @@
-import { use, useCallback } from 'react';
+import { use } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -16,11 +15,11 @@ import { QrCodeModal } from '@/components/qr-code-modal';
 import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
-import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
 import { SensitiveDataWrapper } from '@/components/SensitiveDataWrapper';
 import { useHideSensitiveDataContext } from '@/hooks/hide-sensitive-data';
+import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
+import { useVerifyAddress } from '@/hooks/verify-address';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -36,7 +35,9 @@ export const WalletAddressesPage = () => {
         areBalanceLoading,
     } = useQubicLedgerApp();
 
-    const { verifiedIdentities, verifyAddress } = use(VerifiedAddressContext);
+    const { verifiedIdentities } = useVerifiedAddressContext();
+    const { verifyAddress } = useVerifyAddress();
+
     const { isSensitiveDataHidden, toggleSensitiveDataHidden } = useHideSensitiveDataContext();
 
     const { deviceType } = use(DeviceTypeContext);
@@ -51,39 +52,6 @@ export const WalletAddressesPage = () => {
         useQrCodeModal(selectedAddress?.identity ?? '');
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
-
-    const handleVerifyAddress = useCallback(
-        async (address: IQubicLedgerAddress) => {
-            try {
-                if (verifiedIdentities.includes(address.identity)) {
-                    notifications.show({
-                        title: 'Warning',
-                        color: 'orange',
-                        message: 'Address already verified',
-                    });
-
-                    return;
-                }
-
-                await verifyAddress(address);
-
-                notifications.show({
-                    title: 'Success',
-                    message: 'Address verified successfully',
-                });
-            } catch (error) {
-                notifications.show({
-                    title: 'Error',
-                    color: 'red',
-                    message:
-                        error instanceof Error
-                            ? error.message
-                            : 'Failed to verify address (Unknown reason)',
-                });
-            }
-        },
-        [verifyAddress],
-    );
 
     return (
         <>
@@ -102,7 +70,7 @@ export const WalletAddressesPage = () => {
                     <Center>
                         <Button
                             leftSection={<AddCircleIcon sx={{ fontSize: '0.875rem' }} />}
-                            onClick={async () => await deriveNewAddress()}
+                            onClick={() => deriveNewAddress()}
                             disabled={isGenerateNewAddressButtonDisabled}
                         >
                             {isGeneratingAddress ? 'Generating...' : 'Generate New Address'}
@@ -143,8 +111,7 @@ export const WalletAddressesPage = () => {
                                     ),
                                     onAccountNameAndAddressClick: () =>
                                         selectAddressByIndex(address.addressIndex),
-                                    onVerifyAddressClick: async () =>
-                                        await handleVerifyAddress(address),
+                                    onVerifyAddressClick: () => verifyAddress(address),
                                 }}
                                 afterAccountDetails={
                                     <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>

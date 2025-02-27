@@ -38,8 +38,9 @@ export default function App() {
                 <Layout navbarContent={<NavbarContent />}>
                     <DeviceTypeProvider>
                         <QubicLedgerAppProvider
-                            init={false}
+                            rpcUrl={process.env.REACT_APP_QUBIC_RPC_URL}
                             derivationPath={process.env.REACT_APP_QUBIC_DERIVATION_PATH}
+                            init={false}
                         >
                             <QueryClientProvider client={queryClient}>
                                 <RouterRoutes>
