@@ -7,7 +7,7 @@ import {
     useQubicRpcBroadcastTransactionMutation,
 } from '@/packages/hw-app-qubic-react';
 import { useMutation } from '@tanstack/react-query';
-import { ICustomUseMutationOptions } from '@/packages/hw-app-qubic-react/src/types';
+import type { ICustomUseMutationOptions } from '@/packages/hw-app-qubic-react/src/types';
 
 interface QubicSendTransactionSignedWithLedgerToRpcParameters {
     sourceIdentity: string;
