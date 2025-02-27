@@ -93,14 +93,8 @@ export const WalletOverviewPage = () => {
             onSuccess: () => {
                 setisTransactionProcessing(false);
             },
-            onError: (error) => {
+            onError: () => {
                 setisTransactionProcessing(false);
-
-                notifications.show({
-                    title: 'Failed to broadcast transaction',
-                    message: error instanceof Error ? error.message : 'Unknown Error',
-                    color: 'red',
-                });
             },
         });
 
@@ -141,19 +135,27 @@ export const WalletOverviewPage = () => {
 
     const onSubmitHandler = useCallback(
         async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) => {
-            if (!selectedAddress) {
-                throw new Error('No selected address');
-            }
-
-            if (!isSelectedAddressVerified) {
-                try {
-                    await verifyAddress(selectedAddress, true);
-                } catch {
-                    return;
+            try {
+                if (!selectedAddress) {
+                    throw new Error('No selected address');
                 }
-            }
 
-            await sendTransactionSignedWithLedgerToRpcHandler(values);
+                if (!isSelectedAddressVerified) {
+                    try {
+                        await verifyAddress(selectedAddress, true);
+                    } catch {
+                        return;
+                    }
+                }
+
+                await sendTransactionSignedWithLedgerToRpcHandler(values);
+            } catch (error) {
+                notifications.show({
+                    title: 'Failed to send transaction',
+                    message: error instanceof Error ? error.message : 'Unknown Error',
+                    color: 'red',
+                });
+            }
         },
         [isSelectedAddressVerified, selectedAddress, sendTransactionSignedWithLedgerToRpcHandler],
     );

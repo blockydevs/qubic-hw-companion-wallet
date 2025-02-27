@@ -21,6 +21,12 @@ export const fetcher = async <Data, Return = Data>({
     const response = await fetch(url, { method, ...requestOptions });
 
     if (!response.ok) {
+        const errorResponse = await response.json();
+
+        if (errorResponse?.message) {
+            throw new Error(errorResponse.message);
+        }
+
         throw new Error(`Failed "${method}" to "${url}".}`);
     }
 
