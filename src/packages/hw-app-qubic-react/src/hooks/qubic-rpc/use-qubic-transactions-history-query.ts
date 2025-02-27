@@ -14,19 +14,13 @@ interface UseQubicTransactionsHistoryQueryProps {
     tickInterval?: number;
 }
 
-interface IUseQubicTransactionsHistoryQueryOptions
-    extends Omit<
-        ICustomUseInfiniteQueryOptions<DeepPartial<IQubicTransactionsDTO>>,
-        'placeholderData'
-    > {}
-
 export const useQubicTransactionHistoryQuery = (
     {
         identity,
         initialTick,
         tickInterval = DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
     }: UseQubicTransactionsHistoryQueryProps,
-    queryOptions?: IUseQubicTransactionsHistoryQueryOptions,
+    queryOptions?: ICustomUseInfiniteQueryOptions<DeepPartial<IQubicTransactionsDTO>>,
 ) => {
     const qubicRpcService = useQubicRpcService();
     const [endTick, setEndTick] = useState<number>(0);
