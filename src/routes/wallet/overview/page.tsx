@@ -1,6 +1,7 @@
-import { use, useMemo, useState } from 'react';
+import { use, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Divider, Paper, SegmentedControl, Stack, Title } from '@mantine/core';
+import { Divider, Paper, Stack, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import ExploreIcon from '@mui/icons-material/Explore';
@@ -10,24 +11,51 @@ import { AddressCardBalance } from '@/components/address-card/address-card-balan
 import { QrCodeModal } from '@/components/qr-code-modal';
 import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
-import { DashboardContext } from '@/providers/DashboardContextProvider';
-import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
-import { ConfirmingSection } from '@/routes/wallet/overview/confirming-section';
-import MessageForm from '@/routes/wallet/overview/message-form';
+import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { MissingSelectedAddressView } from '@/routes/wallet/overview/missing-selected-address-view';
-import { useMyOverviewPage } from '@/routes/wallet/overview/page.hooks';
-import { ReplacingTransactionSection } from '@/routes/wallet/overview/replacting-transaction-section';
-import SendForm from '@/routes/wallet/overview/send-form';
+import { SendForm } from '@/routes/wallet/overview/send-form';
+import { SendSuccessModal } from './send-success-modal';
+import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { FullScreenLoader } from '@/components/full-screen-loader';
+import { useVerifiedAddressContext, useVerifyAddress } from '@/hooks/verify-address';
+import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 
-const WALLET_ACTIONS = ['Transaction', 'Message'];
+const fullScreenLoaderDataOptions = {
+    confirmTransactionInLedger: {
+        title: 'Transaction is processing',
+        message: 'Please check transaction on your ledger and take action',
+    },
+    transactionIsBeignBroadcastedToRpc: {
+        title: 'Transaction is being broadcasted to network',
+        message: 'Please wait a moment',
+    },
+};
 
 export const WalletOverviewPage = () => {
     const navigate = useNavigate();
 
-    const { selectedAddress, setMempoolEntryToReplace, mempoolEntryToReplace, deviceType } =
-        use(DashboardContext);
+    const { deviceType } = use(DeviceTypeContext);
 
-    const { verifiedIdentities } = use(VerifiedAddressContext);
+    const [isTransactionProcessing, setisTransactionProcessing] = useState(false);
+    const [sentTransactionDetails, setSentTransactionDetails] = useState<{
+        sentTo: string;
+        sentTxId: string;
+        sentAmount: number;
+    } | null>(null);
+    const [fullScreenLoaderData, setFullScreenLoaderData] = useState<{
+        title: string;
+        message: string;
+    } | null>(fullScreenLoaderDataOptions.confirmTransactionInLedger);
+
+    const { selectedAddress } = useQubicLedgerApp();
+
+    const { verifiedIdentities } = useVerifiedAddressContext();
+    const { verifyAddress } = useVerifyAddress();
+
+    const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
+        useQrCodeModal(selectedAddress.identity ?? '');
+    const [isSuccessModalOpen, { open: openSuccessModal, close: closeSuccessModal }] =
+        useDisclosure();
 
     const {
         data: qubicPriceInUSD,
@@ -35,35 +63,65 @@ export const WalletOverviewPage = () => {
         isLoading: isQubicPriceInUSDLoading,
     } = useQubicPriceFromCoingecko();
 
-    const {
-        showConfirmingSection,
-        acceptingTxId,
-        confirmingTxId,
-        confirmationCount,
-        updateAddressDetails,
-    } = useMyOverviewPage();
+    const { sendTransactionSignedWithLedgerToRpc } = useQubicSendTransactionSignedWithLedgerToRpc();
 
-    const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
-        useQrCodeModal(selectedAddress?.address ?? '');
+    const onSubmitHandler = useCallback(
+        async (values: { sendTo: string; amount: number; resetForm: () => void }) =>
+            await sendTransactionSignedWithLedgerToRpc(
+                {
+                    amount: values.amount,
+                    sourceIdentity: selectedAddress.identity,
+                    destinationIdentity: values.sendTo,
 
-    const [selectedTab, setSelectedTab] = useState<(typeof WALLET_ACTIONS)[number]>('Transaction');
+                    onBeforeSendTransactionSignedWithLedgerToRpc: () => {
+                        setisTransactionProcessing(true);
+                    },
+                    onAfterSendTransactionSignedWithLedgerToRpc: () => {
+                        setisTransactionProcessing(false);
+                    },
 
-    const tabContent = useMemo(() => {
-        switch (selectedTab) {
-            case 'Transaction':
-                return (
-                    <SendForm
-                        onSuccess={updateAddressDetails}
-                        addressContext={selectedAddress}
-                        mempoolEntryToReplace={mempoolEntryToReplace}
-                    />
-                );
-            case 'Message':
-                return <MessageForm selectedAddress={selectedAddress} deviceType={deviceType} />;
-            default:
-                return null;
-        }
-    }, [selectedTab, selectedAddress, deviceType, mempoolEntryToReplace, updateAddressDetails]);
+                    onBeforeCreateTransaction: async () => {
+                        if (!verifiedIdentities.includes(selectedAddress.identity)) {
+                            await verifyAddress(selectedAddress);
+                        }
+                    },
+
+                    onBeforeSignTransactionWithLedger: () => {
+                        setFullScreenLoaderData(
+                            fullScreenLoaderDataOptions.confirmTransactionInLedger,
+                        );
+                    },
+
+                    onBeforeBroadcastTransactionToRpc: () => {
+                        setFullScreenLoaderData(
+                            fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc,
+                        );
+                    },
+                    onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
+                        setSentTransactionDetails(sentTransactionDetails);
+                        openSuccessModal();
+                        values.resetForm();
+                    },
+
+                    onError: (error) => {
+                        notifications.show({
+                            title: 'Failed to broadcast transaction',
+                            message: error instanceof Error ? error.message : 'Unknown Error',
+                            color: 'red',
+                        });
+                    },
+                },
+                deviceType === 'demo',
+            ),
+        [
+            selectedAddress,
+            verifiedIdentities,
+            verifyAddress,
+            openSuccessModal,
+            sendTransactionSignedWithLedgerToRpc,
+            deviceType,
+        ],
+    );
 
     if (!selectedAddress) {
         return <MissingSelectedAddressView />;
@@ -77,6 +135,20 @@ export const WalletOverviewPage = () => {
                 qrCodeAddress={qrCodeAddress}
             />
 
+            <SendSuccessModal
+                sentTo={sentTransactionDetails?.sentTo ?? ''}
+                sentTxId={sentTransactionDetails?.sentTxId ?? ''}
+                sentAmount={sentTransactionDetails?.sentAmount ?? 0}
+                opened={isSuccessModalOpen}
+                onClose={closeSuccessModal}
+            />
+
+            <FullScreenLoader
+                visible={isTransactionProcessing}
+                title={fullScreenLoaderData.title}
+                message={fullScreenLoaderData.message}
+            />
+
             <Stack w='100%'>
                 <Title size='h2'>Overview</Title>
 
@@ -87,28 +159,20 @@ export const WalletOverviewPage = () => {
                     maw='600px'
                     accountDetails={{
                         accountName: 'Account 1',
-                        address: selectedAddress.address,
+                        address: selectedAddress.identity,
                         isSelected: true,
-                        isAddressVerified: verifiedIdentities.includes(selectedAddress.address),
-                        onVerifyAddressClick: () => console.log('verify address'),
+                        isAddressVerified: verifiedIdentities.includes(selectedAddress.identity),
+                        onVerifyAddressClick: async () => await verifyAddress(selectedAddress),
                     }}
                     afterAccountDetails={
-                        showConfirmingSection ? (
-                            <ConfirmingSection
-                                acceptingTxId={acceptingTxId}
-                                confirmingTxId={confirmingTxId}
-                                confirmationCount={confirmationCount}
-                            />
-                        ) : (
-                            <AddressCardBalance
-                                balance={selectedAddress.balance.toString()}
-                                balanceUSD={{
-                                    isLoading: isQubicPriceInUSDLoading,
-                                    value: qubicPriceInUSD,
-                                    error: qubicPriceInUSDError,
-                                }}
-                            />
-                        )
+                        <AddressCardBalance
+                            balance={selectedAddress.balance.toString()}
+                            balanceUSD={{
+                                isLoading: isQubicPriceInUSDLoading,
+                                value: qubicPriceInUSD,
+                                error: qubicPriceInUSDError,
+                            }}
+                        />
                     }
                     buttons={[
                         {
@@ -124,46 +188,26 @@ export const WalletOverviewPage = () => {
                             component: <QrCodeIcon htmlColor='var(--mantine-color-brand-text)' />,
                             label: 'QR Code',
                             onClick: () => {
-                                handleOpenQrCodeModal(selectedAddress.address);
+                                handleOpenQrCodeModal(selectedAddress.identity);
                             },
                         },
                         {
                             component: <ExploreIcon htmlColor='var(--mantine-color-brand-text)' />,
                             label: 'Explorer',
                             isExternalLink: true,
-                            to: `https://explorer.qubic.org/network/address/${selectedAddress.address}`,
+                            to: `https://explorer.qubic.org/network/address/${selectedAddress.identity}`,
                         },
                     ]}
                 />
 
                 <Divider />
 
-                <Paper p='lg' radius='sm'>
-                    <SegmentedControl
-                        data={WALLET_ACTIONS}
-                        value={selectedTab}
-                        onChange={setSelectedTab}
-                        fullWidth
+                <Paper px='lg' py='3rem' radius='sm'>
+                    <SendForm
+                        onSubmit={onSubmitHandler}
+                        isDisabled={isTransactionProcessing}
+                        maxAmount={parseInt(selectedAddress.balance)}
                     />
-
-                    <Stack py='2rem' w='100%'>
-                        {tabContent}
-                    </Stack>
-
-                    {mempoolEntryToReplace ? (
-                        <ReplacingTransactionSection
-                            onCloseNotification={() => {
-                                setMempoolEntryToReplace(null);
-                                notifications.show({
-                                    message: 'RBF cancelled',
-                                    autoClose: 3000,
-                                });
-                            }}
-                            transactionId={
-                                mempoolEntryToReplace.transaction.verboseData.transactionId
-                            }
-                        />
-                    ) : null}
                 </Paper>
             </Stack>
         </>
