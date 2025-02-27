@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useId } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
 import {
     encodeTransactionToBase64,
@@ -6,13 +6,16 @@ import {
     useQubicLedgerSignTransactionMutation,
     useQubicRpcBroadcastTransactionMutation,
 } from '@/packages/hw-app-qubic-react';
+import { useMutation } from '@tanstack/react-query';
+import { ICustomUseMutationOptions } from '@/packages/hw-app-qubic-react/src/types';
 
 interface QubicSendTransactionSignedWithLedgerToRpcParameters {
     sourceIdentity: string;
     destinationIdentity: string;
     amount: number;
 
-    onBeforeSendTransactionSignedWithLedgerToRpc?: () => Promise<void> | void;
+    isDemoMode?: boolean;
+
     onBeforeCreateTransaction?: () => Promise<void> | void;
     onBeforeSignTransactionWithLedger?: () => Promise<void> | void;
     onBeforeBroadcastTransactionToRpc?: () => Promise<void> | void;
@@ -21,8 +24,6 @@ interface QubicSendTransactionSignedWithLedgerToRpcParameters {
         sentTxId: string;
         sentAmount: number;
     }) => Promise<void> | void;
-    onAfterSendTransactionSignedWithLedgerToRpc?: () => Promise<void> | void;
-    onError?: (error: unknown) => Promise<void> | void;
 }
 
 interface QubicSendTransactionDemoParameters
@@ -31,7 +32,12 @@ interface QubicSendTransactionDemoParameters
         'onBeforeBroadcastTransactionToRpc' | 'onAfterBroadcastTransactionToRpc'
     > {}
 
-export const useQubicSendTransactionSignedWithLedgerToRpc = () => {
+export const useQubicSendTransactionSignedWithLedgerToRpc = (
+    mutationOptions?: ICustomUseMutationOptions<
+        void,
+        QubicSendTransactionSignedWithLedgerToRpcParameters
+    >,
+) => {
     const { mutateAsync: ledgerBroadcastTransaction } = useQubicLedgerSignTransactionMutation();
     const { data: latestTick } = useQubicCurrentTickQuery();
     const { mutateAsync: broadcastTransactionToRpc } = useQubicRpcBroadcastTransactionMutation();
@@ -86,7 +92,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = () => {
     }: QubicSendTransactionDemoParameters) => {
         await onBeforeBroadcastTransactionToRpc?.();
 
-        return new Promise((resolve) => {
+        new Promise((resolve) => {
             setTimeout(async () => {
                 await onAfterBroadcastTransactionToRpc({
                     sentTo: 'demo-transaction',
@@ -100,30 +106,18 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = () => {
     };
 
     const sendTransactionSignedWithLedgerToRpc = useCallback(
-        async (
-            {
-                onBeforeSendTransactionSignedWithLedgerToRpc,
-                onAfterSendTransactionSignedWithLedgerToRpc,
-                ...values
-            }: QubicSendTransactionSignedWithLedgerToRpcParameters,
-            isDemoMode = false,
-        ) => {
-            await onBeforeSendTransactionSignedWithLedgerToRpc?.();
-
-            try {
-                isDemoMode
-                    ? await handleDemoTransaction(values)
-                    : await handleBroadcastTransaction(values);
-            } catch (error) {
-                await values.onError?.(error);
-            } finally {
-                await onAfterSendTransactionSignedWithLedgerToRpc?.();
-            }
-        },
+        async (values: QubicSendTransactionSignedWithLedgerToRpcParameters) =>
+            values?.isDemoMode
+                ? await handleDemoTransaction(values)
+                : await handleBroadcastTransaction(values),
         [handleBroadcastTransaction, handleDemoTransaction],
     );
 
-    return {
-        sendTransactionSignedWithLedgerToRpc,
-    };
+    const id = useId();
+
+    return useMutation({
+        mutationKey: ['sendTransactionSignedWithLedgerToRpc', id],
+        mutationFn: sendTransactionSignedWithLedgerToRpc,
+        ...mutationOptions,
+    });
 };

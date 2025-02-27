@@ -63,63 +63,60 @@ export const WalletOverviewPage = () => {
         isLoading: isQubicPriceInUSDLoading,
     } = useQubicPriceFromCoingecko();
 
-    const { sendTransactionSignedWithLedgerToRpc } = useQubicSendTransactionSignedWithLedgerToRpc();
+    const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
+        useQubicSendTransactionSignedWithLedgerToRpc({
+            onSettled: () => {
+                setisTransactionProcessing(false);
+            },
+            onSuccess: () => {
+                setisTransactionProcessing(false);
+            },
+            onError: (error) => {
+                notifications.show({
+                    title: 'Failed to broadcast transaction',
+                    message: error instanceof Error ? error.message : 'Unknown Error',
+                    color: 'red',
+                });
+            },
+        });
 
     const onSubmitHandler = useCallback(
         async (values: { sendTo: string; amount: number; resetForm: () => void }) =>
-            await sendTransactionSignedWithLedgerToRpc(
-                {
-                    amount: values.amount,
-                    sourceIdentity: selectedAddress.identity,
-                    destinationIdentity: values.sendTo,
+            await sendTransactionSignedWithLedgerToRpc({
+                amount: values.amount,
+                sourceIdentity: selectedAddress.identity,
+                destinationIdentity: values.sendTo,
 
-                    onBeforeSendTransactionSignedWithLedgerToRpc: () => {
-                        setisTransactionProcessing(true);
-                    },
-                    onAfterSendTransactionSignedWithLedgerToRpc: () => {
-                        setisTransactionProcessing(false);
-                    },
+                isDemoMode: deviceType === 'demo',
 
-                    onBeforeCreateTransaction: async () => {
-                        if (!verifiedIdentities.includes(selectedAddress.identity)) {
-                            await verifyAddress(selectedAddress);
-                        }
-                    },
-
-                    onBeforeSignTransactionWithLedger: () => {
-                        setFullScreenLoaderData(
-                            fullScreenLoaderDataOptions.confirmTransactionInLedger,
-                        );
-                    },
-
-                    onBeforeBroadcastTransactionToRpc: () => {
-                        setFullScreenLoaderData(
-                            fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc,
-                        );
-                    },
-                    onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
-                        setSentTransactionDetails(sentTransactionDetails);
-                        openSuccessModal();
-                        values.resetForm();
-                    },
-
-                    onError: (error) => {
-                        notifications.show({
-                            title: 'Failed to broadcast transaction',
-                            message: error instanceof Error ? error.message : 'Unknown Error',
-                            color: 'red',
-                        });
-                    },
+                onBeforeCreateTransaction: async () => {
+                    if (!verifiedIdentities.includes(selectedAddress.identity)) {
+                        await verifyAddress(selectedAddress);
+                    }
                 },
-                deviceType === 'demo',
-            ),
+
+                onBeforeSignTransactionWithLedger: () => {
+                    setFullScreenLoaderData(fullScreenLoaderDataOptions.confirmTransactionInLedger);
+                },
+
+                onBeforeBroadcastTransactionToRpc: () => {
+                    setFullScreenLoaderData(
+                        fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc,
+                    );
+                },
+                onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
+                    setSentTransactionDetails(sentTransactionDetails);
+                    openSuccessModal();
+                    values.resetForm();
+                },
+            }),
         [
+            deviceType,
+            openSuccessModal,
             selectedAddress,
+            sendTransactionSignedWithLedgerToRpc,
             verifiedIdentities,
             verifyAddress,
-            openSuccessModal,
-            sendTransactionSignedWithLedgerToRpc,
-            deviceType,
         ],
     );
 
