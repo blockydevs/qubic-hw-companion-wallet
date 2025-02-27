@@ -1,6 +1,6 @@
 import { use, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Divider, Paper, Stack, Title } from '@mantine/core';
+import { Divider, Loader, LoadingOverlay, Paper, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
@@ -11,7 +11,7 @@ import { AddressCardBalance } from '@/components/address-card/address-card-balan
 import { QrCodeModal } from '@/components/qr-code-modal';
 import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
-import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import { useQubicCurrentTickQuery, useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { MissingSelectedAddressView } from '@/routes/wallet/overview/missing-selected-address-view';
 import { SendForm } from '@/routes/wallet/overview/send-form';
 import { SendSuccessModal } from './send-success-modal';
@@ -63,8 +63,10 @@ export const WalletOverviewPage = () => {
         isLoading: isQubicPriceInUSDLoading,
     } = useQubicPriceFromCoingecko();
 
+    const { data: latestTick } = useQubicCurrentTickQuery();
+
     const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
-        useQubicSendTransactionSignedWithLedgerToRpc({
+        useQubicSendTransactionSignedWithLedgerToRpc(latestTick, {
             onMutate: () => {
                 setisTransactionProcessing(true);
                 return []; // No need to return anything
@@ -84,9 +86,10 @@ export const WalletOverviewPage = () => {
         });
 
     const onSubmitHandler = useCallback(
-        async (values: { sendTo: string; amount: number; resetForm: () => void }) =>
+        async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) =>
             await sendTransactionSignedWithLedgerToRpc({
                 amount: values.amount,
+                tick: values.tick,
                 sourceIdentity: selectedAddress.identity,
                 destinationIdentity: values.sendTo,
 
@@ -202,12 +205,34 @@ export const WalletOverviewPage = () => {
 
                 <Divider />
 
-                <Paper px='lg' py='3rem' radius='sm'>
-                    <SendForm
-                        onSubmit={onSubmitHandler}
-                        isDisabled={isTransactionProcessing}
-                        maxAmount={parseInt(selectedAddress.balance)}
+                <Paper px='lg' py='3rem' radius='sm' pos='relative'>
+                    <LoadingOverlay
+                        visible={!latestTick}
+                        loaderProps={{
+                            children: (
+                                <Stack align='center'>
+                                    <Loader size='sm' />
+                                    <Text>Waiting for latest tick info</Text>
+                                </Stack>
+                            ),
+                        }}
                     />
+
+                    {latestTick ? (
+                        <SendForm
+                            latestTick={latestTick}
+                            onSubmit={onSubmitHandler}
+                            isDisabled={isTransactionProcessing}
+                            maxAmount={parseInt(selectedAddress.balance)}
+                        />
+                    ) : (
+                        <SendForm
+                            latestTick={latestTick}
+                            onSubmit={() => {}}
+                            isDisabled={true}
+                            maxAmount={0}
+                        />
+                    )}
                 </Paper>
             </Stack>
         </>

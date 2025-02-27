@@ -8,18 +8,31 @@ import {
     UnstyledButton,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useEffect } from 'react';
 
 interface SendFormProps extends Omit<StackProps, 'onSubmit'> {
-    // TODO: set correct typing
     isDisabled?: boolean;
     maxAmount: number;
-    onSubmit: (result: { amount: number; sendTo: string; resetForm: () => void }) => void;
+    latestTick: number;
+    onSubmit: (result: {
+        amount: number;
+        sendTo: string;
+        tick: number;
+        resetForm: () => void;
+    }) => void;
 }
 
-export const SendForm = ({ onSubmit, isDisabled, maxAmount, ...stackProps }: SendFormProps) => {
+export const SendForm = ({
+    onSubmit,
+    isDisabled,
+    maxAmount,
+    latestTick,
+    ...stackProps
+}: SendFormProps) => {
     const form = useForm({
         initialValues: {
             amount: 0,
+            tick: latestTick + 10,
             sendTo: '',
         },
         validate: {
@@ -36,6 +49,15 @@ export const SendForm = ({ onSubmit, isDisabled, maxAmount, ...stackProps }: Sen
             amount: maxAmount,
         });
     };
+
+    useEffect(() => {
+        console.log('form.getValues().tick', latestTick, form.getValues().tick);
+        if (form.getValues().tick === 0 && latestTick > 0) {
+            form.setValues({
+                tick: latestTick + 10,
+            });
+        }
+    }, [latestTick, form.getValues().tick, form.setValues, form.getValues, form.getValues().tick]);
 
     return (
         <Stack {...stackProps}>
@@ -64,6 +86,29 @@ export const SendForm = ({ onSubmit, isDisabled, maxAmount, ...stackProps }: Sen
                         </Text>
                     </UnstyledButton>
                 }
+                inputWrapperOrder={['label', 'input', 'description', 'error']}
+            />
+
+            <NumberInput
+                label='Tick'
+                placeholder='0'
+                min={0}
+                decimalScale={8}
+                step={1}
+                disabled={isDisabled}
+                required
+                rightSectionWidth='6rem'
+                rightSection={
+                    <Stack display='flex' dir='column' gap='0' justify='flex-end' align='flex-end'>
+                        <Text pl='1rem' size='xs'>
+                            Latest tick:
+                        </Text>
+                        <Text size='xs' c='brand'>
+                            {latestTick}
+                        </Text>
+                    </Stack>
+                }
+                {...form.getInputProps('tick')}
                 inputWrapperOrder={['label', 'input', 'description', 'error']}
             />
 

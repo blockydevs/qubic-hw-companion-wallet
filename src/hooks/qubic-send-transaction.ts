@@ -2,7 +2,6 @@ import { useCallback, useId } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
 import {
     encodeTransactionToBase64,
-    useQubicCurrentTickQuery,
     useQubicLedgerSignTransactionMutation,
     useQubicRpcBroadcastTransactionMutation,
 } from '@/packages/hw-app-qubic-react';
@@ -13,6 +12,7 @@ interface QubicSendTransactionSignedWithLedgerToRpcParameters {
     sourceIdentity: string;
     destinationIdentity: string;
     amount: number;
+    tick: number;
 
     isDemoMode?: boolean;
 
@@ -33,13 +33,13 @@ interface QubicSendTransactionDemoParameters
     > {}
 
 export const useQubicSendTransactionSignedWithLedgerToRpc = (
+    latestTick: number,
     mutationOptions?: ICustomUseMutationOptions<
         void,
         QubicSendTransactionSignedWithLedgerToRpcParameters
     >,
 ) => {
     const { mutateAsync: ledgerBroadcastTransaction } = useQubicLedgerSignTransactionMutation();
-    const { data: latestTick } = useQubicCurrentTickQuery();
     const { mutateAsync: broadcastTransactionToRpc } = useQubicRpcBroadcastTransactionMutation();
 
     const handleBroadcastTransaction = useCallback(
@@ -47,6 +47,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
             destinationIdentity,
             sourceIdentity,
             amount,
+            tick,
             onAfterBroadcastTransactionToRpc,
             onBeforeCreateTransaction,
             onBeforeBroadcastTransactionToRpc,
@@ -65,7 +66,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
                 .setSourcePublicKey(sourcePublicKey)
                 .setDestinationPublicKey(destinationPublicKey)
                 .setAmount(amount)
-                .setTick(latestTick + 20);
+                .setTick(tick);
 
             await onBeforeSignTransactionWithLedger?.();
 
