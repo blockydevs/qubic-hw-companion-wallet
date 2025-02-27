@@ -1,43 +1,36 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+import type { IDataTransformer, IDataValidator, IHttpClient } from '../types';
+import { FetchHttpClient } from './fetch-http-client';
+import { FunctionTransformer } from './function-transformer';
+import { ZodValidator } from './zod-validator';
 
-export interface IFetcherArgs<Data, Return = Data> {
-    url: string;
-    requestOptions?: RequestInit;
-    validation: {
+export class Fetcher<Data, Return = Data> {
+    private constructor(
+        private httpClient: IHttpClient,
+        private validator: IDataValidator<Data>,
+        private transformer: IDataTransformer<Data, Return>,
+    ) {}
+
+    async fetch(url: string, requestOptions?: RequestInit): Promise<Return> {
+        const responseData = await this.httpClient.request<unknown>(url, requestOptions);
+        const validatedData = this.validator.validate(responseData);
+
+        return this.transformer.transform(validatedData);
+    }
+
+    static create<Data, Return = Data>({
+        schema,
+        errorMessage,
+        transformResponse,
+    }: {
         schema: z.Schema<Data>;
         errorMessage?: string;
-    };
-    transformResponse?: (data: Data) => Return;
+        transformResponse?: (data: Data) => Return;
+    }): Fetcher<Data, Return> {
+        return new Fetcher<Data, Return>(
+            new FetchHttpClient(),
+            new ZodValidator(schema, errorMessage),
+            new FunctionTransformer(transformResponse),
+        );
+    }
 }
-
-export const fetcher = async <Data, Return = Data>({
-    requestOptions,
-    url,
-    validation,
-    transformResponse,
-}: IFetcherArgs<Data, Return>): Promise<Return> => {
-    const method = requestOptions?.method ?? 'GET';
-
-    const response = await fetch(url, { method, ...requestOptions });
-
-    if (!response.ok) {
-        const errorResponse = await response.json();
-
-        if (errorResponse?.message) {
-            throw new Error(errorResponse.message);
-        }
-
-        throw new Error(`Failed "${method}" to "${url}".}`);
-    }
-
-    const responseData = await response.json();
-    const validatedResponseData = validation.schema.safeParse(responseData);
-
-    if (!validatedResponseData.success) {
-        throw new Error(validation.errorMessage ?? 'Failed to validate data.');
-    }
-
-    return transformResponse
-        ? transformResponse(validatedResponseData.data)
-        : (validatedResponseData.data as unknown as Return);
-};

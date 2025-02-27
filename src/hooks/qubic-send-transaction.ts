@@ -1,4 +1,4 @@
-import { useCallback, useId } from 'react';
+import { useCallback } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
 import {
     encodeTransactionToBase64,
@@ -110,10 +110,8 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
         [handleBroadcastTransaction, handleDemoTransaction],
     );
 
-    const id = useId();
-
     return useMutation({
-        mutationKey: ['sendTransactionSignedWithLedgerToRpc', id],
+        mutationKey: ['sendTransactionSignedWithLedgerToRpc'],
         mutationFn: sendTransactionSignedWithLedgerToRpc,
         ...mutationOptions,
     });

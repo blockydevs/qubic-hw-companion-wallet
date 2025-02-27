@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { QUBIC_WALLET_LAST_CACHED_INDEXES_LOCAL_STORAGE_KEY } from '../constants';
-import { useQubicLedgerApp } from '../hooks/UseQubicLedgerApp';
+import { useQubicLedgerApp } from '../hooks/use-qubic-ledger-app';
 import { getCache, setCache } from '../utils/local-storage-cache';
 
 interface IQubicLedgerAppDeriveredIndexCacheContext {

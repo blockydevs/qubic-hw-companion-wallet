@@ -17,7 +17,8 @@ import { SendForm } from '@/routes/wallet/overview/send-form';
 import { SendSuccessModal } from './send-success-modal';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { FullScreenLoader } from '@/components/full-screen-loader';
-import { useVerifiedAddressContext, useVerifyAddress } from '@/hooks/verify-address';
+import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
+import { useVerifyAddress } from '@/hooks/verify-address';
 import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 
 const fullScreenLoaderDataOptions = {

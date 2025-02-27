@@ -1,17 +1,7 @@
-import { use, useCallback } from 'react';
+import { useCallback } from 'react';
 import { notifications } from '@mantine/notifications';
-import { VerifiedAddressContext } from '@/providers/VerifiedAddressProvider';
 import type { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
-
-export const useVerifiedAddressContext = () => {
-    const verifiedAddressContext = use(VerifiedAddressContext);
-
-    if (!verifiedAddressContext) {
-        throw new Error('useVerifiedAddressContext must be used within a VerifiedAddressProvider');
-    }
-
-    return verifiedAddressContext;
-};
+import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
 
 export const useVerifyAddress = () => {
     const { verifyAddress, verifiedIdentities } = useVerifiedAddressContext();

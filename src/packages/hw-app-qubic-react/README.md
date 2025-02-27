@@ -176,6 +176,14 @@ const handleSignTransaction = async (transaction) => {
 
 > This requires wrapping your application with a QueryClientProvider from @tanstack/react-query.
 
+#### `useQubicRpcService`
+
+This hook give access to single instance of RPC service.
+
+```ts
+const qubicRpcService = useQubicRpcService();
+```
+
 #### `useQubicCurrentTickQuery`
 
 This hook retrieves the latest tick from the Qubic network.

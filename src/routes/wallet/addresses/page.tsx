@@ -18,7 +18,8 @@ import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { SensitiveDataWrapper } from '@/components/SensitiveDataWrapper';
 import { useHideSensitiveDataContext } from '@/hooks/hide-sensitive-data';
-import { useVerifiedAddressContext, useVerifyAddress } from '@/hooks/verify-address';
+import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
+import { useVerifyAddress } from '@/hooks/verify-address';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -69,7 +70,7 @@ export const WalletAddressesPage = () => {
                     <Center>
                         <Button
                             leftSection={<AddCircleIcon sx={{ fontSize: '0.875rem' }} />}
-                            onClick={async () => await deriveNewAddress()}
+                            onClick={() => deriveNewAddress()}
                             disabled={isGenerateNewAddressButtonDisabled}
                         >
                             {isGeneratingAddress ? 'Generating...' : 'Generate New Address'}
@@ -110,7 +111,7 @@ export const WalletAddressesPage = () => {
                                     ),
                                     onAccountNameAndAddressClick: () =>
                                         selectAddressByIndex(address.addressIndex),
-                                    onVerifyAddressClick: async () => await verifyAddress(address),
+                                    onVerifyAddressClick: () => verifyAddress(address),
                                 }}
                                 afterAccountDetails={
                                     <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>

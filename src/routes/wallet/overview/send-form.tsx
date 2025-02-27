@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
     Button,
     Flex,
@@ -44,7 +44,6 @@ export const SendForm = ({
     latestTick,
     ...stackProps
 }: SendFormProps) => {
-    const isInitialized = useRef(false);
     const form = useForm({
         initialValues: {
             amount: 1,
@@ -85,9 +84,11 @@ export const SendForm = ({
 
     useEffect(() => {
         // INITIALIZE TICK VALUE
-        if (latestTick !== 0 && latestTick > form.getValues().tick && !isInitialized.current) {
+        if (
+            latestTick !== 0 &&
+            (Number.isNaN(form.getValues().tick) || latestTick > form.getValues().tick)
+        ) {
             onTickChangeHandler();
-            isInitialized.current = true;
         }
     }, [latestTick, form.getValues().tick, onTickChangeHandler]);
 
