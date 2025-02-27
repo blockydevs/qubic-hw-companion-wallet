@@ -1,22 +1,13 @@
 import { useCallback, useState } from 'react';
 import qubic from '@qubic-lib/qubic-ts-library';
-import { useQubicLedgerAppContext } from './UseQubicLedgerAppContext';
+import { useQubicLedgerAppContext } from './use-qubic-ledger-app-context';
 import { generateDerivationPathForGivenIndex } from '../utils/derivation-path';
-import { QubicRpcService } from '../services/qubic-rpc';
 import { MAX_ADDRESS_INDEX } from '../constants';
 import type { IQubicLedgerAddress } from '../types';
-
-const getBalanceHandler = async (identity: string) => {
-    try {
-        const balanceResponse = await QubicRpcService.getBalance(identity);
-
-        return balanceResponse.balance;
-    } catch {
-        return '0';
-    }
-};
+import { useQubicRpcService } from './qubic-rpc/use-qubic-rpc-service';
 
 export const useQubicLedgerApp = () => {
+    const qubicRpcService = useQubicRpcService();
     const {
         app,
         initApp,
@@ -32,6 +23,16 @@ export const useQubicLedgerApp = () => {
 
     const [isGeneratingAddress, setIsGeneratingAddress] = useState(false);
     const isAppInitialized = Boolean(app);
+
+    const getBalanceHandler = useCallback(async (identity: string) => {
+        try {
+            const balanceResponse = await qubicRpcService.getBalance(identity);
+
+            return balanceResponse.balance;
+        } catch {
+            return '0';
+        }
+    }, []);
 
     const getVersion = useCallback(async () => {
         if (!app) {

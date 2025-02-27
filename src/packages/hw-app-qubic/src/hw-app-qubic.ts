@@ -78,16 +78,18 @@ export class HWAppQubic {
 
         const shortTxBytes = Buffer.from(transactionBytes.subarray(0, 80));
 
-        const signature = await this.sendToDevice({
+        const signatureResponse = await this.sendToDevice({
             instruction: INS.SIGN_TRANSACTION,
             p1: P1.CONFIRM,
             p2: P2.LAST,
             payload: shortTxBytes,
         });
 
-        const signedData = new Uint8Array(transactionBytes.length + signature.length);
-        signedData.set(transactionBytes);
-        signedData.set(signature, transactionBytes.length);
+        const signature = signatureResponse.subarray(1, 65);
+
+        const signedData = new Uint8Array(shortTxBytes.length + signature.length);
+        signedData.set(shortTxBytes);
+        signedData.set(signature, shortTxBytes.length);
 
         return {
             signature: signature,

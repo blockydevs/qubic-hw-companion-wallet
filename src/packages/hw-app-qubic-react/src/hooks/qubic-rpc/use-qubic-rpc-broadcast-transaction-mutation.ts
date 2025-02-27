@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { QubicRpcService } from '../../services/qubic-rpc';
 import type { ICustomUseMutationOptions, IQubicBroadcastedTransactionDTO } from '../../types';
-import { useId } from 'react';
 import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/QubicTransaction';
+import { useQubicRpcService } from './use-qubic-rpc-service';
 
 export const useQubicRpcBroadcastTransactionMutation = (
     mutationOptions?: ICustomUseMutationOptions<
@@ -10,12 +9,12 @@ export const useQubicRpcBroadcastTransactionMutation = (
         QubicTransaction | string
     >,
 ) => {
-    const id = useId();
+    const qubicRpcService = useQubicRpcService();
 
     return useMutation({
-        mutationKey: ['qubicBroadcastTransaction', id],
+        mutationKey: ['qubicBroadcastTransaction'],
         mutationFn: async (transaction: QubicTransaction | string) =>
-            await QubicRpcService.broadcastTransaction(transaction),
+            await qubicRpcService.broadcastTransaction(transaction),
         ...mutationOptions,
     });
 };

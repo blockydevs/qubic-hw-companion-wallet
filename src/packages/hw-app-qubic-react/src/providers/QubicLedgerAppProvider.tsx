@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { HWAppQubic } from '../../../hw-app-qubic';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress } from '../types';
-import { QubicRpcService } from '../services/qubic-rpc';
+import { QubicRpcServiceContext, QubicRpcServiceProvider } from './QubicRpcServiceProvider';
 
 export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
@@ -15,7 +15,7 @@ export interface IQubicLedgerAppContext {
     addNewAddress: (generatedAddressData: IQubicLedgerAddress) => void;
     refetchBalances: () => Promise<void>;
     setSelectedAddressIndex: (index: number) => void;
-    reset: () => void;
+    reset: () => Promise<void>;
 }
 
 export const QubicLedgerAppContext = createContext<IQubicLedgerAppContext | null>(null);
@@ -23,14 +23,16 @@ export const QubicLedgerAppContext = createContext<IQubicLedgerAppContext | null
 interface QubicLedgerAppProviderProps {
     init?: boolean;
     derivationPath: string;
+    rpcUrl: string;
 }
 
 const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     children,
     derivationPath,
     init,
-}: PropsWithChildren<QubicLedgerAppProviderProps>) => {
-    const ctx = useContext(LedgerWebHIDContext);
+}: PropsWithChildren<Omit<QubicLedgerAppProviderProps, 'rpcUrl'>>) => {
+    const ledgerWebHIDContext = useContext(LedgerWebHIDContext);
+    const qubicRpcService = useContext(QubicRpcServiceContext);
 
     const [app, setApp] = useState<HWAppQubic | null>(null);
     const [generatedAddresses, setGeneratedAddresses] = useState<IQubicLedgerAddress[]>([]);
@@ -46,17 +48,17 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     }, [selectedAddressIndex, generatedAddresses]);
 
     const initApp = useCallback(async () => {
-        if (!ctx) {
-            throw new Error('WebHIDContext not initialized');
+        if (!ledgerWebHIDContext) {
+            throw new Error('LedgerWebHIDContext not initialized');
         }
 
         if (app) {
             throw new Error('Qubic HW App is already initialized');
         }
 
-        const transportForHwAppQubic = ctx?.transport
-            ? ctx.transport
-            : await ctx.initLedgerTransportHandler();
+        const transportForHwAppQubic = ledgerWebHIDContext?.transport
+            ? ledgerWebHIDContext.transport
+            : await ledgerWebHIDContext.initLedgerTransportHandler();
 
         if (!transportForHwAppQubic) {
             throw new Error('Cannot get transport for initializing Qubic HW App');
@@ -67,7 +69,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         setApp(newApp);
 
         return newApp;
-    }, [ctx, app]);
+    }, [ledgerWebHIDContext, app]);
 
     const addNewAddress = useCallback(
         (generatedAddressData: IQubicLedgerAddress) => {
@@ -94,7 +96,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         const updatedAddresses = await Promise.all(
             generatedAddresses.map(async (address) => {
                 try {
-                    const balanceResponse = await QubicRpcService.getBalance(address.identity);
+                    const balanceResponse = await qubicRpcService.getBalance(address.identity);
 
                     return {
                         ...address,
@@ -110,11 +112,12 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         setAreBalanceLoading(false);
     }, [app, generatedAddresses, areBalanceLoading]);
 
-    const reset = useCallback(() => {
+    const reset = useCallback(async () => {
+        await ledgerWebHIDContext?.resetTransport();
         setApp(null);
         setGeneratedAddresses([]);
         setSelectedAddressIndex(null);
-    }, []);
+    }, [app, ledgerWebHIDContext, setApp]);
 
     useEffect(() => {
         if (init && !app) {
@@ -146,10 +149,16 @@ export const QubicLedgerAppProvider = ({
     children,
     init = true,
     derivationPath,
+    rpcUrl,
 }: PropsWithChildren<QubicLedgerAppProviderProps>) => (
     <LedgerWebHIDProvider init={false}>
-        <QubicLedgerAppProviderWithoutWebHIDProvider init={init} derivationPath={derivationPath}>
-            {children}
-        </QubicLedgerAppProviderWithoutWebHIDProvider>
+        <QubicRpcServiceProvider rpcUrl={rpcUrl}>
+            <QubicLedgerAppProviderWithoutWebHIDProvider
+                init={init}
+                derivationPath={derivationPath}
+            >
+                {children}
+            </QubicLedgerAppProviderWithoutWebHIDProvider>
+        </QubicRpcServiceProvider>
     </LedgerWebHIDProvider>
 );

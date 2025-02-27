@@ -88,3 +88,15 @@ export interface ICustomUseMutationOptions<ReturnData, Variables = void>
         UseMutationOptions<ReturnData, Error, Variables, string[]>,
         'mutationFn' | 'mutationKey'
     > {}
+
+export interface IHttpClient {
+    request<Return>(url: string, requestOptions?: RequestInit): Promise<Return>;
+}
+
+export interface IDataValidator<Return> {
+    validate(data: unknown): Return;
+}
+
+export interface IDataTransformer<Data, Return = Data> {
+    transform(data: Data): Return;
+}

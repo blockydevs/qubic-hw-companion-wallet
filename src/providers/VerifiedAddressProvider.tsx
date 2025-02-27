@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useCallback, useState } from 'react';
 import { FullScreenLoader } from '@/components/full-screen-loader';
-import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/UseQubicLedgerAppContext';
+import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/use-qubic-ledger-app-context';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { IQubicLedgerAddress } from '@/packages/hw-app-qubic-react/src/types';
 

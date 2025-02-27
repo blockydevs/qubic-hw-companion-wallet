@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { useEffect, useRef } from 'react';
-import { useQubicLedgerAppContext } from '../hooks/UseQubicLedgerAppContext';
+import { useQubicLedgerAppContext } from '../hooks/use-qubic-ledger-app-context';
 
 interface QubicLedgerDemoModeProviderProps {
     enabled?: boolean;
