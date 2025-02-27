@@ -51,7 +51,6 @@ export const SendForm = ({
     };
 
     useEffect(() => {
-        console.log('form.getValues().tick', latestTick, form.getValues().tick);
         if (form.getValues().tick === 0 && latestTick > 0) {
             form.setValues({
                 tick: latestTick + 10,
