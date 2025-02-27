@@ -40,9 +40,12 @@ export const SendSuccessModal = ({
 
             <Text>sent to</Text>
 
-            <Text w={'calc(var(--modal-size) - 6rem)'} style={{ overflowWrap: 'break-word' }}>
-                <TruncatedText>{sentTo}</TruncatedText>
-            </Text>
+            <TruncatedText
+                w={'calc(var(--modal-size) - 6rem)'}
+                style={{ overflowWrap: 'break-word' }}
+            >
+                {sentTo}
+            </TruncatedText>
 
             <Button onClick={onClose}>Close</Button>
         </Stack>
