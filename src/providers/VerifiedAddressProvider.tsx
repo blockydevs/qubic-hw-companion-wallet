@@ -51,9 +51,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
                     true,
                 );
 
-                const publicKeyHex = publicKey.toString('hex');
-
-                if (publicKeyHex === qubicAddressToVerify.publicKey) {
+                if (publicKey.toString('hex') === qubicAddressToVerify.publicKey.toString('hex')) {
                     setVerifiedIdentities((prev) => [...prev, qubicAddressToVerify.identity]);
                 } else {
                     setVerifiedIdentities((prev) =>
