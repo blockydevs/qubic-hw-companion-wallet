@@ -78,6 +78,7 @@ export const WalletOverviewPage = () => {
         isLoading: isLatestTickLoading,
         isFetching: isLatestTickFetching,
         isRefetching: isLatestTickRefetching,
+        refetch: onRefreshTick,
     } = useQubicCurrentTickQuery();
 
     const isLatestTickLoaded =
@@ -251,6 +252,7 @@ export const WalletOverviewPage = () => {
 
                     {isLatestTickLoaded ? (
                         <SendForm
+                            onRefreshTick={onRefreshTick}
                             latestTick={latestTick}
                             onSubmit={onSubmitHandler}
                             isDisabled={isTransactionProcessing}
@@ -260,6 +262,7 @@ export const WalletOverviewPage = () => {
                     ) : (
                         <SendForm
                             latestTick={latestTick}
+                            onRefreshTick={() => {}}
                             onSubmit={() => {}}
                             isDisabled={true}
                             maxAmount={0}
