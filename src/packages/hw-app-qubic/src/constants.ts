@@ -16,8 +16,7 @@ export const LEDGER_CLA = 0xe0;
  * @property {number} SIGN_MESSAGE - Sign a message
  */
 export const INS = {
-    GET_VERSION: 0x04,
-    GET_VERSION_FULL: 0x01,
+    GET_VERSION: 0x03,
     GET_PUBLIC_KEY: 0x05,
     SIGN_TRANSACTION: 0x06,
     SIGN_MESSAGE: 0x07,
@@ -36,12 +35,9 @@ export const INS = {
  * @property {number} NEXT_SIGNATURE - Next signature in the transaction
  */
 export const P1 = {
-    NON_CONFIRM: 0x00,
+    START: 0x00,
+    MAX: 0x03,
     CONFIRM: 0x01,
-    HEADER: 0x00,
-    OUTPUTS: 0x01,
-    INPUTS: 0x02,
-    NEXT_SIGNATURE: 0x03,
 } as const;
 
 /**

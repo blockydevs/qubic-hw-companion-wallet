@@ -1,9 +1,10 @@
 import type Transport from '@ledgerhq/hw-transport';
 import { StatusCodes } from '@ledgerhq/hw-transport';
 import { INS, LEDGER_CLA, P1, P2 } from './constants';
-import type { IQubicTransaction, ISendToDeviceParams } from './types';
+import type { IQubicTransaction, ISendToDeviceParams, ISignTransactionReturn } from './types';
 import { convertDerivationPathToBuffer } from './utils';
 import { schemaSendToDeviceParams } from './validation';
+import qubic from '@qubic-lib/qubic-ts-library';
 
 export class HWAppQubic {
     transport: Transport;
@@ -44,23 +45,55 @@ export class HWAppQubic {
     async getVersion() {
         const [major, minor, patch] = await this.sendToDevice({
             instruction: INS.GET_VERSION,
-            p1: P1.NON_CONFIRM,
+            p1: P1.START,
         });
 
         return { version: `${major}.${minor}.${patch}` };
     }
 
-    async getPublicKey(derivationPath = "m/44'/1'/0'/0/0", withConfirm = false): Promise<any> {
+    async getPublicKey(
+        derivationPath = "m/44'/1'/0'/0/0",
+        withConfirm = false,
+    ): Promise<Buffer<ArrayBufferLike>> {
         return await this.sendToDevice({
             instruction: INS.GET_PUBLIC_KEY,
-            p1: withConfirm ? P1.CONFIRM : P1.NON_CONFIRM,
-            p2: P2.LAST,
+            p1: withConfirm ? P1.CONFIRM : P1.START,
             payload: convertDerivationPathToBuffer(derivationPath),
         });
     }
 
-    async signTransaction(transaction: IQubicTransaction): Promise<IQubicTransaction> {
-        return transaction;
+    async signTransaction(transaction: IQubicTransaction): Promise<ISignTransactionReturn> {
+        const packetSize = transaction.getPackageSize() - transaction.payload.getPackageSize();
+
+        const builder = new qubic.QubicPackageBuilder(packetSize);
+
+        builder.add(transaction.sourcePublicKey);
+        builder.add(transaction.destinationPublicKey);
+        builder.add(transaction.amount);
+        builder.addInt(transaction.tick);
+        builder.addShort(transaction.inputType);
+        builder.addShort(transaction.inputSize);
+
+        const transactionBytes = builder.getData();
+
+        const shortTxBytes = Buffer.from(transactionBytes.subarray(0, 80));
+
+        const signature = await this.sendToDevice({
+            instruction: INS.SIGN_TRANSACTION,
+            p1: P1.CONFIRM,
+            p2: P2.LAST,
+            payload: shortTxBytes,
+        });
+
+        const signedData = new Uint8Array(transactionBytes.length + signature.length);
+        signedData.set(transactionBytes);
+        signedData.set(signature, transactionBytes.length);
+
+        return {
+            signature: signature,
+            transaction: transactionBytes,
+            signedData,
+        };
     }
 
     async signMessage(message: string) {

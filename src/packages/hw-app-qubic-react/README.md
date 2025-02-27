@@ -2,6 +2,11 @@
 
 This package provides a React hook and provider to interact with the Qubic Ledger hardware wallet. Below are the instructions on how to set up and use the package.
 
+## Known Limitations
+
+-   Requires a WebHID-compatible browser (Chrome/Edge).
+-   Demo mode generates dummy data and does not interact with a physical device.
+
 ## Installation
 
 To install the package, run:
@@ -10,19 +15,21 @@ To install the package, run:
 npm install qubic-hw-app-react
 ```
 
-## Usage
+### React Query Provider Requirement
 
-### Wrapping with Provider
-
-First, wrap your application with the `QubicLedgerProvider`. This ensures that the Qubic Ledger context is available throughout your application.
+In case to usage of `useQubicRpcXXX` or `useQubicLedgerXXXMutation` hooks, to handle RPC calls efficiently, the library requires wrapping your application with a React Query provider. Ensure that your app is wrapped with `QueryClientProvider` from `@tanstack/react-query`:
 
 ```tsx
-import { QubicLedgerAppProvider } from 'qubic-hw-app-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-<QubicLedgerAppProvider derivationPath="m/44'/4218'/0'/0'">
-    {/* Your components go here */}
-</QubicLedgerAppProvider>;
+const queryClient = new QueryClient();
+
+<QueryClientProvider client={queryClient}>
+    <YourApp />
+</QueryClientProvider>;
 ```
+
+## Usage
 
 ### Using Demo Mode
 
@@ -52,13 +59,11 @@ import { QubicLedgerAppProvider, QubicLedgerDemoModeProvider } from 'qubic-hw-ap
 
 // Inside your component tree:
 <QubicLedgerAppProvider derivationPath="m/44'/4218'/0'/0'">
-    <QubicLedgerAppDeriveredIndexCache>
-        {/* Components */}
-    </QubicLedgerAppDeriveredIndexCache>
+    <QubicLedgerAppDeriveredIndexCache>{/* Components */}</QubicLedgerAppDeriveredIndexCache>
 </QubicLedgerAppProvider>;
 ```
 
-### Using the Hook
+### Using the Use Qubic Ledger App Hook
 
 The `useQubicLedgerApp` hook provides functions and state variables to interact with the Qubic Ledger:
 
@@ -126,7 +131,7 @@ const getVersionHandler = async () => {
 };
 ```
 
-### Hook Return Values
+## Hook Return Values
 
 -   **`app`**: Instance of the Qubic Ledger app.
 -   **`isAppInitialized`**: Boolean indicating if the app is initialized.
@@ -140,7 +145,123 @@ const getVersionHandler = async () => {
 -   **`clearSelectedAddress`**: Clears the currently selected address.
 -   **`reset`**: Reset generated addresses (and selected address).
 
-## Known Limitations
+### Using the Qubic Ledger Sign Transaction hook:
 
--   Requires a WebHID-compatible browser (Chrome/Edge).
--   Demo mode generates dummy data and does not interact with a physical device.
+> This requires wrapping your application with a QueryClientProvider from @tanstack/react-query.
+
+The useQubicLedgerSignTransactionMutation hook allows signing transactions using the Qubic Ledger hardware wallet. It leverages react-query's useMutation to handle transaction signing as an asynchronous operation.
+
+After calling `signTransaction`, the transaction will be displayed on the Ledger device, waiting for user confirmation before signing is completed.
+
+#### Importing and Usage
+
+```tsx
+import { useQubicLedgerSignTransactionMutation } from 'qubic-hw-app-react';
+
+const { mutateAsync: signTransaction } = useQubicLedgerSignTransactionMutation();
+
+const handleSignTransaction = async (transaction) => {
+    try {
+        const signedTx = await signTransaction(transaction);
+        console.log('Signed transaction:', signedTx);
+    } catch (err) {
+        console.error('Signing failed:', err.message);
+    }
+};
+```
+
+### Using Qubic RPC Service via hooks:
+
+> This requires wrapping your application with a QueryClientProvider from @tanstack/react-query.
+
+#### `useQubicCurrentTickQuery`
+
+This hook retrieves the latest tick from the Qubic network.
+
+```tsx
+const { data, isLoading, error } = useQubicCurrentTickQuery();
+```
+
+-   `data`: Returns the latest tick as a number.
+
+#### `useQubicRpcBroadcastTransactionMutation`
+
+This hook broadcasts a transaction to the Qubic network.
+
+```tsx
+const { broadcastTransactionToRpc } = useQubicRpcBroadcastTransactionMutation();
+
+const encodedTransaction = encodeTransactionToBase64(transaction);
+
+const { transactionId } = await broadcastTransactionToRpc(encodedTransaction);
+```
+
+-   Returns a mutation object with `mutate`, `isLoading`, and `error` properties.
+-   Mutation accepts a `QubicTransaction` or transaction hash string.
+
+#### `useQubicTransactionHistoryQuery`
+
+The useQubicTransactionHistoryQuery hook retrieves the transaction history for a given identity, starting from a specified tick. Transactions are fetched continuously as long as new ones are available.
+
+```tsx
+const { data, refetch, reset } = useQubicTransactionHistoryQuery(identity);
+```
+
+-   `data`: Contains the transaction history.
+-   `refetch`: Manually triggers a refresh of the transaction history.
+-   `reset`: Clears cached pages and refetches from the latest tick.
+
+Transactions are fetched progressively, ensuring that all available transactions are retrieved without a predefined limit.
+
+By using these hooks, your application can efficiently interact with the Qubic RPC API while leveraging React Query's caching and state management.
+
+### Qubic RPC Service
+
+The library exports `QubicRpcService`, which provides a set of functions for interacting with the Qubic RPC API. This service handles network requests with validation, ensuring that responses match expected schemas. You can build your own hooks using the service.
+
+#### Fetching Balance
+
+Retrieve the balance of a given identity:
+
+```tsx
+import { QubicRpcService } from 'qubic-hw-app-react';
+
+const fetchBalance = async (identity: string) => {
+    try {
+        const balance = await QubicRpcService.getBalance(identity);
+        console.log('Balance:', balance);
+    } catch (error) {
+        console.error('Failed to fetch balance:', error.message);
+    }
+};
+```
+
+#### Fetching Current Tick
+
+Get the latest tick from the Qubic network:
+
+```tsx
+const fetchCurrentTick = async () => {
+    try {
+        const latestTick = await QubicRpcService.getCurrentTick();
+        console.log('Latest tick:', latestTick);
+    } catch (error) {
+        console.error('Failed to fetch latest tick:', error.message);
+    }
+};
+```
+
+#### Fetching Transactions
+
+Retrieve transactions for an identity within a specific tick range:
+
+```tsx
+const fetchTransactions = async (identity: string, startTick: number) => {
+    try {
+        const transactions = await QubicRpcService.getTransactions({ identity, startTick });
+        console.log('Transactions:', transactions);
+    } catch (error) {
+        console.error('Failed to fetch transactions:', error.message);
+    }
+};
+```

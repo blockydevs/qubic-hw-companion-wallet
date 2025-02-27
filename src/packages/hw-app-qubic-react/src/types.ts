@@ -1,6 +1,8 @@
+import { UndefinedInitialDataOptions, UseMutationOptions } from '@tanstack/react-query';
+
 export interface IQubicLedgerAddress {
     identity: string;
-    publicKey: string;
+    publicKey: Buffer<ArrayBufferLike>;
     addressDerivationPath: string;
     addressIndex: number;
     balance: string;
@@ -19,3 +21,29 @@ export interface IQubicBalanceDTO {
         numberOfOutgoingTransfers: number;
     };
 }
+
+export interface IQubicLatestTickDTO {
+    latestTick: number;
+}
+
+export interface IQubicTransactionDTO {}
+
+export interface IQubicTransactionsDTO {}
+
+export interface IQubicBroadcastedTransactionDTO {
+    encodedTransaction: string;
+    peersBroadcasted: number;
+    transactionId: string;
+}
+
+export interface ICustomUseQueryOptions<Data>
+    extends Omit<
+        UndefinedInitialDataOptions<Data, Error, Data, string[]>,
+        'queryKey' | 'queryFn'
+    > {}
+
+export interface ICustomUseMutationOptions<ReturnData, Variables = void>
+    extends Omit<
+        UseMutationOptions<ReturnData, Error, Variables, string[]>,
+        'mutationFn' | 'mutationKey'
+    > {}
