@@ -1,13 +1,12 @@
-import React from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import { notifications } from '@mantine/notifications';
-import { createContext, useCallback, useEffect, useState } from 'react';
 
 interface ILedgerWebHIDContext {
     transport: Transport | null;
     initLedgerTransportHandler: () => Promise<Transport | null>;
+    resetTransport: () => Promise<void>;
 }
 
 export interface LedgerWebHIDProviderProps {
@@ -23,31 +22,23 @@ export const LedgerWebHIDProvider = ({
     const [transport, setTransport] = useState<Transport | null>(null);
 
     const initLedgerTransportHandler = useCallback(async () => {
-        try {
-            if (transport) {
-                throw new Error('Transporter already initialized');
-            }
-
-            const transporterWebHIDInstance = await TransportWebHID.create();
-
-            setTransport(transporterWebHIDInstance);
-
-            return transporterWebHIDInstance;
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-            notifications.show({
-                title: 'Error',
-                color: 'red',
-                message:
-                    errorMessage === 'Access denied to use Ledger device'
-                        ? 'No Ledger wallet selected'
-                        : errorMessage,
-            });
-
-            return null;
+        if (transport) {
+            throw new Error('Transporter already initialized');
         }
-    }, []);
+
+        const transporterWebHIDInstance = await TransportWebHID.create();
+
+        setTransport(transporterWebHIDInstance);
+
+        return transporterWebHIDInstance;
+    }, [transport]);
+
+    const resetTransport = useCallback(async () => {
+        if (transport) {
+            await transport.close();
+            setTransport(null);
+        }
+    }, [transport]);
 
     useEffect(() => {
         if (init && !transport) {
@@ -56,7 +47,9 @@ export const LedgerWebHIDProvider = ({
     }, [init, transport, initLedgerTransportHandler]);
 
     return (
-        <LedgerWebHIDContext.Provider value={{ transport, initLedgerTransportHandler }}>
+        <LedgerWebHIDContext.Provider
+            value={{ transport, resetTransport, initLedgerTransportHandler }}
+        >
             {children}
         </LedgerWebHIDContext.Provider>
     );
