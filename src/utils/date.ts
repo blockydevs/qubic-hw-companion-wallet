@@ -1,5 +1,9 @@
-export const formatTimestamp = (date: string) => {
-    const ensuredUTCDate = new Date(date.replace(' ', 'T') + 'Z'); // Ensure UTC interpretation
+export const formatTimestamp = (timestamp: string) => {
+    const ensuredUTCDate = new Date(Number(timestamp));
+
+    if (isNaN(ensuredUTCDate.getTime())) {
+        throw new Error('Invalid timestamp value');
+    }
 
     const formattedDate = new Intl.DateTimeFormat(navigator.language, {
         year: 'numeric',

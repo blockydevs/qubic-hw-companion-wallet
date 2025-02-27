@@ -1,4 +1,9 @@
-import { UndefinedInitialDataOptions, UseMutationOptions } from '@tanstack/react-query';
+import {
+    InfiniteData,
+    UndefinedInitialDataInfiniteOptions,
+    UndefinedInitialDataOptions,
+    UseMutationOptions,
+} from '@tanstack/react-query';
 
 export interface IQubicLedgerAddress {
     identity: string;
@@ -26,9 +31,33 @@ export interface IQubicLatestTickDTO {
     latestTick: number;
 }
 
-export interface IQubicTransactionDTO {}
+export interface IQubicTransactionDetailsDTO {
+    sourceId: string;
+    destId: string;
+    amount: string;
+    tickNumber: number;
+    inputType: number;
+    inputSize: number;
+    inputHex: string;
+    signatureHex: string;
+    txId: string;
+}
 
-export interface IQubicTransactionsDTO {}
+export interface IQubicTransactionDataDTO {
+    transaction: IQubicTransactionDetailsDTO;
+    timestamp: string;
+    moneyFlew: boolean;
+}
+
+export interface IQubicTransactionDTO {
+    tickNumber: number;
+    identity: string;
+    transactions: IQubicTransactionDataDTO[];
+}
+
+export interface IQubicTransactionsDTO {
+    transactions: IQubicTransactionDTO[];
+}
 
 export interface IQubicBroadcastedTransactionDTO {
     encodedTransaction: string;
@@ -39,6 +68,18 @@ export interface IQubicBroadcastedTransactionDTO {
 export interface ICustomUseQueryOptions<Data>
     extends Omit<
         UndefinedInitialDataOptions<Data, Error, Data, string[]>,
+        'queryKey' | 'queryFn'
+    > {}
+
+export interface ICustomUseInfiniteQueryOptions<Data>
+    extends Omit<
+        UndefinedInitialDataInfiniteOptions<
+            Data,
+            Error,
+            InfiniteData<Data, unknown>,
+            string[],
+            number
+        >,
         'queryKey' | 'queryFn'
     > {}
 

@@ -1,82 +1,77 @@
-import { useCallback, useMemo, useState } from 'react';
-import type { ICustomUseQueryOptions, IQubicTransactionsDTO } from '../../types';
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useQubicCurrentTickQuery } from './UseQubicCurrentTickQuery';
+import { useEffect, useMemo, useState } from 'react';
+import type { ICustomUseInfiniteQueryOptions, IQubicTransactionsDTO } from '../../types';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { QubicRpcService } from '../../services/qubic-rpc';
+import { DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS } from '../../constants';
 
-const handleGetTransactions = async (identity: string, latestTick?: number) => {
+type DeepPartial<T> = {
+    [P in keyof T]?: DeepPartial<T[P]>;
+};
+
+const handleGetTransactions = async (identity: string, startTick: number, endTick: number) => {
     if (!identity) {
         throw new Error('Identity is required');
     }
 
-    if (!latestTick) {
-        throw new Error('Latest tick is required');
+    if (!startTick) {
+        throw new Error('Start tick is required');
     }
 
-    return QubicRpcService.getTransactions({
-        identity,
-        startTick: latestTick,
-    });
+    if (!endTick) {
+        throw new Error('End tick is required');
+    }
+
+    return QubicRpcService.getTransactions({ identity, startTick, endTick });
 };
 
-const generateQueryKey = ({
-    identity,
-    tick,
-    page,
-}: {
-    identity: string;
-    tick?: number;
-    page: number;
-}) => ['qubicTransactionHistory', identity, tick ? tick.toString() : 'NO_TICK', page.toString()];
-
 export const useQubicTransactionHistoryQuery = (
-    identity: string,
-    queryOptions?: Omit<ICustomUseQueryOptions<IQubicTransactionsDTO>, 'placeholderData'>,
+    {
+        identity,
+        initialTick,
+        tickInterval = DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
+    }: {
+        initialTick: number;
+        identity: string;
+        tickInterval?: number;
+    },
+    queryOptions?: Omit<
+        ICustomUseInfiniteQueryOptions<DeepPartial<IQubicTransactionsDTO>>,
+        'placeholderData'
+    >,
 ) => {
-    const queryClient = useQueryClient();
-    const [page, setPage] = useState(0);
+    const [endTick, setEndTick] = useState<number>(0);
+    const [firstTick, setFirstTick] = useState<number>(0);
 
-    const latestTickQuery = useQubicCurrentTickQuery();
+    const query = useInfiniteQuery({
+        queryKey: ['qubicTransactionHistory', identity],
+        queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
+            const newStartTick = firstTick - tickInterval * (pageParam + 1);
+            const newEndTick = firstTick - tickInterval * pageParam;
 
-    const tick = latestTickQuery?.data ?? 0;
+            setEndTick(newEndTick);
 
-    const queryKey = useMemo(
-        () => generateQueryKey({ identity, tick, page }),
-        [identity, tick, page],
-    );
-
-    const query = useQuery({
-        queryKey,
-        queryFn: async () => await handleGetTransactions(identity, tick),
-        enabled: Boolean(identity) && Boolean(tick),
-        placeholderData: keepPreviousData,
+            return handleGetTransactions(identity, newStartTick, newEndTick);
+        },
+        initialPageParam: 0,
+        getNextPageParam: (_, allPages) =>
+            endTick - tickInterval < 0 ? undefined : allPages.length,
+        enabled: Boolean(identity) && Boolean(firstTick),
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         ...queryOptions,
     });
 
-    const refetchHandler = useCallback(() => {
-        setPage((prev) => prev + 1);
-
-        query.refetch();
-    }, [query]);
-
-    const reset = useCallback(() => {
-        const currentPage = page;
-
-        setPage(0);
-        latestTickQuery.refetch();
-
-        for (let i = 0; i < currentPage; i++) {
-            queryClient.removeQueries({
-                queryKey: generateQueryKey({ identity, tick, page: i }),
-            });
+    useEffect(() => {
+        if (!firstTick && initialTick > 0) {
+            setFirstTick(initialTick);
         }
-    }, [queryClient, queryKey, latestTickQuery, page]);
+    }, [firstTick, initialTick]);
 
     return useMemo(
         () => ({
             ...query,
-            refetch: refetchHandler,
-            reset,
+            endTick,
+            firstTick,
         }),
         [query],
     );
