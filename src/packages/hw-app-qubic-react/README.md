@@ -1,22 +1,17 @@
 # qubic-hw-app-react
 
-A React hook and provider designed for seamless integration with the Qubic Ledger hardware wallet. This package leverages the robust **`qubic-hw-app`** package to securely communicate with your Ledger device and is built on the reliable Qubic Typescript Library.
+A React hook and provider designed for seamless integration with the Qubic Ledger hardware wallet. This package leverages the robust **`Qubic Hardware Wallet App`** package to securely communicate with your Ledger device and is built on the reliable **`Qubic Typescript Library`**.
 
-<a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="30px" height="30px"></a>
-<a href="" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
+-   `qubic-hw-app` - <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="35px" height="16px"></a>
+    <a href="" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
+-   `@qubic-lib/qubic-ts-library
+` - <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="35px" height="16px"></a>
+    <a href="" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
 
 ## Known Limitations
 
 -   Requires a WebHID-compatible browser (Chrome/Edge).
 -   Demo mode generates dummy data and does not interact with a physical device.
-
-## Installation
-
-To install the package, run:
-
-```bash
-npm install qubic-hw-app-react
-```
 
 ### React Query Provider Requirement
 
