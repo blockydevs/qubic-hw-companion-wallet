@@ -14,7 +14,6 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import CheckIcon from '@mui/icons-material/Check';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '@/components/truncated-text';
@@ -26,20 +25,18 @@ import styles from '@/routes/wallet/transactions/transaction.module.css';
 interface HistoryTransactionProps {
     transactionId: string;
     timestamp: string;
-    amount: number;
-    isSuccess: boolean;
+    amount: string;
+    transactionType: 'incoming' | 'outgoing';
 }
 
 export const HistoryTransaction = ({
-    isSuccess,
     transactionId,
     timestamp,
+    transactionType,
     amount,
 }: HistoryTransactionProps) => {
     const [opened, { toggle }] = useDisclosure(false);
     const shouldShowTransactionHashInCollapse = useMediaQuery(`(min-width: ${em(1024)})`);
-
-    const transactionType = amount <= 0 ? 'outgoing' : 'incoming';
 
     const ArrowIcon = transactionType === 'outgoing' ? ArrowUpwardIcon : ArrowDownwardIcon;
 
@@ -51,25 +48,14 @@ export const HistoryTransaction = ({
                         px='0.475rem'
                         h='1.5rem'
                         rightSection={
-                            isSuccess ? (
-                                <CheckIcon
-                                    htmlColor='var(--mantine-color-green-filled)'
-                                    sx={{
-                                        paddingBottom: '0.1rem',
-                                        fontSize: '1.25rem',
-                                        transform: 'scaleX(0.85)',
-                                    }}
-                                />
-                            ) : (
-                                <CloseRoundedIcon
-                                    htmlColor='var(--mantine-color-red-filled)'
-                                    sx={{
-                                        paddingBottom: '0.1rem',
-                                        fontSize: '1.25rem',
-                                        transform: 'scaleX(0.85)',
-                                    }}
-                                />
-                            )
+                            <CheckIcon
+                                htmlColor='var(--mantine-color-green-filled)'
+                                sx={{
+                                    paddingBottom: '0.1rem',
+                                    fontSize: '1.25rem',
+                                    transform: 'scaleX(0.85)',
+                                }}
+                            />
                         }
                         color='#202e3c'
                         c='#808b9b'
@@ -168,7 +154,6 @@ export const HistoryTransaction = ({
                             }
                         />
                     )}
-
                     <HistoryTransactionDetailItem
                         label='Timestamp'
                         component={<Text>{formatTimestamp(timestamp)}</Text>}

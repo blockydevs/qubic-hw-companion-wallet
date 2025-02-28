@@ -1,77 +1,72 @@
-import { Divider, Group, Loader, Pagination, Stack, Text, Title } from '@mantine/core';
-import { useNavigate } from 'react-router';
-import { useTransactionsPage } from '@/routes/wallet/transactions/page.hooks';
-import { PendingTransaction } from '@/routes/wallet/transactions/pending-transaction';
+import { Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { HistoryTransaction } from '@/routes/wallet/transactions/history-transaction';
+import {
+    useQubicCurrentTickQuery,
+    useQubicLedgerApp,
+    useQubicTransactionHistoryQuery,
+} from '@/packages/hw-app-qubic-react';
 
 export const WalletTransactionsPage = () => {
-    const {
-        setMempoolEntryToReplace,
-        transactions,
-        page,
-        setPage,
-        txCount,
-        maxPages,
-        loading,
-        pendingRowsData,
-    } = useTransactionsPage();
-    const navigate = useNavigate();
+    const { selectedAddress } = useQubicLedgerApp();
+    const { data: latestTick } = useQubicCurrentTickQuery();
 
-    const hasPendingTransactions = pendingRowsData?.length > 0;
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isLoading: transactionsLoading,
+        endTick,
+        firstTick,
+    } = useQubicTransactionHistoryQuery({
+        identity: selectedAddress.identity,
+        initialTick: latestTick,
+    });
+
+    const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
 
     return (
         <Stack w='100%' gap='xl'>
-            {hasPendingTransactions && (
-                <>
-                    <Stack>
-                        <Title component='p' size='h2'>
-                            Pending transactions
-                        </Title>
-                        <Stack gap='xs' w='100%'>
-                            {(pendingRowsData ?? []).map(
-                                ({ mempoolEntry, transactionId, sentAmount }) => (
-                                    <PendingTransaction
-                                        key={transactionId}
-                                        transactionId={transactionId}
-                                        sentAmount={sentAmount}
-                                        onClick={() => {
-                                            // Set the tx to replace, and switch to overview:
-                                            setMempoolEntryToReplace(mempoolEntry);
-                                            navigate('/wallet/overview');
-                                        }}
-                                    />
-                                ),
-                            )}
-                        </Stack>
-                    </Stack>
-
-                    <Divider />
-                </>
-            )}
-
             <Stack>
                 <Title component='p' size='h2'>
                     Transactions
                 </Title>
+
                 <Stack gap='xs' w='100%'>
-                    {(transactions || []).map(({ transactionId, timestamp, amount, isSuccess }) => (
+                    {transactionsData.map(({ identity, tickNumber, transactions }) => (
                         <HistoryTransaction
-                            key={transactionId}
-                            isSuccess={isSuccess}
-                            transactionId={transactionId}
-                            timestamp={timestamp}
-                            amount={amount}
+                            key={`${identity}-${tickNumber}`}
+                            transactionId={transactions[0].transaction.txId}
+                            timestamp={transactions[0].timestamp}
+                            amount={transactions[0].transaction.amount}
+                            transactionType={
+                                transactions[0].transaction.sourceId === identity
+                                    ? 'outgoing'
+                                    : 'incoming'
+                            }
                         />
                     ))}
                 </Stack>
 
                 <Group w='100%' justify='space-between'>
                     <Group>
-                        <Text fw={600}>Total Transactions: {txCount}</Text>
-                        {loading ? <Loader size={20} /> : null}
-                    </Group>
+                        <Text fw={600}>Total Transactions: {transactionsData?.length ?? 0}</Text>
+                        <Text>
+                            Show transactions from {firstTick} to {endTick} tick
+                        </Text>
 
-                    <Pagination total={maxPages} value={page} onChange={setPage}></Pagination>
+                        {transactionsLoading ? (
+                            <Loader size={20} />
+                        ) : (
+                            <Button
+                                disabled={!hasNextPage}
+                                onClick={() => {
+                                    fetchNextPage();
+                                }}
+                            >
+                                {hasNextPage ? 'Load More' : 'No More Transactions'}
+                            </Button>
+                        )}
+                    </Group>
                 </Group>
             </Stack>
         </Stack>
