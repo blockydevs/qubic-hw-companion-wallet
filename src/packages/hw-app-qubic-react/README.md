@@ -5,8 +5,8 @@ A React hook and provider designed for seamless integration with the Qubic Ledge
 -   `qubic-hw-app` - <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="35px" height="16px"></a>
     <a href="" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
 -   `@qubic-lib/qubic-ts-library
-` - <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="35px" height="16px"></a>
-    <a href="" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
+` - <a href="https://www.npmjs.com/package/@qubic-lib/qubic-ts-library" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Npm-logo.svg/2560px-Npm-logo.svg.png" alt="npm" width="35px" height="16px"></a>
+    <a href="https://github.com/qubic/ts-library/" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="github" width="30px" height="30px"></a>
 
 ## Known Limitations
 
