@@ -1,6 +1,6 @@
 import { TransportOpenUserCancelled } from '@ledgerhq/errors';
 import type Transport from '@ledgerhq/hw-transport';
-import { getAppAndVersion } from '@/lib/ledger';
+import { getAppAndVersion } from '@/utils/ledger';
 
 export const checkIfQubicAppIsOpenOnLedger = async (transport: Transport) => {
     try {
