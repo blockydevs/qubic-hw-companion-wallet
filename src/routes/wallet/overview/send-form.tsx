@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
     Button,
     Flex,
@@ -13,11 +13,13 @@ import {
 import { useForm } from '@mantine/form';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { z } from 'zod';
+import { notifications } from '@mantine/notifications';
 
 interface SendFormProps extends Omit<StackProps, 'onSubmit'> {
     isDisabled?: boolean;
     maxAmount: number;
     latestTick: number;
+    selectedAddressIdentity: string;
 
     submitButtonLabel: string;
     onSubmit: (result: {
@@ -35,15 +37,35 @@ const validateWithZod = <Data extends unknown>(value: Data, schema: z.Schema<Dat
     return result.success ? null : JSON.parse(result.error.message)[0].message;
 };
 
+const ERROR_MESSAGE_TEMPLATES = {
+    amountPositive: 'Amount must be greater than 0',
+    amountLte: (maxAmount: number) => `Amount must be less than or equal to ${maxAmount}`,
+    addressLength: 'Address must be 60 characters long',
+    addressRegex: 'Address must contain only uppercase letters and numbers',
+    addressSelf: 'Cannot send to your own address',
+    tick: (latestTick: number) =>
+        `Number must be greater than or equal to the latest tick (${latestTick})`,
+};
+
+const SUBMIT_ERROR_NOTIFICATION_TITLE = 'Form is not valid';
+
+const ERRORS_ON_SUBMIT = {
+    fillErrorsBeforeSubmitting: 'Please fill the form errors before submitting',
+    fillFormBeforeSubmitting: 'Please fill the form before submitting',
+};
+
 export const SendForm = ({
     onSubmit,
     onRefreshTick,
     submitButtonLabel,
+    selectedAddressIdentity,
     isDisabled,
     maxAmount,
     latestTick,
     ...stackProps
 }: SendFormProps) => {
+    const isTickInitialized = useRef(false);
+
     const form = useForm({
         initialValues: {
             amount: 0,
@@ -51,16 +73,39 @@ export const SendForm = ({
             sendTo: '',
         },
         validate: {
-            amount: (value) => validateWithZod(value, z.number().int().positive().lte(maxAmount)),
+            amount: (value) =>
+                validateWithZod(
+                    value,
+                    z
+                        .number()
+                        .int()
+                        .positive(ERROR_MESSAGE_TEMPLATES.amountPositive)
+                        .lte(maxAmount, ERROR_MESSAGE_TEMPLATES.amountLte(maxAmount)),
+                ),
             sendTo: (value) =>
                 validateWithZod(
                     value,
                     z
                         .string()
-                        .length(60)
-                        .regex(/^[A-Z0-9]+$/),
+                        .length(60, ERROR_MESSAGE_TEMPLATES.addressLength)
+                        .regex(/^[A-Z0-9]+$/, ERROR_MESSAGE_TEMPLATES.addressRegex)
+                        .refine((value) => value !== selectedAddressIdentity, {
+                            message: ERROR_MESSAGE_TEMPLATES.addressSelf,
+                        }),
                 ),
-            tick: (value) => validateWithZod(value, z.number().int().positive().gte(latestTick)),
+            tick: (value) =>
+                validateWithZod(
+                    value,
+                    z
+                        .number({
+                            errorMap: () => ({
+                                message: ERROR_MESSAGE_TEMPLATES.tick(latestTick),
+                            }),
+                        })
+                        .int()
+                        .positive()
+                        .gte(latestTick),
+                ),
         },
         validateInputOnBlur: true,
     });
@@ -82,13 +127,52 @@ export const SendForm = ({
         form.setValues({ tick: latestTick });
     }, [onRefreshTick, latestTick]);
 
+    const onSubmitHandler = useCallback(() => {
+        if (!form.isValid()) {
+            const errorMessage =
+                Object.keys(form.errors).length >= 1
+                    ? ERRORS_ON_SUBMIT.fillErrorsBeforeSubmitting
+                    : ERRORS_ON_SUBMIT.fillFormBeforeSubmitting;
+
+            notifications.show({
+                title: SUBMIT_ERROR_NOTIFICATION_TITLE,
+                message: errorMessage,
+                color: 'red',
+            });
+
+            return;
+        }
+
+        const validation = form.validate();
+
+        if (validation.hasErrors) {
+            notifications.show({
+                title: SUBMIT_ERROR_NOTIFICATION_TITLE,
+                message: ERRORS_ON_SUBMIT.fillErrorsBeforeSubmitting,
+                color: 'red',
+            });
+
+            return;
+        }
+
+        onSubmit({
+            ...form.getValues(),
+            resetForm: form.reset,
+        });
+    }, [form.getValues, form.isValid, form.errors, form.validate, onSubmit]);
+
     useEffect(() => {
         // INITIALIZE TICK VALUE
+        console.log('ghook');
         if (
-            latestTick !== 0 &&
-            (Number.isNaN(form.getValues().tick) || latestTick > form.getValues().tick)
+            latestTick &&
+            latestTick > 0 &&
+            (Number.isNaN(form.getValues().tick) || form.getValues().tick === 0) &&
+            !isTickInitialized.current
         ) {
             onTickChangeHandler();
+            console.log('ghook init', latestTick);
+            isTickInitialized.current = true;
         }
     }, [latestTick, form.getValues().tick, onTickChangeHandler]);
 
@@ -124,7 +208,6 @@ export const SendForm = ({
             <NumberInput
                 label='Tick'
                 placeholder='0'
-                min={latestTick}
                 decimalScale={8}
                 step={1}
                 disabled={isDisabled}
@@ -165,16 +248,7 @@ export const SendForm = ({
                 inputWrapperOrder={['label', 'input', 'description', 'error']}
             />
 
-            <Button
-                fullWidth
-                onClick={() =>
-                    onSubmit({
-                        ...form.getValues(),
-                        resetForm: form.reset,
-                    })
-                }
-                disabled={isDisabled || !form.isValid()}
-            >
+            <Button fullWidth onClick={onSubmitHandler} disabled={isDisabled}>
                 {submitButtonLabel}
             </Button>
         </Stack>
