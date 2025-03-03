@@ -2,6 +2,14 @@
 
 Qubic HW Companion Wallet is a frontend dApp that interacts with the Qubic blockchain using a Ledger device for signing transactions. It leverages the [`hw-app-qubic-react`](src/packages/hw-app-qubic-react/README.md) package to provide seamless integration with the Ledger hardware wallet.
 
+## Environment Variables
+
+The application relies on the following environment variables for configuration:
+
+-   `REACT_APP_IS_DEMO_MODE="true"` - Enables or disables the demo mode. When set to `true`, users can explore the application without connecting a Ledger device.
+-   `REACT_APP_QUBIC_DERIVATION_PATH="m/44'/1'/0'/0/0"` - Specifies the derivation path for generating wallet addresses on the Ledger app.
+-   `REACT_APP_QUBIC_RPC_URL="https://rpc.qubic.org/"` - Defines the RPC endpoint for communicating with the blockchain.
+
 ## Compatible Browsers
 
 The browser needs to support WebUSB/WebHID to interact with the Ledger device. These are the known compatible browsers:
