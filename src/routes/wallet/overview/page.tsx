@@ -158,7 +158,12 @@ export const WalletOverviewPage = () => {
                 });
             }
         },
-        [isSelectedAddressVerified, selectedAddress, sendTransactionSignedWithLedgerToRpcHandler],
+        [
+            isSelectedAddressVerified,
+            selectedAddress,
+            sendTransactionSignedWithLedgerToRpcHandler,
+            verifyAddress,
+        ],
     );
 
     if (!selectedAddress) {
@@ -260,6 +265,7 @@ export const WalletOverviewPage = () => {
                             onSubmit={onSubmitHandler}
                             isDisabled={isTransactionProcessing}
                             maxAmount={parseInt(selectedAddress.balance)}
+                            selectedAddressIdentity={selectedAddress.identity}
                             submitButtonLabel={submitButtonLabel}
                         />
                     ) : (
@@ -269,6 +275,7 @@ export const WalletOverviewPage = () => {
                             onSubmit={() => {}}
                             isDisabled={true}
                             maxAmount={0}
+                            selectedAddressIdentity={selectedAddress.identity}
                             submitButtonLabel={submitButtonLabel}
                         />
                     )}
