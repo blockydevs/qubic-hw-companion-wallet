@@ -80,7 +80,7 @@ export class HWAppQubic {
 
         const signatureResponse = await this.sendToDevice({
             instruction: INS.SIGN_TRANSACTION,
-            p1: P1.CONFIRM,
+            p1: P1.START,
             p2: P2.LAST,
             payload: shortTxBytes,
         });
