@@ -10,7 +10,6 @@ import {
     QubicLedgerAppProvider,
     QubicLedgerDemoModeProvider,
 } from '@/packages/hw-app-qubic-react';
-import { DashboardContextProvider } from '@/providers/DashboardContextProvider';
 import { DeviceTypeContext, DeviceTypeProvider } from '@/providers/DeviceTypeProvider';
 import { OverlayForLoadingAddressesFromCacheProvider } from '@/providers/OverlayForLoadingAddressesFromCacheProvider';
 import { RequireDeviceTypeProvider } from '@/providers/RequireDeviceTypeProvider';
@@ -50,27 +49,25 @@ export default function App() {
                                         path='wallet'
                                         element={
                                             <RequireDeviceTypeProvider>
-                                                <DashboardContextProvider>
-                                                    <DeviceTypeContext.Consumer>
-                                                        {({ deviceType }) => (
-                                                            <QubicLedgerDemoModeProvider
-                                                                enabled={deviceType === 'demo'}
+                                                <DeviceTypeContext.Consumer>
+                                                    {({ deviceType }) => (
+                                                        <QubicLedgerDemoModeProvider
+                                                            enabled={deviceType === 'demo'}
+                                                        >
+                                                            <QubicLedgerAppDeriveredIndexCache
+                                                                enabled={deviceType !== 'demo'}
                                                             >
-                                                                <QubicLedgerAppDeriveredIndexCache
-                                                                    enabled={deviceType !== 'demo'}
-                                                                >
-                                                                    <OverlayForLoadingAddressesFromCacheProvider>
-                                                                        <VerifiedAddressProvider>
-                                                                            <HideSensitiveDataProvider>
-                                                                                <Outlet />
-                                                                            </HideSensitiveDataProvider>
-                                                                        </VerifiedAddressProvider>
-                                                                    </OverlayForLoadingAddressesFromCacheProvider>
-                                                                </QubicLedgerAppDeriveredIndexCache>
-                                                            </QubicLedgerDemoModeProvider>
-                                                        )}
-                                                    </DeviceTypeContext.Consumer>
-                                                </DashboardContextProvider>
+                                                                <OverlayForLoadingAddressesFromCacheProvider>
+                                                                    <VerifiedAddressProvider>
+                                                                        <HideSensitiveDataProvider>
+                                                                            <Outlet />
+                                                                        </HideSensitiveDataProvider>
+                                                                    </VerifiedAddressProvider>
+                                                                </OverlayForLoadingAddressesFromCacheProvider>
+                                                            </QubicLedgerAppDeriveredIndexCache>
+                                                        </QubicLedgerDemoModeProvider>
+                                                    )}
+                                                </DeviceTypeContext.Consumer>
                                             </RequireDeviceTypeProvider>
                                         }
                                     >
