@@ -1,4 +1,4 @@
-import { use } from 'react';
+import { use, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -11,6 +11,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { AddressCard } from '@/components/address-card';
 import { AddressCardBalance } from '@/components/address-card/address-card-balance';
+import { LoadableText } from '@/components/loadable-text';
 import { QrCodeModal } from '@/components/qr-code-modal';
 import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
@@ -53,6 +54,16 @@ export const WalletAddressesPage = () => {
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
 
+    const totalBalanceOfQubicTokens = useMemo(
+        () => generatedAddresses.reduce((acc, address) => acc + Number(address.balance), 0),
+        [generatedAddresses],
+    );
+
+    const totalBalanceOfQubicTokensInUSD = useMemo(
+        () => totalBalanceOfQubicTokens * Number(qubicPriceInUSD),
+        [totalBalanceOfQubicTokens, qubicPriceInUSD],
+    );
+
     return (
         <>
             <QrCodeModal
@@ -90,7 +101,28 @@ export const WalletAddressesPage = () => {
                         </Group>
 
                         <SensitiveDataWrapper isHidden={isSensitiveDataHidden}>
-                            <Text pt='0.25rem'>0 QUBIC / $0</Text>
+                            <Text pt='0.25rem'>
+                                <LoadableText
+                                    mr='0.25rem'
+                                    component='span'
+                                    isDataLoading={areBalanceLoading && isGeneratingAddress}
+                                    hasError={false}
+                                >
+                                    {totalBalanceOfQubicTokens}
+                                </LoadableText>
+                                QUBIC / $
+                                <LoadableText
+                                    component='span'
+                                    isDataLoading={
+                                        areBalanceLoading &&
+                                        isGeneratingAddress &&
+                                        isQubicPriceInUSDLoading
+                                    }
+                                    hasError={qubicPriceInUSDError}
+                                >
+                                    {totalBalanceOfQubicTokensInUSD}
+                                </LoadableText>
+                            </Text>
                         </SensitiveDataWrapper>
                     </Stack>
                 </Flex>

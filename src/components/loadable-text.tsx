@@ -16,7 +16,7 @@ export const LoadableText = ({
     errorText?: string;
     isDataLoading: boolean;
     skeletonProps?: PolymorphicComponentProps<'div', SkeletonProps>;
-} & PolymorphicComponentProps<'p', TextProps>) => {
+} & PolymorphicComponentProps<'p' | 'span', TextProps>) => {
     if (isDataLoading) {
         return (
             <Skeleton
