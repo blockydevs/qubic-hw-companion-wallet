@@ -1,0 +1,1 @@
+# qubic-hw-companion-wallet
