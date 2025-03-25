@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+body {
+    @mixin dark {
+        --mantine-color-body: #101820;
+    }
+}
+
+.alpha-background {
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        @mixin dark {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+.hover {
+    &-alpha-background {
+        @mixin hover {
+            &:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+
+                @mixin dark {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+            }
+        }
+
+        &-strong {
+            @mixin hover {
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+
+                    @mixin dark {
+                        background-color: rgba(255, 255, 255, 0.3);
+                    }
+                }
+            }
+        }
+    }
+
+    &-text-underline {
+        position: relative;
+
+        p {
+            transition: color 200ms;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--mantine-color-brand-text);
+            transform: scaleX(0);
+            transform-origin: 0 0;
+            transition: transform 200ms;
+        }
+
+        @mixin hover {
+            cursor: pointer;
+
+            p {
+                color: var(--mantine-color-brand-text) !important;
+            }
+
+            &:after {
+                transform: scaleX(1);
+            }
+        }
+    }
+}
+
+.border-color * {
+    @mixin dark {
+        border-color: var(--mantine-color-borderColor-filled);
+    }
+}
+
+.mantine-AppShell-navbar {
+    position: fixed;
+    border: unset !important;
+    background: transparent !important;
+    user-select: none;
+
+    .navbar__content {
+        background-color: var(--mantine-color-body-filled);
+        transition-property: opacity, transform !important;
+        transition-duration: var(--mantine-navbar-transition-duration) !important;
+        transition-timing-function: var(--mantine-navbar-transition-timing-function) !important;
+        border-right: 1px solid;
+        border-color: var(--mantine-color-borderColor-filled);
+        height: 100%;
+    }
+
+    @media (min-width: 1920px) {
+        overflow: hidden;
+        left: calc(
+            50% - calc(calc(var(--mantine-max-app-width) - var(--mantine-navbar-width)) / 2)
+        ) !important;
+        transform: translateX(-50%) !important;
+
+        .navbar__content {
+            transform: var(--app-shell-navbar-transform, translateX(0));
+            transition-property: opacity, transform !important;
+            position: relative;
+            border-right: 1px solid;
+            border-color: var(--mantine-color-borderColor-filled);
+            height: 100%;
+        }
+    }
+}
+
+button {
+    &[data-variant='touch'] {
+        all: initial;
+
+        background-color: transparent;
+        position: relative;
+        width: max-content;
+        height: max-content;
+        padding: 0.75rem;
+        display: inline-flex;
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+            background-color: #fff;
+            opacity: 0;
+            transition: opacity 100ms;
+        }
+
+        &:hover {
+            all: iniital;
+            cursor: pointer;
+            background-color: transparent;
+
+            &:after {
+                opacity: 0.1;
+            }
+        }
+
+        &:active {
+            transform: unset;
+
+            &:after {
+                opacity: 0.2;
+            }
+        }
+
+        &:focus-visible {
+            outline: none;
+
+            &:after {
+                opacity: 0.1;
+            }
+
+            &:active {
+                &:after {
+                    opacity: 0.2;
+                }
+            }
+        }
+    }
+}
+
+.qubic {
+    &__input {
+        --input-bg: #222e39;
+    }
+
+    &__checkbox {
+        background-color: #222e39 !important;
+    }
+
+    &__segmented-control {
+        &__control {
+            background-color: rgba(34, 46, 57, 0.65) !important;
+        }
+    }
+}

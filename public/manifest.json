@@ -1,0 +1,22 @@
+{
+    "short_name": "Qubic",
+    "name": "Qubic",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "sizes": "any"
+        },
+        {
+            "src": "qubic_wallet_dark.svg",
+            "sizes": "any"
+        },
+        {
+            "src": "qubic_wallet_dark.svg",
+            "sizes": "any"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+}
