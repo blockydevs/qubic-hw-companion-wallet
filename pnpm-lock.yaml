@@ -21,7 +21,7 @@ importers:
         specifier: ^11.14.0
         version: 11.14.0(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react@19.0.0)
       '@ledgerhq/errors':
-        specifier: ^6.16.0
+        specifier: 6.19.1
         version: 6.19.1
       '@ledgerhq/hw-transport':
         specifier: 6.31.4
@@ -45,7 +45,7 @@ importers:
         specifier: ^6.4.3
         version: 6.4.3(@mui/material@6.4.3(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.8)(react@19.0.0)
       '@qubic-lib/qubic-ts-library':
-        specifier: ^0.1.5
+        specifier: 0.1.5
         version: 0.1.5
       '@tanstack/react-query':
         specifier: ^5.66.0
@@ -54,7 +54,7 @@ importers:
         specifier: ^19.0.0
         version: 19.0.3(@types/react@19.0.8)
       bignumber.js:
-        specifier: ^9.1.2
+        specifier: 9.1.2
         version: 9.1.2
       qrcode.react:
         specifier: ^4.2.0
