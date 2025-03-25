@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { HistoryTransaction } from '@/routes/wallet/transactions/history-transaction';
 import {
@@ -18,11 +19,30 @@ export const WalletTransactionsPage = () => {
         endTick,
         firstTick,
     } = useQubicTransactionHistoryQuery({
-        identity: selectedAddress.identity,
+        identity: selectedAddress?.identity,
         initialTick: latestTick,
     });
 
     const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
+
+    if (!selectedAddress) {
+        return (
+            <Stack w='100%' gap='xl'>
+                <Stack>
+                    <Title component='p' size='h2'>
+                        No transactions found
+                    </Title>
+                    <Stack>
+                        <Text>Please select an address to view transactions</Text>
+
+                        <Link to='/wallet/addresses'>
+                            <Button>Go to address page</Button>
+                        </Link>
+                    </Stack>
+                </Stack>
+            </Stack>
+        );
+    }
 
     return (
         <Stack w='100%' gap='xl'>
