@@ -2,7 +2,7 @@ import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/Q
 import { useMutation } from '@tanstack/react-query';
 import { ICustomUseMutationOptions } from '../types';
 import { useQubicLedgerApp } from './use-qubic-ledger-app';
-import { ISignTransactionReturn } from 'qubic-hw-app/src/types';
+import { ISignTransactionReturn } from '@blockydevs/qubic-hw-app';
 
 interface UseQubicLedgerSignTransactionMutationProps {
     transaction: QubicTransaction;

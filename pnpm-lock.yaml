@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@blockydevs/qubic-hw-app':
+        specifier: 0.1.2-RC2
+        version: 0.1.2-RC2
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.0.8)(react@19.0.0)
@@ -56,9 +59,6 @@ importers:
       qrcode.react:
         specifier: ^4.2.0
         version: 4.2.0(react@19.0.0)
-      qubic-hw-app:
-        specifier: link:../qubic-hw-app/lib-es
-        version: link:../qubic-hw-app/lib-es
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -837,6 +837,9 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+
+  '@blockydevs/qubic-hw-app@0.1.2-RC2':
+    resolution: {integrity: sha512-m9SWrJoZ2yt6ZfWY8VK4gC9wZ/CfOWyEO6gmKAOZQq2dgFj9PXHFN6ye2nDiNTNORtW2DIRyoY95dKDsDprZtQ==}
 
   '@csstools/normalize.css@12.1.1':
     resolution: {integrity: sha512-YAYeJ+Xqh7fUou1d1j9XHl44BmsuThiTr4iNrgCQ3J27IbhXsxXDGZ1cXv8Qvs99d4rBbLiSKy3+WZiet32PcQ==}
@@ -6123,6 +6126,9 @@ packages:
   zod@3.24.1:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -7023,6 +7029,13 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.9
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@blockydevs/qubic-hw-app@0.1.2-RC2':
+    dependencies:
+      '@ledgerhq/errors': 6.19.1
+      '@ledgerhq/hw-transport': 6.31.4
+      '@qubic-lib/qubic-ts-library': 0.1.5
+      zod: 3.24.2
 
   '@csstools/normalize.css@12.1.1': {}
 
@@ -13308,3 +13321,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zod@3.24.1: {}
+
+  zod@3.24.2: {}
