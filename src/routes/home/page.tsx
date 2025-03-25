@@ -1,19 +1,17 @@
 import { use, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
+import { checkIfQubicAppIsOpenOnLedger } from './page.utils';
 import { notifications } from '@mantine/notifications';
+import { useNavigate } from 'react-router';
 
 export default function Home() {
-    const navigate = useNavigate();
-
     const { setDeviceType } = use(DeviceTypeContext);
-
+    const navigate = useNavigate();
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
     const initNewQubicLedgerAppInstance = useCallback(

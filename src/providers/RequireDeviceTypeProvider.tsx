@@ -1,12 +1,20 @@
 import type { PropsWithChildren } from 'react';
-import { use, useCallback, useEffect } from 'react';
+import { use, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 
-export const RequireDeviceTypeProvider = ({ children }: PropsWithChildren) => {
+interface RequireDeviceTypeProviderProps {
+    enabled?: boolean;
+}
+
+export const RequireDeviceTypeProvider = ({
+    children,
+    enabled,
+}: PropsWithChildren<RequireDeviceTypeProviderProps>) => {
     const { deviceType } = use(DeviceTypeContext);
     const navigate = useNavigate();
+    const isInitialized = useRef(false);
 
     const returnToHomepageIfNoDeviceTypeSet = useCallback(async () => {
         if (!deviceType) {
@@ -22,8 +30,14 @@ export const RequireDeviceTypeProvider = ({ children }: PropsWithChildren) => {
     }, [deviceType, navigate]);
 
     useEffect(() => {
-        returnToHomepageIfNoDeviceTypeSet();
-    }, [returnToHomepageIfNoDeviceTypeSet]);
+        if (isInitialized.current || !enabled) {
+            return;
+        }
 
-    return deviceType ? children : null;
+        isInitialized.current = true;
+
+        returnToHomepageIfNoDeviceTypeSet();
+    }, [enabled, returnToHomepageIfNoDeviceTypeSet]);
+
+    return children;
 };
