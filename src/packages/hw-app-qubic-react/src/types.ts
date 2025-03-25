@@ -100,3 +100,7 @@ export interface IDataValidator<Return> {
 export interface IDataTransformer<Data, Return = Data> {
     transform(data: Data): Return;
 }
+
+export interface ITransportListenersConfigProps {
+    onDisconnect?: () => void;
+}

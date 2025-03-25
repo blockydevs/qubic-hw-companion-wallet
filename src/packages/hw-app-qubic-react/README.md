@@ -99,7 +99,7 @@ const {
 -   **`areBalanceLoading`**: Boolean indicating if balances are being loaded.
 -   **`selectAddressByIndex`**: Function to set the selected address by index.
 -   **`refetchBalances`**: Function to refetch balances for generated addresses.
--   **`initApp`**: Function to initialize the Ledger app.
+-   **`initApp`**: Function to initialize the Ledger app. You can pass the event listeners config when initializating app.
 -   **`getVersion`**: Function to retrieve the hardware wallet's version.
 -   **`deriveNewAddress`**: Function to generate a new address using the derivation path.
 -   **`clearSelectedAddress`**: Function to clear the currently selected address.
@@ -120,19 +120,24 @@ const initAppHandler = async () => {
 };
 ```
 
-#### Deriving new address
+#### Event Listeners
 
-Generate a new address using the derivation path.
+The package includes support for event listeners to handle key interactions with the Ledger device. Currently, it provides a listener for the `disconnect` event, ensuring your application remains stable if the device is unexpectedly disconnected.
+
+##### Handling Ledger Disconnection
+
+When the Ledger device disconnects during an active session, the package automatically resets the `app` and `transport` objects in the context state. This prevents errors caused by attempts to interact with a disconnected device and ensures a consistent application state.
+
+##### Defining Event Listeners
+
+You can specify event listeners during app initialization:
 
 ```tsx
-const deriveAddressHandler = async () => {
-    try {
-        const newAddress = await deriveNewAddress();
-        console.log('Derived address:', newAddress);
-    } catch (error) {
-        console.error('Error deriving address:', error.message);
-    }
-};
+await initApp({
+    onDisconnect: () => {
+        console.warn('Ledger device disconnected. Please reconnect the device to continue.');
+    },
+});
 ```
 
 #### Selecting an Address

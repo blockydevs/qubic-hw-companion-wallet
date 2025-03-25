@@ -16,9 +16,26 @@ export default function Home() {
 
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
+    const initNewQubicAppInstance = useCallback(
+        async () =>
+            await initApp({
+                onDisconnect: async () => {
+                    notifications.show({
+                        title: 'Action required',
+                        message:
+                            'Ledger device disconnected. Please make sure you have device connected with the browser.',
+                        c: 'orange',
+                    });
+
+                    await navigate('/');
+                },
+            }),
+        [initApp],
+    );
+
     const handleConnectWithUsb = useCallback(async () => {
         try {
-            const qubicLedgerApp = app ?? (await initApp());
+            const qubicLedgerApp = app ?? (await initNewQubicAppInstance());
 
             await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
 

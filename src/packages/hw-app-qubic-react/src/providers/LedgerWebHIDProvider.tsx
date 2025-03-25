@@ -1,11 +1,15 @@
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import type { ITransportListenersConfigProps } from '../types';
+import { createTransportListeners } from '../utils/transport-listeners';
 
 interface ILedgerWebHIDContext {
     transport: Transport | null;
-    initLedgerTransportHandler: () => Promise<Transport | null>;
+    initLedgerTransportHandler: (
+        listenersConfig?: ITransportListenersConfigProps,
+    ) => Promise<Transport | null>;
     resetTransport: () => Promise<void>;
 }
 
@@ -21,17 +25,24 @@ export const LedgerWebHIDProvider = ({
 }: PropsWithChildren<LedgerWebHIDProviderProps>) => {
     const [transport, setTransport] = useState<Transport | null>(null);
 
-    const initLedgerTransportHandler = useCallback(async () => {
-        if (transport) {
-            throw new Error('Transporter already initialized');
-        }
+    const initLedgerTransportHandler = useCallback(
+        async (listenersConfig?: ITransportListenersConfigProps) => {
+            if (transport) {
+                throw new Error('Transporter already initialized');
+            }
 
-        const transporterWebHIDInstance = await TransportWebHID.create();
+            const transporterWebHIDInstance = await TransportWebHID.create();
 
-        setTransport(transporterWebHIDInstance);
+            if (listenersConfig) {
+                createTransportListeners(transporterWebHIDInstance, listenersConfig);
+            }
 
-        return transporterWebHIDInstance;
-    }, [transport]);
+            setTransport(transporterWebHIDInstance);
+
+            return transporterWebHIDInstance;
+        },
+        [transport],
+    );
 
     const resetTransport = useCallback(async () => {
         if (transport) {
@@ -46,10 +57,13 @@ export const LedgerWebHIDProvider = ({
         }
     }, [init, transport, initLedgerTransportHandler]);
 
+    const contextValues = useMemo(
+        () => ({ transport, resetTransport, initLedgerTransportHandler }),
+        [transport, resetTransport, initLedgerTransportHandler],
+    );
+
     return (
-        <LedgerWebHIDContext.Provider
-            value={{ transport, resetTransport, initLedgerTransportHandler }}
-        >
+        <LedgerWebHIDContext.Provider value={contextValues}>
             {children}
         </LedgerWebHIDContext.Provider>
     );
