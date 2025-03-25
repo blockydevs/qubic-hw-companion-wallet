@@ -16,7 +16,7 @@ export default function Home() {
 
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
 
-    const initNewQubicAppInstance = useCallback(
+    const initNewQubicLedgerAppInstance = useCallback(
         async () =>
             await initApp({
                 onDisconnect: async () => {
@@ -35,7 +35,7 @@ export default function Home() {
 
     const handleConnectWithUsb = useCallback(async () => {
         try {
-            const qubicLedgerApp = app ?? (await initNewQubicAppInstance());
+            const qubicLedgerApp = app ?? (await initNewQubicLedgerAppInstance());
 
             await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
 
