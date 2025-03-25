@@ -23,7 +23,7 @@ export default function Home() {
                     notifications.show({
                         title: 'Action required',
                         message:
-                            'Ledger device disconnected. Please make sure you have device connected with the browser.',
+                            'Ledger device disconnected. Please reconnect your device to continue.',
                         c: 'orange',
                     });
 
