@@ -19,7 +19,7 @@ export const QubicLedgerAppDeriveredIndexCache = ({
     children,
     enabled = true,
 }: PropsWithChildren<QubicLedgerAppDeriveredIndexCacheProps>) => {
-    const { generatedAddresses, deriveNewAddress } = useQubicLedgerApp();
+    const { isAppInitialized, generatedAddresses, deriveNewAddress } = useQubicLedgerApp();
     const [isLoadingAddressesFromCache, setIsLoadingAddressesFromCache] = useState(false);
     const isInitialized = useRef(false);
 
@@ -61,7 +61,7 @@ export const QubicLedgerAppDeriveredIndexCache = ({
         isInitialized.current = true;
 
         deriveCachedAddresses();
-    }, [deriveCachedAddresses]);
+    }, [deriveCachedAddresses, enabled, isAppInitialized]);
 
     useEffect(() => {
         if (isLoadingAddressesFromCache || !enabled) {
@@ -69,7 +69,7 @@ export const QubicLedgerAppDeriveredIndexCache = ({
         }
 
         updateLastDeriveredAddressIndexInLocalStorage();
-    }, [updateLastDeriveredAddressIndexInLocalStorage, isLoadingAddressesFromCache]);
+    }, [updateLastDeriveredAddressIndexInLocalStorage, isLoadingAddressesFromCache, enabled]);
 
     return (
         <QubicLedgerAppDeriveredIndexCacheContext value={{ isLoadingAddressesFromCache }}>

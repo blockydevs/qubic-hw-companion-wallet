@@ -167,7 +167,6 @@ export const SendForm = ({
 
     useEffect(() => {
         // INITIALIZE TICK VALUE
-        console.log('ghook');
         if (
             latestTick &&
             latestTick > 0 &&
@@ -175,7 +174,6 @@ export const SendForm = ({
             !isTickInitialized.current
         ) {
             onTickChangeHandler();
-            console.log('ghook init', latestTick);
             isTickInitialized.current = true;
         }
     }, [latestTick, form.getValues().tick, onTickChangeHandler]);

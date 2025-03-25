@@ -42,7 +42,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
         if (isWalletDashboard && !isNavbarOpened && isSm) {
             return openNavbar();
         }
-    }, [pathname]);
+    }, [isWalletDashboard, isSm]);
 
     return (
         <AppShell

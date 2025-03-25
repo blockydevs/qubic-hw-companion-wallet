@@ -1,54 +1,15 @@
-import { use, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useCallback, useEffect } from 'react';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
+import { useConnectToQubicLedgerApp } from '@/hooks/qubic-ledger-app';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
-import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
-import { notifications } from '@mantine/notifications';
 
 export default function Home() {
-    const navigate = useNavigate();
+    const { generatedAddresses, reset } = useQubicLedgerApp();
 
-    const { setDeviceType } = use(DeviceTypeContext);
-
-    const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
-
-    const handleConnectWithUsb = useCallback(async () => {
-        try {
-            const qubicLedgerApp = app ?? (await initApp());
-
-            await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
-
-            setDeviceType('usb');
-            navigate(`/wallet/addresses`, { replace: true });
-        } catch (e) {
-            if (e instanceof Error) {
-                const isAccessDeniedMessage = e.message === 'Access denied to use Ledger device';
-
-                notifications.show({
-                    title: 'Action required',
-                    message: isAccessDeniedMessage ? 'No Ledger wallet selected' : e.message,
-                    c: isAccessDeniedMessage ? 'orange' : 'blue',
-                });
-            } else {
-                notifications.show({
-                    title: 'Error',
-                    c: 'red',
-                    message: 'Could not connect to Ledger device',
-                });
-            }
-
-            await reset();
-        }
-    }, [navigate, setDeviceType, initApp]);
-
-    const handleConnectToDemo = useCallback(() => {
-        setDeviceType('demo');
-        navigate(`/wallet/addresses`, { replace: true });
-    }, [navigate, setDeviceType]);
+    const { handleConnectToDemo, handleConnectWithUsb } = useConnectToQubicLedgerApp();
 
     const resetIfAddressesExistHandler = useCallback(() => {
         if (generatedAddresses.length) {
