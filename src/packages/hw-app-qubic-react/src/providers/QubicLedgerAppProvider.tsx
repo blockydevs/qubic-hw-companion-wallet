@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
-import type { IQubicLedgerAddress } from '../types';
+import type { IQubicLedgerAddress, ITransportListenersConfigProps } from '../types';
 import { QubicRpcServiceContext, QubicRpcServiceProvider } from './QubicRpcServiceProvider';
 import { HWAppQubic } from 'qubic-hw-app/src/hw-app-qubic';
 
@@ -12,7 +12,7 @@ export interface IQubicLedgerAppContext {
     areBalanceLoading: boolean;
     derivationPath: string;
     transactionTickOffset: number;
-    initApp: () => Promise<HWAppQubic>;
+    initApp: (listenersConfig?: ITransportListenersConfigProps) => Promise<HWAppQubic>;
     addNewAddress: (generatedAddressData: IQubicLedgerAddress) => void;
     refetchBalances: () => Promise<void>;
     setSelectedAddressIndex: (index: number) => void;
@@ -50,29 +50,39 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         return generatedAddresses[selectedAddressIndex];
     }, [selectedAddressIndex, generatedAddresses]);
 
-    const initApp = useCallback(async () => {
-        if (!ledgerWebHIDContext) {
-            throw new Error('LedgerWebHIDContext not initialized');
-        }
+    const initApp = useCallback(
+        async (listenersConfig?: ITransportListenersConfigProps) => {
+            if (!ledgerWebHIDContext) {
+                throw new Error('LedgerWebHIDContext not initialized');
+            }
 
-        if (app) {
-            throw new Error('Qubic HW App is already initialized');
-        }
+            if (app) {
+                throw new Error('Qubic HW App is already initialized');
+            }
 
-        const transportForHwAppQubic = ledgerWebHIDContext?.transport
-            ? ledgerWebHIDContext.transport
-            : await ledgerWebHIDContext.initLedgerTransportHandler();
+            const transportForHwAppQubic = ledgerWebHIDContext?.transport
+                ? ledgerWebHIDContext.transport
+                : await ledgerWebHIDContext.initLedgerTransportHandler({
+                      onDisconnect: () => {
+                          setApp(null);
+                          ledgerWebHIDContext.resetTransport();
 
-        if (!transportForHwAppQubic) {
-            throw new Error('Cannot get transport for initializing Qubic HW App');
-        }
+                          listenersConfig?.onDisconnect?.();
+                      },
+                  });
 
-        const newApp = new HWAppQubic(transportForHwAppQubic);
+            if (!transportForHwAppQubic) {
+                throw new Error('Cannot get transport for initializing Qubic HW App');
+            }
 
-        setApp(newApp);
+            const newApp = new HWAppQubic(transportForHwAppQubic);
 
-        return newApp;
-    }, [ledgerWebHIDContext, app]);
+            setApp(newApp);
+
+            return newApp;
+        },
+        [ledgerWebHIDContext, app],
+    );
 
     const addNewAddress = useCallback(
         (generatedAddressData: IQubicLedgerAddress) => {
@@ -128,22 +138,37 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         }
     }, [init, app, initApp]);
 
+    const contextValues = useMemo(
+        () => ({
+            app,
+            selectedAddress,
+            generatedAddresses,
+            derivationPath,
+            areBalanceLoading,
+            initApp,
+            addNewAddress,
+            transactionTickOffset,
+            refetchBalances,
+            setSelectedAddressIndex,
+            reset,
+        }),
+        [
+            app,
+            selectedAddress,
+            generatedAddresses,
+            derivationPath,
+            areBalanceLoading,
+            initApp,
+            addNewAddress,
+            transactionTickOffset,
+            refetchBalances,
+            setSelectedAddressIndex,
+            reset,
+        ],
+    );
+
     return (
-        <QubicLedgerAppContext.Provider
-            value={{
-                app,
-                selectedAddress,
-                generatedAddresses,
-                derivationPath,
-                areBalanceLoading,
-                initApp,
-                addNewAddress,
-                transactionTickOffset,
-                refetchBalances,
-                setSelectedAddressIndex,
-                reset,
-            }}
-        >
+        <QubicLedgerAppContext.Provider value={contextValues}>
             {children}
         </QubicLedgerAppContext.Provider>
     );
