@@ -1,24 +1,39 @@
 import { use, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import { Button, Center, Divider, Flex, Group, Image, Stack, Text, Title } from '@mantine/core';
 import DeveloperIcon from '@mui/icons-material/DeveloperMode';
 import UsbIcon from '@mui/icons-material/Usb';
 import { IS_DEMO_MODE } from '@/constants';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
+import { checkIfQubicAppIsOpenOnLedger } from './page.utils';
 import { notifications } from '@mantine/notifications';
+import { useNavigate } from 'react-router';
 
 export default function Home() {
-    const navigate = useNavigate();
-
     const { setDeviceType } = use(DeviceTypeContext);
-
+    const navigate = useNavigate();
     const { generatedAddresses, initApp, app, reset } = useQubicLedgerApp();
+
+    const initNewQubicLedgerAppInstance = useCallback(
+        async () =>
+            await initApp({
+                onDisconnect: async () => {
+                    notifications.show({
+                        title: 'Action required',
+                        message:
+                            'Ledger device disconnected. Please reconnect your device to continue.',
+                        c: 'orange',
+                    });
+
+                    await navigate('/');
+                },
+            }),
+        [initApp],
+    );
 
     const handleConnectWithUsb = useCallback(async () => {
         try {
-            const qubicLedgerApp = app ?? (await initApp());
+            const qubicLedgerApp = app ?? (await initNewQubicLedgerAppInstance());
 
             await checkIfQubicAppIsOpenOnLedger(qubicLedgerApp.transport);
 

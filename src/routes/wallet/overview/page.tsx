@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { use, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Divider, Loader, LoadingOverlay, Paper, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -86,10 +86,6 @@ export const WalletOverviewPage = () => {
         isRefetching: isLatestTickRefetching,
         refetch: onRefreshTick,
     } = useQubicCurrentTickQuery();
-
-    useEffect(() => {
-        console.log('Latest Tick:', latestTick);
-    }, [latestTick]);
 
     const isLatestTickLoaded =
         !isLatestTickLoading && !isLatestTickFetching && !isLatestTickRefetching;
