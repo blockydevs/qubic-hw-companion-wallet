@@ -4,6 +4,7 @@ import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from '@/layout/Layout';
 import { cssVariablesResolver, mantineTheme } from '@/layout/mantine.theme';
+import { PageNotFound } from '@/components/page-not-found';
 import { NavbarContent } from '@/layout/NavbarContent';
 import {
     QubicLedgerAppDeriveredIndexCache,
@@ -14,8 +15,8 @@ import { DeviceTypeContext, DeviceTypeProvider } from '@/providers/DeviceTypePro
 import { LocaleInfoProvider } from '@/providers/LocaleInfoProvider';
 import { OverlayForLoadingAddressesFromCacheProvider } from '@/providers/OverlayForLoadingAddressesFromCacheProvider';
 import {
-    ReconnectUserLedgerQubicAppProvider,
     ReconnectUserLedgerQubicAppContext,
+    ReconnectUserLedgerQubicAppProvider,
 } from '@/providers/ReconnectUserLedgerQubicAppProvider';
 import { RequireDeviceTypeProvider } from '@/providers/RequireDeviceTypeProvider';
 import { HideSensitiveDataProvider } from '@/providers/SensitiveDataHiddenProvider';
@@ -52,8 +53,8 @@ export default function App() {
                             <ReconnectUserLedgerQubicAppProvider>
                                 <QueryClientProvider client={queryClient}>
                                     <RouterRoutes>
+                                        <Route path='*' element={<PageNotFound />} />
                                         <Route path='/' element={<Home />} />
-
                                         <Route
                                             path='wallet'
                                             element={
