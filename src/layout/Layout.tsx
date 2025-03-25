@@ -32,7 +32,11 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const { breakpoints } = useMantineTheme();
     const isSm = useMediaQuery(`(min-width: ${breakpoints.sm})`);
 
-    const isWalletDashboard = pathname.startsWith('/wallet');
+    const isWalletDashboard = [
+        '/wallet/addresses',
+        '/wallet/overview',
+        '/wallet/transactions',
+    ].includes(pathname);
 
     useLayoutEffect(() => {
         if (!isWalletDashboard) {
@@ -42,7 +46,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
         if (isWalletDashboard && !isNavbarOpened && isSm) {
             return openNavbar();
         }
-    }, [pathname]);
+    }, [isWalletDashboard, isSm]);
 
     return (
         <AppShell

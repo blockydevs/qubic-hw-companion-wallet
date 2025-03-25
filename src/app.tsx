@@ -4,6 +4,7 @@ import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from '@/layout/Layout';
 import { cssVariablesResolver, mantineTheme } from '@/layout/mantine.theme';
+import { PageNotFound } from '@/components/page-not-found';
 import { NavbarContent } from '@/layout/NavbarContent';
 import {
     QubicLedgerAppDeriveredIndexCache,
@@ -47,6 +48,8 @@ export default function App() {
                         >
                             <QueryClientProvider client={queryClient}>
                                 <RouterRoutes>
+                                    <Route path='*' element={<PageNotFound />} />
+
                                     <Route path='/' element={<Home />} />
 
                                     <Route
