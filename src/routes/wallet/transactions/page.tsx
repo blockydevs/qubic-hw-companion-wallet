@@ -5,6 +5,7 @@ import {
     useQubicLedgerApp,
     useQubicTransactionHistoryQuery,
 } from '@/packages/hw-app-qubic-react';
+import { Link } from 'react-router';
 
 export const WalletTransactionsPage = () => {
     const { selectedAddress } = useQubicLedgerApp();
@@ -18,11 +19,30 @@ export const WalletTransactionsPage = () => {
         endTick,
         firstTick,
     } = useQubicTransactionHistoryQuery({
-        identity: selectedAddress.identity,
+        identity: selectedAddress?.identity,
         initialTick: latestTick,
     });
 
     const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
+
+    if (!selectedAddress) {
+        return (
+            <Stack w='100%' gap='xl'>
+                <Stack>
+                    <Title component='p' size='h2'>
+                        No transactions found
+                    </Title>
+                    <Stack>
+                        <Text>Please select an address to view transactions</Text>
+
+                        <Link to='/wallet/addresses'>
+                            <Button>Go to address page</Button>
+                        </Link>
+                    </Stack>
+                </Stack>
+            </Stack>
+        );
+    }
 
     return (
         <Stack w='100%' gap='xl'>
