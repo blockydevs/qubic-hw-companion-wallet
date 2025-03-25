@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress, ITransportListenersConfigProps } from '../types';
 import { QubicRpcServiceContext, QubicRpcServiceProvider } from './QubicRpcServiceProvider';
-import { HWAppQubic } from 'qubic-hw-app/src/hw-app-qubic';
+import { HWAppQubic } from '@blockydevs/qubic-hw-app';
 
 export interface IQubicLedgerAppContext {
     app: HWAppQubic | null;
