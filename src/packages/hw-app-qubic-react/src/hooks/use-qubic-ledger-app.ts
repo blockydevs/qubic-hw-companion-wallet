@@ -82,7 +82,7 @@ export const useQubicLedgerApp = () => {
 
                 return generatedAddressData;
             } catch (error) {
-                throw new Error(`Error generating new address: ${error.message}`);
+                throw new Error(`Cannot generate new address: ${error.message}`);
             } finally {
                 setIsGeneratingAddress(false);
             }
