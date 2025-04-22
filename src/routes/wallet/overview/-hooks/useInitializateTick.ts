@@ -3,11 +3,11 @@ import { useEffect, useRef } from 'react';
 export const useInitializeTick = ({
     latestTick,
     transactionTickOffset,
-    onTickChangeHandler,
+    enabled,
 }: {
     latestTick: number;
     transactionTickOffset: number;
-    onTickChangeHandler: () => void;
+    enabled?: boolean;
 }) => {
     const isTickInitialized = useRef(false);
 
@@ -15,11 +15,10 @@ export const useInitializeTick = ({
 
     useEffect(() => {
         // INITIALIZE TICK VALUE
-        if (latestTick && latestTick > 0 && !isTickInitialized.current) {
-            onTickChangeHandler();
+        if (enabled && latestTick && latestTick > 0 && !isTickInitialized.current) {
             isTickInitialized.current = true;
         }
-    }, [latestTick, onTickChangeHandler]);
+    }, [enabled, latestTick]);
 
     return { targetTransactionTick };
 };
