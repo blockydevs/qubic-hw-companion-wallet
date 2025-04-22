@@ -13,7 +13,8 @@ import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
 import { useQubicCurrentTickQuery, useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { MissingSelectedAddressView } from '@/routes/wallet/overview/missing-selected-address-view';
-import { SendForm } from '@/routes/wallet/overview/send-form';
+import { SendFormWithTickField } from '@/routes/wallet/overview/send-form-with-tick-field';
+import { SendFormWithoutTick } from '@/routes/wallet/overview/send-form-without-tick-field';
 import { SendSuccessModal } from './send-success-modal';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { FullScreenLoader } from '@/components/full-screen-loader';
@@ -22,6 +23,20 @@ import { useVerifyAddress } from '@/hooks/verify-address';
 import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 import { useLocaleInfo } from '@/hooks/locale-info';
 import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/use-qubic-ledger-app-context';
+
+interface BaseSendFormSubmitValues {
+    amount: number;
+    sendTo: string;
+    resetForm: () => void;
+}
+interface SendFormWithTickFieldSubmitValues extends BaseSendFormSubmitValues {
+    tick: number;
+    type: 'with-tick-field';
+}
+
+interface SendFormWithoutTickFieldSubmitValues extends BaseSendFormSubmitValues {
+    type: 'without-tick-field';
+}
 
 const fullScreenLoaderDataOptions = {
     confirmTransactionInLedger: {
@@ -33,6 +48,8 @@ const fullScreenLoaderDataOptions = {
         message: 'Please wait a moment',
     },
 };
+
+const isTickFieldEnabled = process.env.REACT_APP_QUBIC_TICK_FIELD_VISIBLE === 'true';
 
 export const WalletOverviewPage = () => {
     const navigate = useNavigate();
@@ -84,7 +101,7 @@ export const WalletOverviewPage = () => {
         isLoading: isLatestTickLoading,
         isFetching: isLatestTickFetching,
         isRefetching: isLatestTickRefetching,
-        refetch: onRefreshTick,
+        refetch: refetchTickValue,
     } = useQubicCurrentTickQuery();
 
     const isLatestTickLoaded =
@@ -144,7 +161,9 @@ export const WalletOverviewPage = () => {
     );
 
     const onSubmitHandler = useCallback(
-        async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) => {
+        async (
+            values: SendFormWithoutTickFieldSubmitValues | SendFormWithTickFieldSubmitValues,
+        ) => {
             try {
                 if (!selectedAddress) {
                     throw new Error('No selected address');
@@ -158,7 +177,18 @@ export const WalletOverviewPage = () => {
                     }
                 }
 
-                await sendTransactionSignedWithLedgerToRpcHandler(values);
+                const tick =
+                    values.type === 'with-tick-field'
+                        ? values.tick
+                        : (await refetchTickValue()).data +
+                          parseInt(process.env.REACT_APP_TRANSACTION_TICK_OFFSET);
+
+                await sendTransactionSignedWithLedgerToRpcHandler({
+                    amount: values.amount,
+                    sendTo: values.sendTo,
+                    tick,
+                    resetForm: values.resetForm,
+                });
             } catch (error) {
                 notifications.show({
                     title: 'Failed to send transaction',
@@ -168,10 +198,11 @@ export const WalletOverviewPage = () => {
             }
         },
         [
-            isSelectedAddressVerified,
             selectedAddress,
-            sendTransactionSignedWithLedgerToRpcHandler,
+            isSelectedAddressVerified,
             verifyAddress,
+            refetchTickValue,
+            sendTransactionSignedWithLedgerToRpcHandler,
         ],
     );
 
@@ -268,16 +299,30 @@ export const WalletOverviewPage = () => {
                         }}
                     />
 
-                    {isLatestTickLoaded && (
-                        <SendForm
-                            onRefreshTick={onRefreshTick}
-                            latestTick={latestTick}
+                    {isTickFieldEnabled ? (
+                        <SendFormWithTickField
+                            setMaxAmountHandler={(setAmountFieldValue) => {
+                                setAmountFieldValue(parseInt(selectedAddress.balance));
+                            }}
                             onSubmit={onSubmitHandler}
                             isDisabled={isTransactionProcessing}
                             maxAmount={parseInt(selectedAddress.balance)}
                             selectedAddressIdentity={selectedAddress.identity}
                             submitButtonLabel={submitButtonLabel}
+                            onRefreshTick={refetchTickValue}
+                            latestTick={latestTick}
                             transactionTickOffset={transactionTickOffset}
+                        />
+                    ) : (
+                        <SendFormWithoutTick
+                            setMaxAmountHandler={(setAmountFieldValue) => {
+                                setAmountFieldValue(parseInt(selectedAddress.balance));
+                            }}
+                            onSubmit={onSubmitHandler}
+                            isDisabled={isTransactionProcessing}
+                            maxAmount={parseInt(selectedAddress.balance)}
+                            selectedAddressIdentity={selectedAddress.identity}
+                            submitButtonLabel={submitButtonLabel}
                         />
                     )}
                 </Paper>
