@@ -85,14 +85,6 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
         validateInputOnBlur: true,
     });
 
-    useInitializeTick({
-        latestTick,
-        enabled: isTickFieldEnabled && isLatestTickLoaded && form.values.tick !== 0,
-        onTickInitialized: (tick) => {
-            form.setFieldValue('tick', tick + transactionTickOffset);
-        },
-    });
-
     const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
         useQubicSendTransactionSignedWithLedgerToRpc(
             selectedAddress?.addressDerivationPath,
@@ -208,6 +200,14 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
         },
         [refetchTickValue],
     );
+
+    useInitializeTick({
+        latestTick,
+        enabled: isTickFieldEnabled && isLatestTickLoaded && form.values.tick !== 0,
+        onTickInitialized: (tick) => {
+            form.setFieldValue('tick', tick + transactionTickOffset);
+        },
+    });
 
     return {
         form,
