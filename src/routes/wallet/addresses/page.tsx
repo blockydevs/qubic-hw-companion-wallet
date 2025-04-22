@@ -1,4 +1,4 @@
-import { use, useMemo } from 'react';
+import { use, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import BigNumber from 'bignumber.js';
 import { Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
@@ -23,6 +23,7 @@ import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
+import { notifications } from '@mantine/notifications';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -55,6 +56,18 @@ export const WalletAddressesPage = () => {
 
     const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
         useQrCodeModal(selectedAddress?.identity ?? '');
+
+    const deriveNewAddressHandler = useCallback(async () => {
+        try {
+            await deriveNewAddress();
+        } catch (error) {
+            notifications.show({
+                title: 'Error',
+                message: error instanceof Error ? error.message : 'Unknown error',
+                color: 'red',
+            });
+        }
+    }, [deriveNewAddress]);
 
     const isGenerateNewAddressButtonDisabled = isGeneratingAddress || deviceType === 'demo';
 
@@ -89,7 +102,7 @@ export const WalletAddressesPage = () => {
                     <Center>
                         <Button
                             leftSection={<AddCircleIcon sx={{ fontSize: '0.875rem' }} />}
-                            onClick={() => deriveNewAddress()}
+                            onClick={deriveNewAddressHandler}
                             disabled={isGenerateNewAddressButtonDisabled}
                         >
                             {isGeneratingAddress ? 'Generating...' : 'Generate New Address'}
