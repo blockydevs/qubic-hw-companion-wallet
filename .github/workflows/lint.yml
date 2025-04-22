@@ -1,43 +1,43 @@
 name: Lint
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  push:
-    branches:
-      - main
-      - develop
-  # Replace pull_request with pull_request_target if you
-  # plan to use this action with forks, see the Limitations section
-  pull_request:
-    branches:
-      - main
-      - develop
+    # Trigger the workflow on push or pull request,
+    # but only for the main branch
+    push:
+        branches:
+            - main
+            - develop
+    # Replace pull_request with pull_request_target if you
+    # plan to use this action with forks, see the Limitations section
+    pull_request:
+        branches:
+            - main
+            - develop
 
 # Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
 permissions:
-  checks: write
-  contents: write
+    checks: write
+    contents: write
 
 jobs:
-  run-linters:
-    name: Run linters
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
+    run-linters:
+        name: Run linters
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-            version: 9
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 9
 
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              shell: bash
+              run: pnpm install --frozen-lockfile
 
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-            eslint: true
-            prettier: true
-            prettier_args: "--config ./.prettierrc"
+            - name: Run linters
+              uses: wearerequired/lint-action@v2
+              with:
+                  eslint: true
+                  prettier: true
+                  prettier_args: '--config ./.prettierrc'
