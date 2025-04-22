@@ -1,9 +1,10 @@
 # Contributing
 
 ## Tech Choices
-- React with mantine.dev (https://v7.mantine.dev/)
-  - This is in alpha but the components available is good enough for use
-- Icons - https://tabler-icons.io/
+
+-   React with mantine.dev (https://v7.mantine.dev/)
+    -   This is in alpha but the components available is good enough for use
+-   Icons - https://tabler-icons.io/
 
 ## Code
 
