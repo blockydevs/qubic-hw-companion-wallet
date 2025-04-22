@@ -2,7 +2,7 @@
   "name": "qubic-hw-companion-wallet",
   "description": "The front-end interface for the Qubic Ledger device app",
   "author": "BlockyDevs (https://github.com/blockydevs/)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "license": "MIT",
   "scripts": {
