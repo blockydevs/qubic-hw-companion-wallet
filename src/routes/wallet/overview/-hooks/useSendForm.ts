@@ -1,13 +1,13 @@
 import { use, useCallback, useMemo, useState } from 'react';
+import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
 import { useQubicCurrentTickQuery, useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/use-qubic-ledger-app-context';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
-import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
-import { useInitializeTick } from '@/routes/wallet/overview/page.hooks';
+import { useInitializeTick } from '@/routes/wallet/overview/-hooks/useInitializateTick';
 import { generateValidateOptions } from '@/routes/wallet/overview/page.utils';
 
 const fullScreenLoaderDataOptions = {
@@ -87,7 +87,7 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
 
     useInitializeTick({
         latestTick,
-        enabled: isLatestTickLoaded && isTickFieldEnabled && form.values.tick !== 0,
+        enabled: isTickFieldEnabled && isLatestTickLoaded && form.values.tick !== 0,
         onTickInitialized: (tick) => {
             form.setFieldValue('tick', tick + transactionTickOffset);
         },

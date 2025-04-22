@@ -2,23 +2,20 @@ import { useEffect, useRef } from 'react';
 
 export const useInitializeTick = ({
     latestTick,
-    transactionTickOffset,
     enabled,
+    onTickInitialized,
 }: {
     latestTick: number;
-    transactionTickOffset: number;
+    onTickInitialized: (tick: number) => void;
     enabled?: boolean;
 }) => {
     const isTickInitialized = useRef(false);
 
-    const targetTransactionTick = transactionTickOffset + latestTick;
-
     useEffect(() => {
         // INITIALIZE TICK VALUE
         if (enabled && latestTick && latestTick > 0 && !isTickInitialized.current) {
+            onTickInitialized(latestTick);
             isTickInitialized.current = true;
         }
-    }, [enabled, latestTick]);
-
-    return { targetTransactionTick };
+    }, [enabled, latestTick, onTickInitialized]);
 };
