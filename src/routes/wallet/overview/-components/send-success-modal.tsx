@@ -39,7 +39,7 @@ export const SendSuccessModal = ({
                     </Title>
 
                     <TruncatedText
-                        w={'calc(var(--modal-size) - 6rem)'}
+                        w='calc(var(--modal-size) - 6rem)'
                         style={{ overflowWrap: 'break-word' }}
                         c='brand'
                     >
@@ -54,7 +54,7 @@ export const SendSuccessModal = ({
                         href={`https://explorer.qubic.org/network/tx/${sentTxId}`}
                         target='_blank'
                         c='brand'
-                        w={'calc(var(--modal-size) - 6rem)'}
+                        w='calc(var(--modal-size) - 6rem)'
                         style={{ overflowWrap: 'break-word' }}
                     >
                         {sentTxId}

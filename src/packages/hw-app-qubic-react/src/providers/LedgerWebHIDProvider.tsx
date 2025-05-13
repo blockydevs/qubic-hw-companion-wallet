@@ -1,9 +1,10 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type { ITransportListenersConfigProps } from '../types';
 import { createTransportListeners } from '../utils/transport-listeners';
+import { checkIfQubicAppIsOpenOnLedger } from '@/routes/home/page.utils';
 
 interface ILedgerWebHIDContext {
     transport: Transport | null;
@@ -24,6 +25,7 @@ export const LedgerWebHIDProvider = ({
     init = true,
 }: PropsWithChildren<LedgerWebHIDProviderProps>) => {
     const [transport, setTransport] = useState<Transport | null>(null);
+    const isInitialized = useRef(false);
 
     const initLedgerTransportHandler = useCallback(
         async (listenersConfig?: ITransportListenersConfigProps) => {
@@ -44,15 +46,32 @@ export const LedgerWebHIDProvider = ({
         [transport],
     );
 
+    const checkIfQubicAppIsOpenOnLedgerHandler = useCallback(async (transport: Transport) => {
+        try {
+            return await checkIfQubicAppIsOpenOnLedger(transport);
+        } catch {
+            return false;
+        }
+    }, []);
+
     const resetTransport = useCallback(async () => {
         if (transport) {
-            await transport.close();
-            setTransport(null);
+            try {
+                if (checkIfQubicAppIsOpenOnLedgerHandler(transport)) {
+                    await transport.close();
+                }
+            } catch {
+                // #FIXME: the "checkIfQubicAppIsOpenOnLedgerHandler" throw error instead of returning false
+                return;
+            }
         }
+
+        setTransport(null);
     }, [transport]);
 
     useEffect(() => {
-        if (init && !transport) {
+        if (init && !transport && !isInitialized.current) {
+            isInitialized.current = true;
             initLedgerTransportHandler();
         }
     }, [init, transport, initLedgerTransportHandler]);

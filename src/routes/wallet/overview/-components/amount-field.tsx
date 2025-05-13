@@ -19,10 +19,10 @@ export const AmountField = ({
             decimalScale={8}
             disabled={disabled}
             required
-            rightSectionWidth={'3rem'}
+            rightSectionWidth='3rem'
             rightSection={
                 <UnstyledButton aria-label='Set Max Amount' onClick={setMaxAmountHandler}>
-                    <Text size='0.8rem' c={'brand'}>
+                    <Text size='0.8rem' c='brand'>
                         MAX
                     </Text>
                 </UnstyledButton>

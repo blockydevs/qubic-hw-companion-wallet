@@ -74,7 +74,7 @@ export const VerifiedAddressProvider = ({ children }: PropsWithChildren) => {
                 setAddressInVerificationProcess(null);
             }
         },
-        [app, verifiedIdentities, selectedAddress],
+        [deviceType, verifiedIdentities, selectedAddress?.identity, app],
     );
 
     return (

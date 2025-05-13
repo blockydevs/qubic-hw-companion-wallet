@@ -1,3 +1,4 @@
+import type Transport from '@ledgerhq/hw-transport';
 import {
     InfiniteData,
     UndefinedInitialDataInfiniteOptions,
