@@ -41,3 +41,4 @@ jobs:
                   eslint: true
                   prettier: true
                   prettier_args: '--config ./.prettierrc'
+                  esling_args: '--config ./.eslintrc.js'
