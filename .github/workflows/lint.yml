@@ -35,10 +35,11 @@ jobs:
               shell: bash
               run: pnpm install --frozen-lockfile
 
-            - name: Run linters
-              uses: wearerequired/lint-action@v2
-              with:
-                  eslint: true
-                  prettier: true
-                  prettier_args: '--config ./.prettierrc'
-                  esling_args: '--config ./.eslintrc.js'
+            - name: Eslint check
+              run: pnpm eslint-check
+
+            - name: Prettier check
+              run: pnpm prettier-check
+
+            - name: Check for TypeScript errors
+              run: pnpm ts-check
