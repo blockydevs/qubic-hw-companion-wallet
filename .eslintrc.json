@@ -56,7 +56,7 @@
             "version": "detect"
         }
     },
-    "ignorePatterns": ["src/packages/", "node_modules"],
+    "ignorePatterns": ["src/packages/", "node_modules", "config-overrides.js"],
     "env": {
         "es6": true,
         "browser": true
