@@ -14,6 +14,7 @@
         "eject": "react-app-rewired eject",
         "eslint-check": "eslint './**/*.{js,jsx,ts,tsx}' --config ./.eslintrc.json",
         "prettier-check": "prettier --check './**/*.{js,jsx,ts,tsx}' --config ./.prettierrc",
+        "lint": "npm run eslint-check && npm run prettier-check",
         "format": "prettier --write './**/*.{js,jsx,ts,tsx,css}' --config ./.prettierrc"
     },
     "dependencies": {
