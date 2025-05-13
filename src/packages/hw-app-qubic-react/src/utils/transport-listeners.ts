@@ -6,6 +6,6 @@ export const createTransportListeners = (
     listenersConfig?: ITransportListenersConfigProps,
 ) => {
     if (listenersConfig?.onDisconnect) {
-        transport.on('disconnect', () => listenersConfig.onDisconnect(transport));
+        transport.on('disconnect', listenersConfig.onDisconnect);
     }
 };
