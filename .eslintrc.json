@@ -56,7 +56,7 @@
             "version": "detect"
         }
     },
-    "ignorePatterns": ["src/packages/", "**/*.js", "node_modules"],
+    "ignorePatterns": ["src/packages/", "node_modules"],
     "env": {
         "es6": true,
         "browser": true
