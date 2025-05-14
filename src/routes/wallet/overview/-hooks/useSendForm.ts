@@ -77,8 +77,8 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
             ...(isTickFieldEnabled && { tick: latestTick }),
         },
         validate: generateValidateOptions({
-            maxAmount: parseInt(selectedAddress.balance),
-            selectedAddressIdentity: selectedAddress.identity,
+            maxAmount: parseInt(selectedAddress?.balance),
+            selectedAddressIdentity: selectedAddress?.identity,
             type: isTickFieldEnabled ? 'with-tick-field' : 'without-tick-field',
             latestTick,
         }),
