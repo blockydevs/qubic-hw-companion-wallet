@@ -18,6 +18,7 @@ export const ReconnectUserLedgerQubicAppProvider = ({ children }: PropsWithChild
     const tryToReconnectIfAnyWebHIDDeviceIsConnected = useCallback(async () => {
         setIsReconnecting(true);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const activeDevices = await (navigator as any).hid.getDevices();
 
         if (!activeDevices.length) {

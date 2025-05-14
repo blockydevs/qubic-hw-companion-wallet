@@ -87,24 +87,27 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
         [broadcastTransactionToRpc, derivationPath, latestTick, ledgerSignTransaction],
     );
 
-    const handleDemoTransaction = async ({
-        onAfterBroadcastTransactionToRpc,
-        onBeforeBroadcastTransactionToRpc,
-    }: QubicSendTransactionDemoParameters) => {
-        await onBeforeBroadcastTransactionToRpc?.();
+    const handleDemoTransaction = useCallback(
+        async ({
+            onAfterBroadcastTransactionToRpc,
+            onBeforeBroadcastTransactionToRpc,
+        }: QubicSendTransactionDemoParameters) => {
+            await onBeforeBroadcastTransactionToRpc?.();
 
-        return new Promise<void>((resolve) => {
-            setTimeout(async () => {
-                await onAfterBroadcastTransactionToRpc({
-                    sentTo: 'demo-transaction',
-                    sentTxId: 'demo-transaction-id',
-                    sentAmount: 100,
-                });
+            return new Promise<void>((resolve) => {
+                setTimeout(async () => {
+                    await onAfterBroadcastTransactionToRpc({
+                        sentTo: 'demo-transaction',
+                        sentTxId: 'demo-transaction-id',
+                        sentAmount: 100,
+                    });
 
-                resolve(void 0);
-            }, 3000);
-        });
-    };
+                    resolve(void 0);
+                }, 3000);
+            });
+        },
+        [],
+    );
 
     const sendTransactionSignedWithLedgerToRpc = useCallback(
         async (values: QubicSendTransactionSignedWithLedgerToRpcParameters) =>
