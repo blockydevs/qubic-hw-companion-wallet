@@ -1,21 +1,23 @@
 import { TruncatedText } from '@/components/truncated-text';
+import { IQubicPendingTransaction } from '@/types';
 import type { ModalProps } from '@mantine/core';
 import { Modal, Stack, Text, Anchor, Button, Title, Paper } from '@mantine/core';
 import React from 'react';
 
-interface SendSuccessModalProps extends ModalProps {
-    sentTxId: string;
-    sentAmount: number;
-    sentTo: string;
+interface SentTransactionDetailsModalProps extends ModalProps, IQubicPendingTransaction {
+    currentTick: number;
 }
 
-export const SendSuccessModal = ({
-    sentTxId,
-    sentAmount,
-    sentTo,
+export const SentTransactionDetailsModal = ({
+    amount,
+    status,
+    tick,
+    currentTick,
+    to,
+    txId,
     onClose,
     ...modalProps
-}: SendSuccessModalProps) => (
+}: SentTransactionDetailsModalProps) => (
     <Modal centered withCloseButton={false} onClose={onClose} {...modalProps}>
         <Stack align='center' ta='center' gap='lg'>
             <Title component='p' size='xl' c='brand'>
@@ -29,7 +31,7 @@ export const SendSuccessModal = ({
                     </Title>
 
                     <Text component='h2' fw={600} c='brand'>
-                        {sentAmount} QUBIC
+                        {amount} QUBIC
                     </Text>
                 </Stack>
 
@@ -43,7 +45,7 @@ export const SendSuccessModal = ({
                         style={{ overflowWrap: 'break-word' }}
                         c='brand'
                     >
-                        {sentTo}
+                        {to}
                     </TruncatedText>
                 </Stack>
 
@@ -51,14 +53,38 @@ export const SendSuccessModal = ({
                     <Text fw={600}>Transaction ID</Text>
 
                     <Anchor
-                        href={`https://explorer.qubic.org/network/tx/${sentTxId}`}
+                        href={`https://explorer.qubic.org/network/tx/${txId}`}
                         target='_blank'
                         c='brand'
                         w='calc(var(--modal-size) - 6rem)'
                         style={{ overflowWrap: 'break-word' }}
                     >
-                        {sentTxId}
+                        {txId}
                     </Anchor>
+                </Stack>
+
+                <Stack gap='xs'>
+                    <Text fw={600}>Current tick</Text>
+
+                    <Text component='h2' fw={600} c='brand'>
+                        {currentTick}
+                    </Text>
+                </Stack>
+
+                <Stack gap='xs'>
+                    <Text fw={600}>Transaction tick</Text>
+
+                    <Text component='h2' fw={600} c='brand'>
+                        {tick}
+                    </Text>
+                </Stack>
+
+                <Stack gap='xs'>
+                    <Text fw={600}>Transaction status</Text>
+
+                    <Text component='h2' fw={600} c='brand'>
+                        {status}
+                    </Text>
                 </Stack>
             </Paper>
 

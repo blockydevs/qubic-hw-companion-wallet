@@ -4,13 +4,14 @@ export { useQubicLedgerAppDeriveredIndexCacheContext } from './src/hooks/use-qub
 
 export { useQubicCurrentTickQuery } from './src/hooks/qubic-rpc/use-qubic-current-tick-query';
 export { useQubicRpcBroadcastTransactionMutation } from './src/hooks/qubic-rpc/use-qubic-rpc-broadcast-transaction-mutation';
-export { useQubicTransactionHistoryQuery } from './src/hooks/qubic-rpc/use-qubic-transactions-history-query';
+export { useQubicWholeTransactionsHistoryInfiniteQuery } from './src/hooks/qubic-rpc/use-qubic-whole-transactions-history-infinite-query';
 
 export { useQubicRpcService } from './src/hooks/qubic-rpc/use-qubic-rpc-service';
 
 export { QubicLedgerAppProvider } from './src/providers/QubicLedgerAppProvider';
 export { QubicLedgerAppDeriveredIndexCache } from './src/providers/QubicLedgerAppDeriveredIndexCache';
 export { QubicLedgerDemoModeProvider } from './src/providers/QubicLedgerDemoModeProvider';
+export { QubicWalletPendingSessionTransactionsProvider } from '../../providers/QubicWalletPendingSessionTransactionsProvider';
 
 export { QubicRpcService } from './src/services/qubic-rpc';
 

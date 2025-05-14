@@ -10,6 +10,7 @@ import {
     QubicLedgerAppDeriveredIndexCache,
     QubicLedgerAppProvider,
     QubicLedgerDemoModeProvider,
+    QubicWalletPendingSessionTransactionsProvider,
 } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext, DeviceTypeProvider } from '@/providers/DeviceTypeProvider';
 import { LocaleInfoProvider } from '@/providers/LocaleInfoProvider';
@@ -52,67 +53,69 @@ export default function App() {
                         >
                             <QueryClientProvider client={queryClient}>
                                 <ReconnectUserLedgerQubicAppProvider>
-                                    <RouterRoutes>
-                                        <Route path='*' element={<PageNotFound />} />
-                                        <Route path='/' element={<Home />} />
-                                        <Route
-                                            path='wallet'
-                                            element={
-                                                <ReconnectUserLedgerQubicAppContext.Consumer>
-                                                    {({ isReconnectingInitialized }) => (
-                                                        <DeviceTypeContext.Consumer>
-                                                            {({ deviceType }) =>
-                                                                deviceType ? (
-                                                                    <RequireDeviceTypeProvider
-                                                                        enabled={
-                                                                            isReconnectingInitialized
-                                                                        }
-                                                                    >
-                                                                        <QubicLedgerDemoModeProvider
+                                    <QubicWalletPendingSessionTransactionsProvider>
+                                        <RouterRoutes>
+                                            <Route path='*' element={<PageNotFound />} />
+                                            <Route path='/' element={<Home />} />
+                                            <Route
+                                                path='wallet'
+                                                element={
+                                                    <ReconnectUserLedgerQubicAppContext.Consumer>
+                                                        {({ isReconnectingInitialized }) => (
+                                                            <DeviceTypeContext.Consumer>
+                                                                {({ deviceType }) =>
+                                                                    deviceType ? (
+                                                                        <RequireDeviceTypeProvider
                                                                             enabled={
-                                                                                deviceType ===
-                                                                                'demo'
+                                                                                isReconnectingInitialized
                                                                             }
                                                                         >
-                                                                            <QubicLedgerAppDeriveredIndexCache
+                                                                            <QubicLedgerDemoModeProvider
                                                                                 enabled={
-                                                                                    deviceType !==
+                                                                                    deviceType ===
                                                                                     'demo'
                                                                                 }
                                                                             >
-                                                                                <OverlayForLoadingAddressesFromCacheProvider>
-                                                                                    <VerifiedAddressProvider>
-                                                                                        <HideSensitiveDataProvider>
-                                                                                            <LocaleInfoProvider>
-                                                                                                <Outlet />
-                                                                                            </LocaleInfoProvider>
-                                                                                        </HideSensitiveDataProvider>
-                                                                                    </VerifiedAddressProvider>
-                                                                                </OverlayForLoadingAddressesFromCacheProvider>
-                                                                            </QubicLedgerAppDeriveredIndexCache>
-                                                                        </QubicLedgerDemoModeProvider>
-                                                                    </RequireDeviceTypeProvider>
-                                                                ) : null
-                                                            }
-                                                        </DeviceTypeContext.Consumer>
-                                                    )}
-                                                </ReconnectUserLedgerQubicAppContext.Consumer>
-                                            }
-                                        >
-                                            <Route
-                                                path='addresses'
-                                                element={<WalletAddressesPage />}
-                                            />
-                                            <Route
-                                                path='overview'
-                                                element={<WalletOverviewPage />}
-                                            />
-                                            <Route
-                                                path='transactions'
-                                                element={<WalletTransactionsPage />}
-                                            />
-                                        </Route>
-                                    </RouterRoutes>
+                                                                                <QubicLedgerAppDeriveredIndexCache
+                                                                                    enabled={
+                                                                                        deviceType !==
+                                                                                        'demo'
+                                                                                    }
+                                                                                >
+                                                                                    <OverlayForLoadingAddressesFromCacheProvider>
+                                                                                        <VerifiedAddressProvider>
+                                                                                            <HideSensitiveDataProvider>
+                                                                                                <LocaleInfoProvider>
+                                                                                                    <Outlet />
+                                                                                                </LocaleInfoProvider>
+                                                                                            </HideSensitiveDataProvider>
+                                                                                        </VerifiedAddressProvider>
+                                                                                    </OverlayForLoadingAddressesFromCacheProvider>
+                                                                                </QubicLedgerAppDeriveredIndexCache>
+                                                                            </QubicLedgerDemoModeProvider>
+                                                                        </RequireDeviceTypeProvider>
+                                                                    ) : null
+                                                                }
+                                                            </DeviceTypeContext.Consumer>
+                                                        )}
+                                                    </ReconnectUserLedgerQubicAppContext.Consumer>
+                                                }
+                                            >
+                                                <Route
+                                                    path='addresses'
+                                                    element={<WalletAddressesPage />}
+                                                />
+                                                <Route
+                                                    path='overview'
+                                                    element={<WalletOverviewPage />}
+                                                />
+                                                <Route
+                                                    path='transactions'
+                                                    element={<WalletTransactionsPage />}
+                                                />
+                                            </Route>
+                                        </RouterRoutes>
+                                    </QubicWalletPendingSessionTransactionsProvider>
                                 </ReconnectUserLedgerQubicAppProvider>
                             </QueryClientProvider>
                         </QubicLedgerAppProvider>

@@ -14,7 +14,7 @@ interface UseQubicTransactionsHistoryQueryProps {
     tickInterval?: number;
 }
 
-export const useQubicTransactionHistoryQuery = (
+export const useQubicWholeTransactionsHistoryInfiniteQuery = (
     {
         identity,
         initialTick,
