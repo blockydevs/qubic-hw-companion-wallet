@@ -79,6 +79,7 @@ export const useConnectToQubicLedgerApp = () => {
                 });
             },
             onError: async (e) => {
+                await reset();
                 await handleError(e);
             },
         });
@@ -89,6 +90,7 @@ export const useConnectToQubicLedgerApp = () => {
         setDeviceType,
         navigate,
         handleError,
+        reset,
     ]);
 
     const handleConnectToDemo = useCallback(() => {

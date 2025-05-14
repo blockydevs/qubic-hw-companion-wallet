@@ -33,15 +33,31 @@ export const LedgerWebHIDProvider = ({
                 throw new Error('Transporter already initialized');
             }
 
-            const transporterWebHIDInstance = await TransportWebHID.create();
+            let transporterWebHIDInstance: Transport | null = null;
 
-            if (listenersConfig) {
-                createTransportListeners(transporterWebHIDInstance, listenersConfig);
+            try {
+                transporterWebHIDInstance = await TransportWebHID.create();
+
+                const isOpenQubicAppOnLedger = await checkIfQubicAppIsOpenOnLedger(
+                    transporterWebHIDInstance,
+                );
+
+                if (!isOpenQubicAppOnLedger) {
+                    await transporterWebHIDInstance.close();
+                }
+
+                if (listenersConfig) {
+                    createTransportListeners(transporterWebHIDInstance, listenersConfig);
+                }
+
+                setTransport(transporterWebHIDInstance);
+
+                return transporterWebHIDInstance;
+            } catch (error) {
+                transporterWebHIDInstance?.close();
+
+                throw error;
             }
-
-            setTransport(transporterWebHIDInstance);
-
-            return transporterWebHIDInstance;
         },
         [transport],
     );
