@@ -278,12 +278,13 @@ const { transactionId } = await broadcastTransactionToRpc(encodedTransaction);
 -   Returns a mutation object with `mutateAsync`, `isLoading`, `error` and rest [`useMutation`](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) return values.
 -   Mutation accepts a `QubicTransaction` or transaction hash string.
 
-#### `useQubicTransactionHistoryQuery`
+#### `useQubicWholeTransactionsHistoryInfiniteQuery`
 
-The `useQubicTransactionHistoryQuery` hook retrieves the transaction history for a given identity, starting from a specified tick. Transactions are fetched continuously as long as new ones are available.
+The `useQubicWholeTransactionsHistoryInfiniteQuery` hook retrieves the transaction history for a given identity, starting from a specified tick. Transactions are fetched continuously as long as new ones are available.
 
 ```tsx
-const { data, refetch, reset, firstTick, endTick } = useQubicTransactionHistoryQuery(identity);
+const { data, refetch, reset, firstTick, endTick } =
+    useQubicWholeTransactionsHistoryInfiniteQuery(identity);
 ```
 
 -   `firstTick`: The initial tick from which the transaction history starts.

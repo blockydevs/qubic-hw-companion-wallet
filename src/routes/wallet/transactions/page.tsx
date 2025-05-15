@@ -4,7 +4,7 @@ import { HistoryTransaction } from '@/routes/wallet/transactions/history-transac
 import {
     useQubicCurrentTickQuery,
     useQubicLedgerApp,
-    useQubicTransactionHistoryQuery,
+    useQubicWholeTransactionsHistoryInfiniteQuery,
 } from '@/packages/hw-app-qubic-react';
 
 export const WalletTransactionsPage = () => {
@@ -18,7 +18,7 @@ export const WalletTransactionsPage = () => {
         isLoading: transactionsLoading,
         endTick,
         firstTick,
-    } = useQubicTransactionHistoryQuery({
+    } = useQubicWholeTransactionsHistoryInfiniteQuery({
         identity: selectedAddress?.identity,
         initialTick: latestTick,
     });
