@@ -18,6 +18,10 @@ export const checkIfQubicAppIsOpenOnLedger = async (transport: Transport) => {
         }
 
         if (e instanceof Error) {
+            if (e.message.includes('Locked device')) {
+                throw new Error('Please unlock device.');
+            }
+
             throw new Error(`Could not interact with the Ledger device: ${e.message}`);
         }
 
