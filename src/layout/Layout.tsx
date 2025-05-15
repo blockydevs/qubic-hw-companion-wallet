@@ -46,7 +46,7 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
         if (isWalletDashboard && !isNavbarOpened && isSm) {
             return openNavbar();
         }
-    }, [isWalletDashboard, isSm]);
+    }, [isWalletDashboard, isSm, isNavbarOpened, closeNavbar, openNavbar]);
 
     return (
         <AppShell

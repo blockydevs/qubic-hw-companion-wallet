@@ -50,8 +50,8 @@ export default function App() {
                             )}
                             init={false}
                         >
-                            <ReconnectUserLedgerQubicAppProvider>
-                                <QueryClientProvider client={queryClient}>
+                            <QueryClientProvider client={queryClient}>
+                                <ReconnectUserLedgerQubicAppProvider>
                                     <RouterRoutes>
                                         <Route path='*' element={<PageNotFound />} />
                                         <Route path='/' element={<Home />} />
@@ -113,8 +113,8 @@ export default function App() {
                                             />
                                         </Route>
                                     </RouterRoutes>
-                                </QueryClientProvider>
-                            </ReconnectUserLedgerQubicAppProvider>
+                                </ReconnectUserLedgerQubicAppProvider>
+                            </QueryClientProvider>
                         </QubicLedgerAppProvider>
                     </DeviceTypeProvider>
                 </Layout>

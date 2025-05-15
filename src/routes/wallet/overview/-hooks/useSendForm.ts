@@ -77,8 +77,8 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
             ...(isTickFieldEnabled && { tick: latestTick }),
         },
         validate: generateValidateOptions({
-            maxAmount: parseInt(selectedAddress.balance),
-            selectedAddressIdentity: selectedAddress.identity,
+            maxAmount: parseInt(selectedAddress?.balance),
+            selectedAddressIdentity: selectedAddress?.identity,
             type: isTickFieldEnabled ? 'with-tick-field' : 'without-tick-field',
             latestTick,
         }),
@@ -128,14 +128,7 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
                     values.resetForm();
                 },
             }),
-        [
-            selectedAddress,
-            deviceType,
-            sendTransactionSignedWithLedgerToRpc,
-            openSuccessModal,
-            fullScreenLoaderDataOptions.confirmTransactionInLedger,
-            fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc,
-        ],
+        [selectedAddress, deviceType, sendTransactionSignedWithLedgerToRpc, openSuccessModal],
     );
 
     const onSubmitResetFormHandler = useCallback(async () => {
@@ -182,12 +175,14 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
             onSubmitError(error instanceof Error ? error.message : 'Unknown Error');
         }
     }, [
-        form,
         selectedAddress,
         isSelectedAddressVerified,
-        verifyAddress,
-        sendTransactionSignedWithLedgerToRpcHandler,
+        form.values,
         refetchTickValue,
+        sendTransactionSignedWithLedgerToRpcHandler,
+        onSubmitResetFormHandler,
+        verifyAddress,
+        onSubmitError,
     ]);
 
     const onRefetchTickValueHandler = useCallback(

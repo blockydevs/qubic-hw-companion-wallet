@@ -33,7 +33,7 @@ export const ERRORS_ON_SUBMIT = {
     fillFormBeforeSubmitting: 'Please fill the form before submitting',
 };
 
-const validateWithZod = <Data extends unknown>(value: Data, schema: z.Schema<Data>) => {
+const validateWithZod = <Data>(value: Data, schema: z.Schema<Data>) => {
     const result = schema.safeParse(value);
 
     return result.success ? null : JSON.parse(result.error.message)[0].message;

@@ -40,7 +40,7 @@ export const useVerifyAddress = () => {
                 }
             }
         },
-        [verifyAddress],
+        [verifiedIdentities, verifyAddress],
     );
 
     return {
