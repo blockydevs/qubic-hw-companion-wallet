@@ -1,5 +1,13 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { LedgerWebHIDContext, LedgerWebHIDProvider } from './LedgerWebHIDProvider';
 import type { IQubicLedgerAddress, ITransportListenersConfigProps } from '../types';
 import { QubicRpcServiceContext, QubicRpcServiceProvider } from './QubicRpcServiceProvider';
@@ -42,6 +50,8 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | null>(null);
     const [areBalanceLoading, setAreBalanceLoading] = useState(false);
 
+    const wasInitialized = useRef(false);
+
     const selectedAddress = useMemo(() => {
         if (selectedAddressIndex === null) {
             return null;
@@ -49,40 +59,6 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
 
         return generatedAddresses[selectedAddressIndex];
     }, [selectedAddressIndex, generatedAddresses]);
-
-    const initApp = useCallback(
-        async (listenersConfig?: ITransportListenersConfigProps) => {
-            if (!ledgerWebHIDContext) {
-                throw new Error('LedgerWebHIDContext not initialized');
-            }
-
-            if (app) {
-                throw new Error('Qubic HW App is already initialized');
-            }
-
-            const transportForHwAppQubic = ledgerWebHIDContext?.transport
-                ? ledgerWebHIDContext.transport
-                : await ledgerWebHIDContext.initLedgerTransportHandler({
-                      onDisconnect: () => {
-                          setApp(null);
-                          ledgerWebHIDContext.resetTransport();
-
-                          listenersConfig?.onDisconnect?.();
-                      },
-                  });
-
-            if (!transportForHwAppQubic) {
-                throw new Error('Cannot get transport for initializing Qubic HW App');
-            }
-
-            const newApp = new HWAppQubic(transportForHwAppQubic);
-
-            setApp(newApp);
-
-            return newApp;
-        },
-        [ledgerWebHIDContext, app],
-    );
 
     const addNewAddress = useCallback(
         (generatedAddressData: IQubicLedgerAddress) => {
@@ -130,10 +106,44 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
         setApp(null);
         setGeneratedAddresses([]);
         setSelectedAddressIndex(null);
-    }, [app, ledgerWebHIDContext, setApp]);
+    }, [app, ledgerWebHIDContext]);
+
+    const initApp = useCallback(
+        async (listenersConfig?: ITransportListenersConfigProps) => {
+            if (!ledgerWebHIDContext) {
+                throw new Error('LedgerWebHIDContext not initialized');
+            }
+
+            if (app) {
+                throw new Error('Qubic HW App is already initialized');
+            }
+
+            const transportForHwAppQubic = ledgerWebHIDContext?.transport
+                ? ledgerWebHIDContext.transport
+                : await ledgerWebHIDContext.initLedgerTransportHandler({
+                      onDisconnect: () => {
+                          reset();
+
+                          listenersConfig?.onDisconnect?.();
+                      },
+                  });
+
+            if (!transportForHwAppQubic) {
+                throw new Error('Cannot get transport for initializing Qubic HW App');
+            }
+
+            const newApp = new HWAppQubic(transportForHwAppQubic);
+
+            setApp(newApp);
+
+            return newApp;
+        },
+        [ledgerWebHIDContext, app],
+    );
 
     useEffect(() => {
-        if (init && !app) {
+        if (init && !app && !wasInitialized.current) {
+            wasInitialized.current = true;
             initApp();
         }
     }, [init, app, initApp]);

@@ -5,7 +5,6 @@ import { getAppAndVersion } from '@/utils/ledger';
 export const checkIfQubicAppIsOpenOnLedger = async (transport: Transport) => {
     try {
         const { name } = await getAppAndVersion(transport);
-
         if (name !== 'Qubic') {
             throw new Error('Please open the Qubic app on your device.');
         }
