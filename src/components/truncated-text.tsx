@@ -18,7 +18,8 @@ export const TruncatedText = ({
     const childrenString = Array.isArray(children) ? children.join('') : children;
 
     const shouldTruncate =
-        charsFromBeginning + charsFromEnd + truncateText.length < childrenString.length;
+        charsFromBeginning + charsFromEnd + (truncateText?.length ?? 0) <
+        (childrenString?.length ?? 0);
 
     if (shouldTruncate) {
         return (

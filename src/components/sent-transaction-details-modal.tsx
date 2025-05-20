@@ -1,21 +1,34 @@
-import { TruncatedText } from '@/components/truncated-text';
-import { IQubicPendingTransaction } from '@/types';
 import type { ModalProps } from '@mantine/core';
-import { Modal, Stack, Text, Anchor, Button, Title, Paper } from '@mantine/core';
-import React from 'react';
+import { Modal, Stack, Text, Anchor, Button, Title, Paper, Group, Divider } from '@mantine/core';
+import { TruncatedText } from '@/components/truncated-text';
+import { TransactionProgress } from '@/components/transaction-progress';
+import type {
+    IQubicPendingTransaction,
+    QubicTransactionStatus,
+} from '@/packages/hw-app-qubic-react';
 
-interface SentTransactionDetailsModalProps extends ModalProps, IQubicPendingTransaction {
+interface SentTransactionDetailsModalProps
+    extends ModalProps,
+        Omit<IQubicPendingTransaction, 'status'> {
     currentTick: number;
+    label: React.ReactNode;
+    beforeLabel?: React.ReactNode;
+    status: QubicTransactionStatus;
+    progressColor: string;
 }
 
 export const SentTransactionDetailsModal = ({
     amount,
-    status,
+    label,
+    beforeLabel,
     tick,
     currentTick,
     to,
     txId,
+    status,
+    // createdAtTick,
     onClose,
+    progressColor,
     ...modalProps
 }: SentTransactionDetailsModalProps) => (
     <Modal centered withCloseButton={false} onClose={onClose} {...modalProps}>
@@ -63,28 +76,44 @@ export const SentTransactionDetailsModal = ({
                     </Anchor>
                 </Stack>
 
+                <Divider
+                    size='md'
+                    label='Keep this windows open to follow the status'
+                    labelPosition='center'
+                />
+
+                <Group display='flex' justify='center' gap='xl'>
+                    <Stack gap='xs'>
+                        <Text fw={600}>Current tick</Text>
+
+                        <Text component='h2' fw={600} c='brand'>
+                            {currentTick}
+                        </Text>
+                    </Stack>
+
+                    <Stack gap='xs'>
+                        <Text fw={600}>Target tick</Text>
+
+                        <Text component='h2' fw={600} c='brand'>
+                            {tick}
+                        </Text>
+                    </Stack>
+                </Group>
+
                 <Stack gap='xs'>
-                    <Text fw={600}>Current tick</Text>
+                    <Group display='flex' justify='center' gap='xs'>
+                        {beforeLabel && beforeLabel}
 
-                    <Text component='h2' fw={600} c='brand'>
-                        {currentTick}
-                    </Text>
-                </Stack>
+                        {label}
+                    </Group>
 
-                <Stack gap='xs'>
-                    <Text fw={600}>Transaction tick</Text>
-
-                    <Text component='h2' fw={600} c='brand'>
-                        {tick}
-                    </Text>
-                </Stack>
-
-                <Stack gap='xs'>
-                    <Text fw={600}>Transaction status</Text>
-
-                    <Text component='h2' fw={600} c='brand'>
-                        {status}
-                    </Text>
+                    <TransactionProgress
+                        currentTick={currentTick}
+                        targetTick={tick}
+                        status={status}
+                        progressColor={progressColor}
+                        c={progressColor}
+                    />
                 </Stack>
             </Paper>
 

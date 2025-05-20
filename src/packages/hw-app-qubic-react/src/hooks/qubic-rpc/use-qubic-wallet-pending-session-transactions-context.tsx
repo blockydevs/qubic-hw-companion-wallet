@@ -1,4 +1,4 @@
-import { QubicWalletPendingSessionTransactionsContext } from '@/providers/QubicWalletPendingSessionTransactionsProvider';
+import { QubicWalletPendingSessionTransactionsContext } from '../../providers/QubicWalletPendingSessionTransactionsProvider';
 import { use } from 'react';
 
 export const useQubicWalletPendingSessionTransactionsContext = () => {

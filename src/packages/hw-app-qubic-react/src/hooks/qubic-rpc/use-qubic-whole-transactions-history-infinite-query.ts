@@ -60,6 +60,10 @@ export const useQubicWholeTransactionsHistoryInfiniteQuery = (
             ...query,
             endTick,
             firstTick,
+            reset: () => {
+                setFirstTick(initialTick);
+                setEndTick(0);
+            },
         }),
         [query],
     );

@@ -3,12 +3,12 @@ import { useForm } from '@mantine/form';
 import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
+import type { IQubicPendingTransaction } from '@/packages/hw-app-qubic-react';
 import { useQubicCurrentTickQuery, useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/use-qubic-ledger-app-context';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { useInitializeTick } from '@/routes/wallet/overview/-hooks/useInitializateTick';
 import { generateValidateOptions } from '@/routes/wallet/overview/page.utils';
-import { IQubicPendingTransaction } from '@/types';
 
 interface UseSendFormProps {
     isTickFieldEnabled?: boolean;

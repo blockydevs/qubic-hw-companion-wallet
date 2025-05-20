@@ -23,13 +23,16 @@ import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
 import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
-import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import {
+    useQubicLedgerApp,
+    useQubicWalletPendingSessionTransactionsContext,
+} from '@/packages/hw-app-qubic-react';
 import { AmountField } from '@/routes/wallet/overview/-components/amount-field';
 import { MissingSelectedAddressView } from '@/routes/wallet/overview/-components/missing-selected-address-view';
 import { TickField } from '@/routes/wallet/overview/-components/tick-field';
 import { useSendForm } from '@/routes/wallet/overview/-hooks/useSendForm';
 import { useState } from 'react';
-import { useQubicWalletPendingSessionTransactionsContext } from '@/hooks/use-qubic-wallet-pending-session-transactions-context';
+import { useSentTransactionDetailsContext } from '@/hooks/use-sent-transaction-context';
 
 const fullScreenLoaderDataOptions = {
     confirmTransactionInLedger: {
@@ -50,8 +53,8 @@ export const WalletOverviewPage = () => {
     const { selectedAddress } = useQubicLedgerApp();
 
     const { verifiedIdentities } = useVerifiedAddressContext();
-    const { addTransaction, openTransactionDetailsModalForId } =
-        useQubicWalletPendingSessionTransactionsContext();
+    const { addTransaction } = useQubicWalletPendingSessionTransactionsContext();
+    const { openTransactionDetailsModalForId } = useSentTransactionDetailsContext();
     const { verifyAddress } = useVerifyAddress();
 
     const { localeSeparators } = useLocaleInfo();
@@ -87,6 +90,7 @@ export const WalletOverviewPage = () => {
         },
         onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
             addTransaction(sentTransactionDetails);
+            console.log({ sentTransactionDetails });
             openTransactionDetailsModalForId(sentTransactionDetails.txId);
         },
         onSubmitError: (errorMessage) => {
