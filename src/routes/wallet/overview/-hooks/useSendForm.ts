@@ -128,6 +128,7 @@ export const useSendForm = ({
                 onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
                     onAfterBroadcastTransactionToRpc({
                         amount: sentTransactionDetails.sentAmount,
+                        from: sentTransactionDetails.from,
                         tick: tick,
                         createdAtTick: currentTick,
                         status: 'pending',

@@ -1,9 +1,16 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
+import { z } from 'zod';
 import { useQueries, UseQueryResult } from '@tanstack/react-query';
-import { useQubicCurrentTickQuery, useQubicRpcService } from '../../';
+import {
+    useQubicCurrentTickQuery,
+    useQubicLedgerApp,
+    useQubicLedgerAppDeriveredIndexCacheContext,
+    useQubicRpcService,
+} from '../../';
 import type { IQubicPendingTransaction } from '../types';
 import { setCache } from '../utils/local-storage-cache';
+import { qubicPendingTransactionSchema } from '../utils/validation-schemas';
 
 interface IQubicWalletPendingSessionTransactionsContextProps {
     pendingTransactions: IQubicPendingTransaction[];
@@ -45,15 +52,23 @@ const addTransactionToCache = (
 export const QubicWalletPendingSessionTransactionsProvider = ({ children }: PropsWithChildren) => {
     const [trackedPendingTransactions, setTrackedPendingTransactions] = useState<
         IQubicPendingTransaction[]
-    >(JSON.parse(localStorage.getItem(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY)) || []);
+    >([]);
+    const wasInitialized = useRef(false);
 
     const qubicRpc = useQubicRpcService();
 
     const { data: latestTick } = useQubicCurrentTickQuery();
+    const { isLoadingAddressesFromCache } = useQubicLedgerAppDeriveredIndexCacheContext();
+    const { generatedAddresses, isGeneratingAddress, isAppInitialized } = useQubicLedgerApp();
 
     const pendingTransactionsQueries = useQueries({
         queries: trackedPendingTransactions.map((pendingTransactionData) => ({
-            queryKey: ['transactionStatus', pendingTransactionData.txId, qubicRpc.getTransaction],
+            queryKey: [
+                'transactionStatus',
+                pendingTransactionData.txId,
+                generatedAddresses,
+                qubicRpc.getTransaction,
+            ],
             queryFn: async () => {
                 if (!pendingTransactionData) {
                     throw new Error('Pending Transaction Data not found');
@@ -74,7 +89,11 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
             },
             enabled:
                 pendingTransactionData?.status === 'pending' &&
-                pendingTransactionData.tick <= latestTick,
+                pendingTransactionData.tick <= latestTick &&
+                isAppInitialized &&
+                !isLoadingAddressesFromCache &&
+                !isGeneratingAddress &&
+                generatedAddresses.length > 0,
             retry: 3,
             refetchOnWindowFocus: false,
         })),
@@ -116,6 +135,54 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
     const removeTransaction = (txId: string) => {
         setTrackedPendingTransactions(() => removeTransactionFromCache(txId));
     };
+
+    useEffect(() => {
+        const shouldSkip =
+            wasInitialized.current ||
+            isAppInitialized ||
+            isLoadingAddressesFromCache ||
+            isGeneratingAddress ||
+            !generatedAddresses.length;
+
+        if (shouldSkip) {
+            return;
+        }
+
+        wasInitialized.current = true;
+
+        try {
+            const raw = localStorage.getItem(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY);
+            const parsed = JSON.parse(raw ?? 'null');
+
+            const validation = z.array(qubicPendingTransactionSchema).safeParse(parsed);
+
+            if (!validation.success) {
+                console.error(
+                    'Invalid pending transactions format in localStorage:',
+                    validation.error,
+                );
+                return;
+            }
+
+            if (
+                !validation.data.filter((tx) =>
+                    generatedAddresses.map(({ identity }) => identity).includes(tx.from),
+                )
+            ) {
+                throw new Error('No transactions found for the current identity');
+            }
+
+            setTrackedPendingTransactions(validation.data as IQubicPendingTransaction[]);
+        } catch (error) {
+            console.error('Failed to parse pending transactions from localStorage:', error);
+        }
+    }, [
+        isAppInitialized,
+        isLoadingAddressesFromCache,
+        isGeneratingAddress,
+        generatedAddresses,
+        setTrackedPendingTransactions,
+    ]);
 
     return (
         <QubicWalletPendingSessionTransactionsContext.Provider
