@@ -63,9 +63,6 @@ export default function App() {
                         `${process.env.REACT_APP_TRANSACTION_TICK_OFFSET}`,
                     )}
                     init={false}
-                    onInitLedgerAppError={(error) =>
-                        onInitializationError(error, 'Error initializing app')
-                    }
                 >
                     <QueryClientProvider client={queryClient}>
                         <MantineProvider
