@@ -54,7 +54,7 @@ export const SentTransactionDetailsModal = ({
 
                     <TruncatedText
                         component='a'
-                        href={`https://explorer.qubic.org/network/address/${to}`}
+                        href={`${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_ADDRESS_ENDPOINT}/${to}`}
                         target='_blank'
                         c='brand'
                         w='max-content'
@@ -71,7 +71,7 @@ export const SentTransactionDetailsModal = ({
 
                     <TruncatedText
                         component='a'
-                        href={`https://explorer.qubic.org/network/tx/${txId}`}
+                        href={`${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT}/${txId}`}
                         target='_blank'
                         c='brand'
                         w='max-content'
