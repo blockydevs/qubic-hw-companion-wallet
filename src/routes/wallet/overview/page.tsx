@@ -90,7 +90,6 @@ export const WalletOverviewPage = () => {
         },
         onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
             addTransaction(sentTransactionDetails);
-            console.log({ sentTransactionDetails });
             openTransactionDetailsModalForId(sentTransactionDetails.txId);
         },
         onSubmitError: (errorMessage) => {

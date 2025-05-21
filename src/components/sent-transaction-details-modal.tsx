@@ -9,7 +9,7 @@ import type {
 
 interface SentTransactionDetailsModalProps
     extends ModalProps,
-        Omit<IQubicPendingTransaction, 'status'> {
+        Omit<IQubicPendingTransaction, 'status' | 'from' | 'createdAtTick'> {
     currentTick: number;
     label: React.ReactNode;
     beforeLabel?: React.ReactNode;

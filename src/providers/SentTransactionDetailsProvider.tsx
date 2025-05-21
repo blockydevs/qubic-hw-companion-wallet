@@ -183,7 +183,6 @@ export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) 
     return (
         <SentTransactionDetailsContext.Provider value={{ openTransactionDetailsModalForId }}>
             <SentTransactionDetailsModal
-                createdAtTick={selectedTransactionDetailsData?.createdAtTick}
                 amount={selectedTransactionDetailsData?.amount}
                 tick={selectedTransactionDetailsData?.tick}
                 currentTick={latestTick ?? 0}

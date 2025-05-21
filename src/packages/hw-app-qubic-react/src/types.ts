@@ -114,4 +114,5 @@ export interface IQubicPendingTransaction {
     status: QubicTransactionStatus;
     tick: number;
     createdAtTick: number;
+    from: string;
 }
