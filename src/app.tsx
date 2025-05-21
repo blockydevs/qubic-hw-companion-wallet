@@ -10,6 +10,7 @@ import {
     QubicLedgerAppDeriveredIndexCache,
     QubicLedgerAppProvider,
     QubicLedgerDemoModeProvider,
+    QubicWalletPendingSessionTransactionsProvider,
 } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext, DeviceTypeProvider } from '@/providers/DeviceTypeProvider';
 import { LocaleInfoProvider } from '@/providers/LocaleInfoProvider';
@@ -25,6 +26,8 @@ import Home from '@/routes/home/page';
 import { WalletAddressesPage } from '@/routes/wallet/addresses/page';
 import { WalletOverviewPage } from '@/routes/wallet/overview/page';
 import { WalletTransactionsPage } from '@/routes/wallet/transactions/page';
+import { SentTransactionDetailsProvider } from './providers/SentTransactionDetailsProvider';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient();
 
@@ -32,25 +35,24 @@ export default function App() {
     return (
         <>
             <ColorSchemeScript />
-
-            <MantineProvider
-                defaultColorScheme='dark'
-                theme={mantineTheme}
-                cssVariablesResolver={cssVariablesResolver}
-            >
-                <Notifications />
-
-                <Layout navbarContent={<NavbarContent />}>
-                    <DeviceTypeProvider>
-                        <QubicLedgerAppProvider
-                            rpcUrl={process.env.REACT_APP_QUBIC_RPC_URL}
-                            derivationPath={process.env.REACT_APP_QUBIC_DERIVATION_PATH}
-                            transactionTickOffset={parseInt(
-                                `${process.env.REACT_APP_TRANSACTION_TICK_OFFSET}`,
-                            )}
-                            init={false}
+            <DeviceTypeProvider>
+                <QubicLedgerAppProvider
+                    rpcUrl={process.env.REACT_APP_QUBIC_RPC_URL}
+                    derivationPath={process.env.REACT_APP_QUBIC_DERIVATION_PATH}
+                    transactionTickOffset={parseInt(
+                        `${process.env.REACT_APP_TRANSACTION_TICK_OFFSET}`,
+                    )}
+                    init={false}
+                >
+                    <QueryClientProvider client={queryClient}>
+                        <MantineProvider
+                            defaultColorScheme='dark'
+                            theme={mantineTheme}
+                            cssVariablesResolver={cssVariablesResolver}
                         >
-                            <QueryClientProvider client={queryClient}>
+                            <Notifications limit={10} />
+
+                            <Layout navbarContent={<NavbarContent />}>
                                 <ReconnectUserLedgerQubicAppProvider>
                                     <RouterRoutes>
                                         <Route path='*' element={<PageNotFound />} />
@@ -81,13 +83,17 @@ export default function App() {
                                                                                 }
                                                                             >
                                                                                 <OverlayForLoadingAddressesFromCacheProvider>
-                                                                                    <VerifiedAddressProvider>
-                                                                                        <HideSensitiveDataProvider>
-                                                                                            <LocaleInfoProvider>
-                                                                                                <Outlet />
-                                                                                            </LocaleInfoProvider>
-                                                                                        </HideSensitiveDataProvider>
-                                                                                    </VerifiedAddressProvider>
+                                                                                    <QubicWalletPendingSessionTransactionsProvider>
+                                                                                        <VerifiedAddressProvider>
+                                                                                            <HideSensitiveDataProvider>
+                                                                                                <LocaleInfoProvider>
+                                                                                                    <SentTransactionDetailsProvider>
+                                                                                                        <Outlet />
+                                                                                                    </SentTransactionDetailsProvider>
+                                                                                                </LocaleInfoProvider>
+                                                                                            </HideSensitiveDataProvider>
+                                                                                        </VerifiedAddressProvider>
+                                                                                    </QubicWalletPendingSessionTransactionsProvider>
                                                                                 </OverlayForLoadingAddressesFromCacheProvider>
                                                                             </QubicLedgerAppDeriveredIndexCache>
                                                                         </QubicLedgerDemoModeProvider>
@@ -114,11 +120,12 @@ export default function App() {
                                         </Route>
                                     </RouterRoutes>
                                 </ReconnectUserLedgerQubicAppProvider>
-                            </QueryClientProvider>
-                        </QubicLedgerAppProvider>
-                    </DeviceTypeProvider>
-                </Layout>
-            </MantineProvider>
+                                <ReactQueryDevtools />
+                            </Layout>
+                        </MantineProvider>
+                    </QueryClientProvider>
+                </QubicLedgerAppProvider>
+            </DeviceTypeProvider>
         </>
     );
 }

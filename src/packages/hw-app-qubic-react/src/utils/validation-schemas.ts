@@ -51,3 +51,13 @@ export const qubicBroadcastedTransactionResult = z.object({
     peersBroadcasted: z.number(),
     transactionId: z.string(),
 });
+
+export const qubicPendingTransactionSchema = z.object({
+    txId: z.string(),
+    status: z.enum(['pending', 'success', 'failed']),
+    amount: z.number(),
+    to: z.string(),
+    tick: z.number(),
+    createdAtTick: z.number(),
+    from: z.string(),
+});

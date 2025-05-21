@@ -1,61 +1,38 @@
-import { use, useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useState } from 'react';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
 import { useQubicSendTransactionSignedWithLedgerToRpc } from '@/hooks/qubic-send-transaction';
 import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
+import type { IQubicPendingTransaction } from '@/packages/hw-app-qubic-react';
 import { useQubicCurrentTickQuery, useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { useQubicLedgerAppContext } from '@/packages/hw-app-qubic-react/src/hooks/use-qubic-ledger-app-context';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { useInitializeTick } from '@/routes/wallet/overview/-hooks/useInitializateTick';
 import { generateValidateOptions } from '@/routes/wallet/overview/page.utils';
 
-const fullScreenLoaderDataOptions = {
-    confirmTransactionInLedger: {
-        title: 'Transaction is processing',
-        message: 'Please check transaction on your ledger and take action',
-    },
-    transactionIsBeignBroadcastedToRpc: {
-        title: 'Transaction is being broadcasted to network',
-        message: 'Please wait a moment',
-    },
-};
-
 interface UseSendFormProps {
     isTickFieldEnabled?: boolean;
     onSubmitError: (errorMessage: string) => void;
+    onBeforeSignTransactionWithLedger: () => void;
+    onBeforeBroadcastTransactionToRpc: () => void;
+    onAfterBroadcastTransactionToRpc: (sentTransactionDetails: IQubicPendingTransaction) => void;
 }
 
-export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSendFormProps) => {
+export const useSendForm = ({
+    onSubmitError,
+    onAfterBroadcastTransactionToRpc,
+    onBeforeBroadcastTransactionToRpc,
+    onBeforeSignTransactionWithLedger,
+    isTickFieldEnabled = false,
+}: UseSendFormProps) => {
     const [isTransactionProcessing, setisTransactionProcessing] = useState(false);
-    const [sentTransactionDetails, setSentTransactionDetails] = useState<{
-        sentTo: string;
-        sentTxId: string;
-        sentAmount: number;
-    } | null>(null);
-    const [fullScreenLoaderData, setFullScreenLoaderData] = useState<{
-        title: string;
-        message: string;
-    } | null>(fullScreenLoaderDataOptions.confirmTransactionInLedger);
 
     const { deviceType } = use(DeviceTypeContext);
-
-    const [isSuccessModalOpen, { open: openSuccessModal, close: closeSuccessModal }] =
-        useDisclosure();
 
     const { selectedAddress } = useQubicLedgerApp();
 
     const { verifyAddress } = useVerifyAddress();
     const { verifiedIdentities } = useVerifiedAddressContext();
-
-    const isSelectedAddressVerified = useMemo(
-        () => verifiedIdentities.includes(selectedAddress?.identity),
-        [selectedAddress, verifiedIdentities],
-    );
-    const submitButtonLabel = useMemo(
-        () => (isSelectedAddressVerified ? 'Sign with Ledger and Send' : 'Verify address'),
-        [isSelectedAddressVerified],
-    );
 
     const { transactionTickOffset } = useQubicLedgerAppContext();
 
@@ -103,34 +80,6 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
             },
         );
 
-    const sendTransactionSignedWithLedgerToRpcHandler = useCallback(
-        async (values: { sendTo: string; amount: number; tick: number; resetForm: () => void }) =>
-            await sendTransactionSignedWithLedgerToRpc({
-                amount: values.amount,
-                tick: values.tick,
-                sourceIdentity: selectedAddress.identity,
-                destinationIdentity: values.sendTo,
-
-                isDemoMode: deviceType === 'demo',
-
-                onBeforeSignTransactionWithLedger: () => {
-                    setFullScreenLoaderData(fullScreenLoaderDataOptions.confirmTransactionInLedger);
-                },
-
-                onBeforeBroadcastTransactionToRpc: () => {
-                    setFullScreenLoaderData(
-                        fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc,
-                    );
-                },
-                onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
-                    setSentTransactionDetails(sentTransactionDetails);
-                    openSuccessModal();
-                    values.resetForm();
-                },
-            }),
-        [selectedAddress, deviceType, sendTransactionSignedWithLedgerToRpc, openSuccessModal],
-    );
-
     const onSubmitResetFormHandler = useCallback(async () => {
         form.reset();
 
@@ -151,7 +100,7 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
                 throw new Error('No selected address');
             }
 
-            if (!isSelectedAddressVerified) {
+            if (!verifiedIdentities.includes(selectedAddress?.identity)) {
                 try {
                     await verifyAddress(selectedAddress, true);
                 } catch {
@@ -159,29 +108,51 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
                 }
             }
 
+            const { data: currentTick } = await refetchTickValue();
+
             const tick =
                 'tick' in form.values
                     ? form.values.tick
-                    : (await refetchTickValue()).data +
-                      parseInt(process.env.REACT_APP_TRANSACTION_TICK_OFFSET);
+                    : currentTick + parseInt(process.env.REACT_APP_TRANSACTION_TICK_OFFSET);
 
-            await sendTransactionSignedWithLedgerToRpcHandler({
+            await sendTransactionSignedWithLedgerToRpc({
                 amount: form.values.amount,
-                sendTo: form.values.sendTo,
                 tick,
-                resetForm: onSubmitResetFormHandler,
+                sourceIdentity: selectedAddress.identity,
+                destinationIdentity: form.values.sendTo,
+
+                isDemoMode: deviceType === 'demo',
+
+                onBeforeSignTransactionWithLedger,
+                onBeforeBroadcastTransactionToRpc,
+                onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
+                    onAfterBroadcastTransactionToRpc({
+                        amount: sentTransactionDetails.sentAmount,
+                        from: sentTransactionDetails.from,
+                        tick: tick,
+                        createdAtTick: currentTick,
+                        status: 'pending',
+                        to: sentTransactionDetails.sentTo,
+                        txId: sentTransactionDetails.sentTxId,
+                    });
+                    onSubmitResetFormHandler();
+                },
             });
         } catch (error) {
             onSubmitError(error instanceof Error ? error.message : 'Unknown Error');
         }
     }, [
         selectedAddress,
-        isSelectedAddressVerified,
-        form.values,
+        verifiedIdentities,
         refetchTickValue,
-        sendTransactionSignedWithLedgerToRpcHandler,
-        onSubmitResetFormHandler,
+        form.values,
+        sendTransactionSignedWithLedgerToRpc,
+        deviceType,
+        onBeforeSignTransactionWithLedger,
+        onBeforeBroadcastTransactionToRpc,
         verifyAddress,
+        onAfterBroadcastTransactionToRpc,
+        onSubmitResetFormHandler,
         onSubmitError,
     ]);
 
@@ -206,15 +177,10 @@ export const useSendForm = ({ onSubmitError, isTickFieldEnabled = false }: UseSe
 
     return {
         form,
-        submitButtonLabel,
         isTransactionProcessing,
         latestTick,
         isLatestTickLoaded,
         onSubmitHandler,
         onRefetchTickValueHandler,
-        isSuccessModalOpen,
-        closeSuccessModal,
-        sentTransactionDetails,
-        fullScreenLoaderData,
     };
 };
