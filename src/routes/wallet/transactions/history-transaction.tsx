@@ -4,41 +4,34 @@ import {
     Button,
     Collapse,
     Divider,
-    em,
     Group,
     Stack,
     Text,
     Tooltip,
 } from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { useDisclosure } from '@mantine/hooks';
 import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { TruncatedText } from '@/components/truncated-text';
-import { copyAddress } from '@/utils/copy';
-import { formatTimestamp } from '@/utils/date';
 import { HistoryTransactionDetailItem } from '@/routes/wallet/transactions/history-transaction-detail-item';
 import styles from '@/routes/wallet/transactions/transaction.module.css';
+import { copyAddress } from '@/utils/copy';
 
 interface HistoryTransactionProps {
     transactionId: string;
-    timestamp: string;
     amount: string;
-    transactionType: 'incoming' | 'outgoing';
+    icon: React.ReactNode;
+    collapseItems: { label: string; component: React.ReactNode }[];
 }
 
 export const HistoryTransaction = ({
     transactionId,
-    timestamp,
-    transactionType,
     amount,
+    icon,
+    collapseItems,
 }: HistoryTransactionProps) => {
     const [opened, { toggle }] = useDisclosure(false);
-    const shouldShowTransactionHashInCollapse = useMediaQuery(`(min-width: ${em(1024)})`);
-
-    const ArrowIcon = transactionType === 'outgoing' ? ArrowUpwardIcon : ArrowDownwardIcon;
 
     return (
         <Group className={styles.transaction}>
@@ -63,13 +56,7 @@ export const HistoryTransaction = ({
                         TX
                     </Badge>
 
-                    <ArrowIcon
-                        htmlColor={
-                            transactionType === 'outgoing'
-                                ? 'var(--mantine-color-red-filled)'
-                                : 'var(--mantine-color-green-filled)'
-                        }
-                    />
+                    {icon}
                 </Group>
 
                 <Group gap='xs'>
@@ -128,36 +115,13 @@ export const HistoryTransaction = ({
                 <Divider pb='0.5rem' pt='0.25rem' />
 
                 <Stack gap='sm'>
-                    {shouldShowTransactionHashInCollapse && (
+                    {collapseItems.map((item, index) => (
                         <HistoryTransactionDetailItem
-                            label='TX ID'
-                            component={
-                                <>
-                                    {' '}
-                                    <Text c='brand'>{transactionId}</Text>
-                                    <Tooltip label='Copy transaction hash' position='right'>
-                                        <Button
-                                            p='0.25rem'
-                                            variant='touch'
-                                            onClick={() => copyAddress(transactionId)}
-                                        >
-                                            <ContentCopyIcon
-                                                htmlColor='var(--mantine-color-fontColor-filled)'
-                                                sx={{
-                                                    width: '1rem',
-                                                    height: '1rem',
-                                                }}
-                                            />
-                                        </Button>
-                                    </Tooltip>
-                                </>
-                            }
+                            key={`HistoryTransactionDetailItem-${transactionId}-${index}`}
+                            label={item.label}
+                            component={item.component}
                         />
-                    )}
-                    <HistoryTransactionDetailItem
-                        label='Timestamp'
-                        component={<Text>{formatTimestamp(timestamp)}</Text>}
-                    />
+                    ))}
                 </Stack>
             </Collapse>
         </Group>
