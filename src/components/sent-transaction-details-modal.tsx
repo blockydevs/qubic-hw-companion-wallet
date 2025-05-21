@@ -1,5 +1,5 @@
 import type { ModalProps } from '@mantine/core';
-import { Modal, Stack, Text, Anchor, Button, Title, Paper, Group, Divider } from '@mantine/core';
+import { Anchor, Button, Divider, Group, Modal, Paper, Stack, Text, Title } from '@mantine/core';
 import { TruncatedText } from '@/components/truncated-text';
 import { TransactionProgress } from '@/components/transaction-progress';
 import type {
@@ -26,7 +26,6 @@ export const SentTransactionDetailsModal = ({
     to,
     txId,
     status,
-    // createdAtTick,
     onClose,
     progressColor,
     ...modalProps
