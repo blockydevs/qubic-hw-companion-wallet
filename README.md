@@ -27,6 +27,15 @@ The application relies on the following environment variables for configuration:
 -   `REACT_APP_QUBIC_SHOW_TICK_SECONDS=true`
     When enabled (`true`), display time passed from the latest tick update.
 
+- `REACT_APP_QUBIC_EXPLORER_BASE_URL="https://explorer.qubic.org"`
+    URL For the Qubic explorer page.
+
+- `REACT_APP_QUBIC_EXPLORER_ADDRESS_ENDPOINT="network/address"`
+    Endpoint in the explorer to read address information
+
+- `REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT="network/tx"`
+  Endpoint in the explorer to read transaction information
+
 ## Compatible Browsers
 
 The browser needs to support WebUSB/WebHID to interact with the Ledger device. These are the known compatible browsers:
