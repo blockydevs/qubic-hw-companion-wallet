@@ -23,12 +23,27 @@ import { useQrCodeModal } from '@/hooks/qr-code';
 import { useQubicPriceFromCoingecko } from '@/hooks/qubic-price';
 import { useVerifyAddress } from '@/hooks/verify-address';
 import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
-import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
+import {
+    useQubicLedgerApp,
+    useQubicWalletPendingSessionTransactionsContext,
+} from '@/packages/hw-app-qubic-react';
 import { AmountField } from '@/routes/wallet/overview/-components/amount-field';
 import { MissingSelectedAddressView } from '@/routes/wallet/overview/-components/missing-selected-address-view';
-import { SendSuccessModal } from '@/routes/wallet/overview/-components/send-success-modal';
 import { TickField } from '@/routes/wallet/overview/-components/tick-field';
 import { useSendForm } from '@/routes/wallet/overview/-hooks/useSendForm';
+import { useState } from 'react';
+import { useSentTransactionDetailsContext } from '@/hooks/use-sent-transaction-context';
+
+const fullScreenLoaderDataOptions = {
+    confirmTransactionInLedger: {
+        title: 'Transaction is processing',
+        message: 'Please check transaction on your ledger and take action',
+    },
+    transactionIsBeignBroadcastedToRpc: {
+        title: 'Transaction is being broadcasted to network',
+        message: 'Please wait a moment',
+    },
+};
 
 const isTickFieldEnabled = process.env.REACT_APP_QUBIC_TICK_FIELD_VISIBLE === 'true';
 
@@ -38,9 +53,16 @@ export const WalletOverviewPage = () => {
     const { selectedAddress } = useQubicLedgerApp();
 
     const { verifiedIdentities } = useVerifiedAddressContext();
+    const { addTransaction } = useQubicWalletPendingSessionTransactionsContext();
+    const { openTransactionDetailsModalForId } = useSentTransactionDetailsContext();
     const { verifyAddress } = useVerifyAddress();
 
     const { localeSeparators } = useLocaleInfo();
+
+    const [fullScreenLoaderData, setFullScreenLoaderData] = useState<{
+        title: string;
+        message: string;
+    } | null>(fullScreenLoaderDataOptions.confirmTransactionInLedger);
 
     const { closeQrCodeModal, handleOpenQrCodeModal, isQrCodeModalOpened, qrCodeAddress } =
         useQrCodeModal(selectedAddress?.identity ?? '');
@@ -53,18 +75,24 @@ export const WalletOverviewPage = () => {
 
     const {
         form,
-        submitButtonLabel,
         isTransactionProcessing,
         latestTick,
         isLatestTickLoaded,
         onSubmitHandler,
         onRefetchTickValueHandler,
-        isSuccessModalOpen,
-        closeSuccessModal,
-        sentTransactionDetails,
-        fullScreenLoaderData,
     } = useSendForm({
         isTickFieldEnabled,
+        onBeforeSignTransactionWithLedger: () => {
+            setFullScreenLoaderData(fullScreenLoaderDataOptions.confirmTransactionInLedger);
+        },
+        onBeforeBroadcastTransactionToRpc: () => {
+            setFullScreenLoaderData(fullScreenLoaderDataOptions.transactionIsBeignBroadcastedToRpc);
+        },
+        onAfterBroadcastTransactionToRpc: async (sentTransactionDetails) => {
+            addTransaction(sentTransactionDetails);
+            console.log({ sentTransactionDetails });
+            openTransactionDetailsModalForId(sentTransactionDetails.txId);
+        },
         onSubmitError: (errorMessage) => {
             notifications.show({
                 title: 'Failed to send transaction',
@@ -73,6 +101,10 @@ export const WalletOverviewPage = () => {
             });
         },
     });
+
+    const submitButtonLabel = verifiedIdentities.includes(selectedAddress?.identity)
+        ? 'Sign with Ledger and Send'
+        : 'Verify address';
 
     if (!selectedAddress) {
         return <MissingSelectedAddressView />;
@@ -84,14 +116,6 @@ export const WalletOverviewPage = () => {
                 isQrCodeModalOpened={isQrCodeModalOpened}
                 closeQrCodeModal={closeQrCodeModal}
                 qrCodeAddress={qrCodeAddress}
-            />
-
-            <SendSuccessModal
-                sentTo={sentTransactionDetails?.sentTo ?? ''}
-                sentTxId={sentTransactionDetails?.sentTxId ?? ''}
-                sentAmount={sentTransactionDetails?.sentAmount ?? 0}
-                opened={isSuccessModalOpen}
-                onClose={closeSuccessModal}
             />
 
             <FullScreenLoader

@@ -10,6 +10,7 @@ export const useQubicCurrentTickQuery = (useQueryOptions?: IUseQubicCurrentTickQ
     return useQuery({
         queryKey: ['qubicCurrentTick'],
         queryFn: async () => await qubicRpcService.getCurrentTick(),
+        refetchInterval: 10000,
         ...useQueryOptions,
     });
 };

@@ -6,6 +6,7 @@ import {
     qubicBroadcastedTransactionResult,
     qubicLatestTickSchema,
     qubicTransactionsSchema,
+    transactionDataSchema,
 } from '../utils/validation-schemas';
 import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/QubicTransaction';
 
@@ -45,6 +46,13 @@ export class QubicRpcService {
         }).fetch(
             `${this.rpcUrl}v2/identities/${identity}/transfers?startTick=${startTick}&endTick=${endTick}`,
         );
+    }
+
+    async getTransaction({ transactionId }: { transactionId: string }) {
+        return await Fetcher.create({
+            schema: transactionDataSchema,
+            errorMessage: `Invalid transactions response data for ${transactionId} transaction.`,
+        }).fetch(`${this.rpcUrl}v2/transactions/${transactionId}`);
     }
 
     async broadcastTransaction(

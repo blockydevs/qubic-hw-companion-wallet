@@ -3,7 +3,8 @@
         "prettier",
         "plugin:react/recommended",
         "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@tanstack/query/recommended"
     ],
     "plugins": ["prettier", "react", "react-hooks", "@typescript-eslint"],
     "parser": "@typescript-eslint/parser",
