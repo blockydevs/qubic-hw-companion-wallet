@@ -1,29 +1,19 @@
 import { Link } from 'react-router';
-import { Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
-import { HistoryTransaction } from '@/routes/wallet/transactions/history-transaction';
+import { Button, em, Stack, Text, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
-    useQubicCurrentTickQuery,
     useQubicLedgerApp,
-    useQubicWholeTransactionsHistoryInfiniteQuery,
+    useQubicWalletPendingSessionTransactionsContext,
 } from '@/packages/hw-app-qubic-react';
+import { HistoryTransactions } from './-components/history-transactions';
+import { PendingTransactions } from './-components/pending-transactions';
 
 export const WalletTransactionsPage = () => {
     const { selectedAddress } = useQubicLedgerApp();
-    const { data: latestTick } = useQubicCurrentTickQuery();
+    const qubicWalletPendingSessionTransactionsContext =
+        useQubicWalletPendingSessionTransactionsContext();
 
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isLoading: transactionsLoading,
-        endTick,
-        firstTick,
-    } = useQubicWholeTransactionsHistoryInfiniteQuery({
-        identity: selectedAddress?.identity,
-        initialTick: latestTick,
-    });
-
-    const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
+    const shouldShowTransactionHashInCollapse = useMediaQuery(`(min-width: ${em(1024)})`);
 
     if (!selectedAddress) {
         return (
@@ -44,51 +34,21 @@ export const WalletTransactionsPage = () => {
         );
     }
 
+    const pendingTransactions =
+        qubicWalletPendingSessionTransactionsContext.pendingTransactions.filter(
+            (tx) => tx.status === 'pending',
+        );
+
     return (
         <Stack w='100%' gap='xl'>
-            <Stack>
-                <Title component='p' size='h2'>
-                    Transactions
-                </Title>
+            {pendingTransactions.length > 0 && (
+                <PendingTransactions
+                    pendingTransactions={pendingTransactions}
+                    shouldShowTransactionHashInCollapse={shouldShowTransactionHashInCollapse}
+                />
+            )}
 
-                <Stack gap='xs' w='100%'>
-                    {transactionsData.map(({ identity, tickNumber, transactions }) => (
-                        <HistoryTransaction
-                            key={`${identity}-${tickNumber}`}
-                            transactionId={transactions[0].transaction.txId}
-                            timestamp={transactions[0].timestamp}
-                            amount={transactions[0].transaction.amount}
-                            transactionType={
-                                transactions[0].transaction.sourceId === identity
-                                    ? 'outgoing'
-                                    : 'incoming'
-                            }
-                        />
-                    ))}
-                </Stack>
-
-                <Group w='100%' justify='space-between'>
-                    <Group>
-                        <Text fw={600}>Total Transactions: {transactionsData?.length ?? 0}</Text>
-                        <Text>
-                            Show transactions from {firstTick} to {endTick} tick
-                        </Text>
-
-                        {transactionsLoading ? (
-                            <Loader size={20} />
-                        ) : (
-                            <Button
-                                disabled={!hasNextPage}
-                                onClick={() => {
-                                    fetchNextPage();
-                                }}
-                            >
-                                {hasNextPage ? 'Load More' : 'No More Transactions'}
-                            </Button>
-                        )}
-                    </Group>
-                </Group>
-            </Stack>
+            <HistoryTransactions />
         </Stack>
     );
 };
