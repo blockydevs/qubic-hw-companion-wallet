@@ -56,6 +56,8 @@ export const LedgerWebHIDProvider = ({
             } catch (error) {
                 transporterWebHIDInstance?.close();
 
+                listenersConfig.onError?.(error);
+
                 throw error;
             }
         },
