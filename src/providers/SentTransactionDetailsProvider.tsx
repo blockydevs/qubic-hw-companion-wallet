@@ -17,17 +17,19 @@ export const SentTransactionDetailsContext = createContext<ISentTransactionDetai
     null,
 );
 
+type SentTransactionLabelProps = { href?: string };
+
 const sentTransactionDataMap: Record<
     QubicTransactionStatus,
     {
         beforeLabel?: React.ReactNode;
-        label: React.ReactNode;
+        label: (props: SentTransactionLabelProps) => React.ReactNode;
         progressColor: string;
     }
 > = {
     pending: {
         beforeLabel: <Loader size='xs' />,
-        label: (
+        label: () => (
             <Text size='sm' c='grey'>
                 Please wait until target tick has been reached
             </Text>
@@ -35,19 +37,19 @@ const sentTransactionDataMap: Record<
         progressColor: 'brand',
     },
     success: {
-        label: (
+        label: ({ href }: { href?: string }) => (
             <Text c='green'>
-                Transaction successful - <Anchor href='xd'>LINK</Anchor>
+                Transaction successful - {href ? <Anchor href={href}>LINK</Anchor> : 'LINK'}
             </Text>
         ),
         progressColor: 'green',
     },
     failed: {
-        label: <Text c='red'>Transaction not successful, please retry</Text>,
+        label: () => <Text c='red'>Transaction not successful, please retry</Text>,
         progressColor: 'red',
     },
     unknown: {
-        label: <Text c='orange'>Cannot connect, please try again later</Text>,
+        label: () => <Text c='orange'>Cannot connect, please try again later</Text>,
         progressColor: 'orange',
     },
 };
@@ -187,11 +189,13 @@ export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) 
                 tick={selectedTransactionDetailsData?.tick}
                 currentTick={latestTick ?? 0}
                 status={selectedTransactionDetailsData?.status ?? ('pending' as const)}
-                label={
-                    sentTransactionDataMap[
-                        selectedTransactionDetailsData?.status ?? ('pending' as const)
-                    ].label
-                }
+                label={sentTransactionDataMap[
+                    selectedTransactionDetailsData?.status ?? ('pending' as const)
+                ].label({
+                    href: selectedTransactionDetailsData?.txId
+                        ? `https://explorer.qubic.org/network/tx/${selectedTransactionDetailsData.txId}`
+                        : undefined,
+                })}
                 beforeLabel={
                     sentTransactionDataMap[
                         selectedTransactionDetailsData?.status ?? ('pending' as const)
