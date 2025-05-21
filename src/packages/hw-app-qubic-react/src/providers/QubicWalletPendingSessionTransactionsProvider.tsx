@@ -9,7 +9,7 @@ import {
     useQubicRpcService,
 } from '../../';
 import type { IQubicPendingTransaction } from '../types';
-import { setCache } from '../utils/local-storage-cache';
+import { getCache, removeCache, setCache } from '../utils/local-storage-cache';
 import { qubicPendingTransactionSchema } from '../utils/validation-schemas';
 
 interface IQubicWalletPendingSessionTransactionsContextProps {
@@ -139,7 +139,7 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
     useEffect(() => {
         const shouldSkip =
             wasInitialized.current ||
-            isAppInitialized ||
+            !isAppInitialized ||
             isLoadingAddressesFromCache ||
             isGeneratingAddress ||
             !generatedAddresses.length;
@@ -151,16 +151,18 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
         wasInitialized.current = true;
 
         try {
-            const raw = localStorage.getItem(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY);
-            const parsed = JSON.parse(raw ?? 'null');
+            const cacheData = getCache(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY);
 
-            const validation = z.array(qubicPendingTransactionSchema).safeParse(parsed);
+            const validation = z.array(qubicPendingTransactionSchema).safeParse(cacheData);
 
             if (!validation.success) {
                 console.error(
                     'Invalid pending transactions format in localStorage:',
                     validation.error,
                 );
+
+                removeCache(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY);
+
                 return;
             }
 
@@ -169,12 +171,19 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
                     generatedAddresses.map(({ identity }) => identity).includes(tx.from),
                 )
             ) {
-                throw new Error('No transactions found for the current identity');
+                console.error('No addresses found in pending transactions in localStorage:', {
+                    generatedAddresses,
+                    localStoragePendingTransactions: validation.data.map(({ from }) => from),
+                });
+
+                return;
             }
 
             setTrackedPendingTransactions(validation.data as IQubicPendingTransaction[]);
         } catch (error) {
             console.error('Failed to parse pending transactions from localStorage:', error);
+
+            removeCache(QUBIC_WALLET_PENDING_SESSION_TRANSACTIONS_CACHE_KEY);
         }
     }, [
         isAppInitialized,
