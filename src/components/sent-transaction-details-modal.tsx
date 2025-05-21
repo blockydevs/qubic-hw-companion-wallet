@@ -1,5 +1,5 @@
 import type { ModalProps } from '@mantine/core';
-import { Anchor, Button, Divider, Group, Modal, Paper, Stack, Text, Title } from '@mantine/core';
+import { Button, Divider, Group, Modal, Paper, Stack, Text, Title } from '@mantine/core';
 import { TruncatedText } from '@/components/truncated-text';
 import { TransactionProgress } from '@/components/transaction-progress';
 import type {
@@ -31,7 +31,7 @@ export const SentTransactionDetailsModal = ({
     ...modalProps
 }: SentTransactionDetailsModalProps) => (
     <Modal centered withCloseButton={false} onClose={onClose} {...modalProps}>
-        <Stack align='center' ta='center' gap='lg'>
+        <Stack align='center' ta='center' gap='lg' w='full'>
             <Title component='p' size='xl' c='brand'>
                 Sent!
             </Title>
@@ -53,9 +53,14 @@ export const SentTransactionDetailsModal = ({
                     </Title>
 
                     <TruncatedText
-                        w='calc(var(--modal-size) - 6rem)'
-                        style={{ overflowWrap: 'break-word' }}
+                        component='a'
+                        href={`https://explorer.qubic.org/network/address/${to}`}
+                        target='_blank'
                         c='brand'
+                        w='max-content'
+                        mx='auto'
+                        style={{ overflowWrap: 'break-word' }}
+                        className='hover-text-underline'
                     >
                         {to}
                     </TruncatedText>
@@ -64,15 +69,18 @@ export const SentTransactionDetailsModal = ({
                 <Stack gap='xs'>
                     <Text fw={600}>Transaction ID</Text>
 
-                    <Anchor
+                    <TruncatedText
+                        component='a'
                         href={`https://explorer.qubic.org/network/tx/${txId}`}
                         target='_blank'
                         c='brand'
-                        w='calc(var(--modal-size) - 6rem)'
+                        w='max-content'
+                        mx='auto'
                         style={{ overflowWrap: 'break-word' }}
+                        className='hover-text-underline'
                     >
                         {txId}
-                    </Anchor>
+                    </TruncatedText>
                 </Stack>
 
                 <Divider
