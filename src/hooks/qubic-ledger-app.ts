@@ -38,6 +38,11 @@ export const useConnectToQubicLedgerApp = () => {
 
                     await navigate('/');
                 },
+                onError: async () => {
+                    await reset();
+
+                    navigate('/');
+                },
             });
         },
     });

@@ -1,6 +1,6 @@
-import { Outlet, Route, Routes as RouterRoutes } from 'react-router';
+import { Outlet, Route, useNavigate, Routes as RouterRoutes } from 'react-router';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
+import { notifications, Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from '@/layout/Layout';
 import { cssVariablesResolver, mantineTheme } from '@/layout/mantine.theme';
@@ -28,10 +28,30 @@ import { WalletOverviewPage } from '@/routes/wallet/overview/page';
 import { WalletTransactionsPage } from '@/routes/wallet/transactions/page';
 import { SentTransactionDetailsProvider } from './providers/SentTransactionDetailsProvider';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useCallback } from 'react';
 
 const queryClient = new QueryClient();
 
 export default function App() {
+    const navigate = useNavigate();
+
+    const onInitializationError = useCallback(
+        (error: unknown, title: string) => {
+            if (error instanceof Error) {
+                notifications.show({
+                    id: 'address-derivation-error',
+                    title,
+                    message: error.message,
+                    color: 'red',
+                    autoClose: 5000,
+                });
+            }
+
+            navigate('/');
+        },
+        [navigate],
+    );
+
     return (
         <>
             <ColorSchemeScript />
@@ -43,6 +63,9 @@ export default function App() {
                         `${process.env.REACT_APP_TRANSACTION_TICK_OFFSET}`,
                     )}
                     init={false}
+                    onInitLedgerAppError={(error) =>
+                        onInitializationError(error, 'Error initializing app')
+                    }
                 >
                     <QueryClientProvider client={queryClient}>
                         <MantineProvider
@@ -80,6 +103,14 @@ export default function App() {
                                                                                 enabled={
                                                                                     deviceType !==
                                                                                     'demo'
+                                                                                }
+                                                                                onDeriveNewAddressError={(
+                                                                                    error,
+                                                                                ) =>
+                                                                                    onInitializationError(
+                                                                                        error,
+                                                                                        'Error deriving address',
+                                                                                    )
                                                                                 }
                                                                             >
                                                                                 <OverlayForLoadingAddressesFromCacheProvider>

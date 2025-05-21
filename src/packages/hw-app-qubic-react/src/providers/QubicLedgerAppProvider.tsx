@@ -34,12 +34,14 @@ interface QubicLedgerAppProviderProps {
     derivationPath: string;
     transactionTickOffset: number;
     rpcUrl: string;
+    onInitLedgerAppError?: (error: unknown) => void;
 }
 
 const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     children,
     derivationPath,
     transactionTickOffset,
+    onInitLedgerAppError,
     init,
 }: PropsWithChildren<Omit<QubicLedgerAppProviderProps, 'rpcUrl'>>) => {
     const ledgerWebHIDContext = useContext(LedgerWebHIDContext);
@@ -126,6 +128,11 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
 
                           listenersConfig?.onDisconnect?.();
                       },
+                      onError: (error) => {
+                          reset();
+
+                          listenersConfig?.onError?.(error);
+                      },
                   });
 
             if (!transportForHwAppQubic) {
@@ -190,6 +197,7 @@ export const QubicLedgerAppProvider = ({
     derivationPath,
     transactionTickOffset,
     rpcUrl,
+    onInitLedgerAppError,
 }: PropsWithChildren<QubicLedgerAppProviderProps>) => (
     <LedgerWebHIDProvider init={false}>
         <QubicRpcServiceProvider rpcUrl={rpcUrl}>
@@ -197,6 +205,7 @@ export const QubicLedgerAppProvider = ({
                 init={init}
                 transactionTickOffset={transactionTickOffset}
                 derivationPath={derivationPath}
+                onInitLedgerAppError={onInitLedgerAppError}
             >
                 {children}
             </QubicLedgerAppProviderWithoutWebHIDProvider>

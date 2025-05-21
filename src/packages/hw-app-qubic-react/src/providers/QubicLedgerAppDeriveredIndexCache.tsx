@@ -10,6 +10,7 @@ interface IQubicLedgerAppDeriveredIndexCacheContext {
 
 interface QubicLedgerAppDeriveredIndexCacheProps {
     enabled?: boolean;
+    onDeriveNewAddressError: (error: unknown) => void;
 }
 
 export const QubicLedgerAppDeriveredIndexCacheContext =
@@ -18,6 +19,7 @@ export const QubicLedgerAppDeriveredIndexCacheContext =
 export const QubicLedgerAppDeriveredIndexCache = ({
     children,
     enabled = true,
+    onDeriveNewAddressError,
 }: PropsWithChildren<QubicLedgerAppDeriveredIndexCacheProps>) => {
     const { isAppInitialized, generatedAddresses, deriveNewAddress } = useQubicLedgerApp();
     const [isLoadingAddressesFromCache, setIsLoadingAddressesFromCache] = useState(false);
@@ -34,7 +36,11 @@ export const QubicLedgerAppDeriveredIndexCache = ({
         setIsLoadingAddressesFromCache(true);
 
         for (let i = 0; i < parseInt(lastDeriveredAddressFromCache); i++) {
-            await deriveNewAddress(i);
+            try {
+                await deriveNewAddress(i);
+            } catch (error) {
+                onDeriveNewAddressError(error);
+            }
         }
 
         setIsLoadingAddressesFromCache(false);
