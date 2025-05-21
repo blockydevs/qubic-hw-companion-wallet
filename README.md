@@ -6,9 +6,26 @@ Qubic HW Companion Wallet is a frontend dApp that interacts with the Qubic block
 
 The application relies on the following environment variables for configuration:
 
--   `REACT_APP_IS_DEMO_MODE="true"` - Enables or disables the demo mode. When set to `true`, users can explore the application without connecting a Ledger device.
--   `REACT_APP_QUBIC_DERIVATION_PATH="m/44'/1'/0'/0/0"` - Specifies the derivation path for generating wallet addresses on the Ledger app.
--   `REACT_APP_QUBIC_RPC_URL="https://rpc.qubic.org/"` - Defines the RPC endpoint for communicating with the blockchain.
+-   `REACT_APP_IS_DEMO_MODE="true"`
+    Enables or disables the demo mode. When set to `true`, users can explore the application without connecting a Ledger device.
+
+-   `REACT_APP_QUBIC_DERIVATION_PATH="m/44'/1'/0'/0/0"`
+    Specifies the derivation path for generating wallet addresses on the Ledger app.
+
+-   `REACT_APP_QUBIC_RPC_URL="https://rpc.qubic.org/"`
+    Defines the RPC endpoint for communicating with the blockchain.
+
+-   `REACT_APP_TRANSACTION_TICK_OFFSET=10`
+    Sets the default offset (in ticks) to be added to the current tick for transaction expiration. Used for setting a future tick as deadline.
+
+-   `REACT_APP_QUBIC_TICK_FIELD_VISIBLE=false`
+    Controls the visibility of the tick input field in the transaction form. When set to `false`, the tick field is hidden and calculated automatically.
+
+-   `REACT_APP_QUBIC_TICK_REFRESH_INTERVAL=10000`
+    Determines how often (in milliseconds) the app fetches and refreshes the current tick from the blockchain.
+
+-   `REACT_APP_QUBIC_SHOW_TICK_SECONDS=true`
+    When enabled (`true`), display time passed from the latest tick update.
 
 ## Compatible Browsers
 

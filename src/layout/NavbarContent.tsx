@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router';
 import { Divider } from '@mantine/core';
 import { NavbarLink } from '@/components/navbar-link';
+import { CurrentTick } from '@/components/current-tick';
 
 export const NavbarContent = () => {
     const { pathname } = useLocation();
@@ -20,6 +21,9 @@ export const NavbarContent = () => {
             <NavbarLink to='/wallet/addresses' icon='ImportContacts' label='Addresses' />
             <NavbarLink to='/wallet/overview' icon='Face5' label='Overview' />
             <NavbarLink to='/wallet/transactions' icon='Bolt' label='Transactions' />
+
+            <Divider hiddenFrom='sm' pb='20' />
+            <CurrentTick hiddenFrom='sm' mx='auto' />
         </>
     );
 };
