@@ -170,7 +170,7 @@ export const WalletOverviewPage = () => {
                             component: <ExploreIcon htmlColor='var(--mantine-color-brand-text)' />,
                             label: 'Explorer',
                             isExternalLink: true,
-                            to: `https://explorer.qubic.org/network/address/${selectedAddress.identity}`,
+                            to: `${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_ADDRESS_ENDPOINT}/${selectedAddress.identity}`,
                         },
                     ]}
                 />
