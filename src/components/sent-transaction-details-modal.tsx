@@ -6,6 +6,7 @@ import type {
     IQubicPendingTransaction,
     QubicTransactionStatus,
 } from '@/packages/hw-app-qubic-react';
+import { produceLinkToTransactionExplorer } from '@/providers/SentTransactionDetailsProvider';
 
 interface SentTransactionDetailsModalProps
     extends ModalProps,
@@ -42,7 +43,7 @@ export const SentTransactionDetailsModal = ({
                         Amount
                     </Title>
 
-                    <Text component='h2' fw={600} c='brand'>
+                    <Text component='h2' fw={600} c='fontColor'>
                         {amount} QUBIC
                     </Text>
                 </Stack>
@@ -71,7 +72,7 @@ export const SentTransactionDetailsModal = ({
 
                     <TruncatedText
                         component='a'
-                        href={`${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT}/${txId}`}
+                        href={produceLinkToTransactionExplorer(txId)}
                         target='_blank'
                         c='brand'
                         w='max-content'
@@ -93,7 +94,7 @@ export const SentTransactionDetailsModal = ({
                     <Stack gap='xs'>
                         <Text fw={600}>Current tick</Text>
 
-                        <Text component='h2' fw={600} c='brand'>
+                        <Text component='h2' fw={600} c='fontColor'>
                             {currentTick}
                         </Text>
                     </Stack>
@@ -101,7 +102,7 @@ export const SentTransactionDetailsModal = ({
                     <Stack gap='xs'>
                         <Text fw={600}>Target tick</Text>
 
-                        <Text component='h2' fw={600} c='brand'>
+                        <Text component='h2' fw={600} c='fontColor'>
                             {tick}
                         </Text>
                     </Stack>
