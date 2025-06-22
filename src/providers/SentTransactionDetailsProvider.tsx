@@ -1,8 +1,10 @@
 import { SentTransactionDetailsModal } from '@/components/sent-transaction-details-modal';
 import { TruncatedText } from '@/components/truncated-text';
-import { useQubicCurrentTickQuery } from '@/packages/hw-app-qubic-react';
-import { useQubicWalletPendingSessionTransactionsContext } from '@/packages/hw-app-qubic-react';
 import type { QubicTransactionStatus } from '@/packages/hw-app-qubic-react';
+import {
+    useQubicCurrentTickQuery,
+    useQubicWalletPendingSessionTransactionsContext,
+} from '@/packages/hw-app-qubic-react';
 import { Anchor, Group, Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification, updateNotification, useNotifications } from '@mantine/notifications';
@@ -39,7 +41,7 @@ const sentTransactionDataMap: Record<
     success: {
         label: ({ href }: { href?: string }) => (
             <Text c='green'>
-                Transaction successful - {href ? <Anchor href={href}>LINK</Anchor> : 'LINK'}
+                Transaction successful - {href ? <Anchor href={href}>Explorer</Anchor> : 'LINK'}
             </Text>
         ),
         progressColor: 'green',
@@ -52,6 +54,10 @@ const sentTransactionDataMap: Record<
         label: () => <Text c='orange'>Cannot connect, please try again later</Text>,
         progressColor: 'orange',
     },
+};
+
+export const produceLinkToTransactionExplorer = (txId: string) => {
+    return `${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT}/${txId}`;
 };
 
 export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) => {
@@ -154,7 +160,19 @@ export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) 
                 title: (
                     <div>
                         <Text display='inline-block'>Transaction </Text>{' '}
-                        <TruncatedText c='brand' display='inline-block'>
+                        <TruncatedText
+                            component='a'
+                            href={produceLinkToTransactionExplorer(
+                                selectedTransactionDetailsData?.txId,
+                            )}
+                            target='_blank'
+                            c='brand'
+                            w='max-content'
+                            mx='auto'
+                            style={{ overflowWrap: 'break-word' }}
+                            className='hover-text-underline'
+                            display='inline-block'
+                        >
                             {tx.txId}{' '}
                         </TruncatedText>{' '}
                         <Text display='inline-block'>{tx.status} </Text>
@@ -165,9 +183,9 @@ export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) 
                         {tx.status === 'pending' && (
                             <Text c='grey'>Please wait until target tick has been reached</Text>
                         )}
-                        <Group gap='4px'>
-                            Click <Anchor>here</Anchor> to check transaction details.
-                        </Group>
+                        {/*<Group gap='4px'>*/}
+                        {/*    Click <Anchor>here</Anchor> to check transaction details.*/}
+                        {/*</Group>*/}
                     </Group>
                 ),
             });

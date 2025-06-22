@@ -36,6 +36,10 @@ export const HistoryTransactions = () => {
 
     const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
 
+    const transactionsDataDesc = transactionsData.sort(
+        (a, b) => parseInt(b.transactions[0].timestamp) - parseInt(a.transactions[0].timestamp),
+    );
+
     return (
         <Stack>
             <Group display='flex' gap='12'>
@@ -50,7 +54,7 @@ export const HistoryTransactions = () => {
             </Group>
 
             <Stack gap='xs' w='100%'>
-                {transactionsData.map(({ identity, tickNumber, transactions }) => (
+                {transactionsDataDesc.map(({ identity, tickNumber, transactions }) => (
                     <HistoryTransaction
                         key={`${identity}-${tickNumber}-${transactions[0].transaction.txId}`}
                         icon={

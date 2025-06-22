@@ -103,6 +103,7 @@ export interface IDataTransformer<Data, Return = Data> {
 
 export interface ITransportListenersConfigProps {
     onDisconnect?: () => void;
+    onError?: (error: Error) => void;
 }
 
 export type QubicTransactionStatus = 'pending' | 'success' | 'failed' | 'unknown';

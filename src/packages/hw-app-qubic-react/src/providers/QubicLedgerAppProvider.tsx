@@ -126,6 +126,11 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
 
                           listenersConfig?.onDisconnect?.();
                       },
+                      onError: (error) => {
+                          reset();
+
+                          listenersConfig?.onError?.(error);
+                      },
                   });
 
             if (!transportForHwAppQubic) {
