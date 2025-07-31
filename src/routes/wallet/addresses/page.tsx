@@ -199,6 +199,16 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Payment',
                                         onClick: () => {
+                                            if (selectedAddress?.identity !== address.identity) {
+                                                selectAddressByIndex(address.addressIndex);
+
+                                                notifications.show({
+                                                    title: 'Warning',
+                                                    color: 'cyan',
+                                                    message: 'Updated selected address',
+                                                });
+                                            }
+
                                             navigate('/wallet/overview');
                                         },
                                     },
