@@ -61,3 +61,27 @@ export const qubicPendingTransactionSchema = z.object({
     createdAtTick: z.number(),
     from: z.string(),
 });
+
+const transactionForIdentitySchema = z.object({
+    hash: z.string(),
+    amount: z.string(),
+    source: z.string(),
+    destination: z.string(),
+    tickNumber: z.number(),
+    timestamp: z.string(),
+    inputType: z.number(),
+    inputSize: z.number(),
+    inputData: z.string(),
+    signature: z.string(),
+    moneyFlew: z.boolean(),
+});
+
+export const transactionsForIdentitySchema = z.object({
+    validForTick: z.number(),
+    hits: z.object({
+        total: z.number(),
+        from: z.number(),
+        size: z.number(),
+    }),
+    transactions: z.array(transactionForIdentitySchema),
+});

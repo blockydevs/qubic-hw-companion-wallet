@@ -34,6 +34,7 @@ interface QubicLedgerAppProviderProps {
     derivationPath: string;
     transactionTickOffset: number;
     rpcUrl: string;
+    apiUrl: string;
 }
 
 const QubicLedgerAppProviderWithoutWebHIDProvider = ({
@@ -41,7 +42,7 @@ const QubicLedgerAppProviderWithoutWebHIDProvider = ({
     derivationPath,
     transactionTickOffset,
     init,
-}: PropsWithChildren<Omit<QubicLedgerAppProviderProps, 'rpcUrl'>>) => {
+}: PropsWithChildren<Omit<QubicLedgerAppProviderProps, 'rpcUrl' | 'apiUrl'>>) => {
     const ledgerWebHIDContext = useContext(LedgerWebHIDContext);
     const qubicRpcService = useContext(QubicRpcServiceContext);
 
@@ -195,9 +196,10 @@ export const QubicLedgerAppProvider = ({
     derivationPath,
     transactionTickOffset,
     rpcUrl,
+    apiUrl,
 }: PropsWithChildren<QubicLedgerAppProviderProps>) => (
     <LedgerWebHIDProvider init={false}>
-        <QubicRpcServiceProvider rpcUrl={rpcUrl}>
+        <QubicRpcServiceProvider rpcUrl={rpcUrl} apiUrl={apiUrl}>
             <QubicLedgerAppProviderWithoutWebHIDProvider
                 init={init}
                 transactionTickOffset={transactionTickOffset}
