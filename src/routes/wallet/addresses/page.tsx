@@ -24,6 +24,7 @@ import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { notifications } from '@mantine/notifications';
+import { TruncatedText } from '@/components/truncated-text';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -203,9 +204,17 @@ export const WalletAddressesPage = () => {
                                                 selectAddressByIndex(address.addressIndex);
 
                                                 notifications.show({
-                                                    title: 'Warning',
+                                                    title: 'Selected Account Updated',
                                                     color: 'cyan',
-                                                    message: 'Updated selected address',
+                                                    message: (
+                                                        <Group gap='0.25rem'>
+                                                            Switched to Account{' '}
+                                                            {address.addressIndex + 1}
+                                                            <TruncatedText size='sm' c='grey'>
+                                                                ({address.identity})
+                                                            </TruncatedText>
+                                                        </Group>
+                                                    ),
                                                 });
                                             }
 
