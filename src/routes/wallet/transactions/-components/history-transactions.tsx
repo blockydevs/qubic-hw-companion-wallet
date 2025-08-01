@@ -1,4 +1,5 @@
 import {
+    Anchor,
     Button,
     Card,
     Center,
@@ -23,7 +24,7 @@ import { queryFactory } from '@/utils/query-factory';
 import { useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@mantine/core';
 import { TruncatedText } from '@/components/truncated-text';
-import { Link } from 'react-router';
+import { produceLinkToTransactionExplorer } from '@/utils/links';
 
 interface Props {
     page: number;
@@ -34,7 +35,7 @@ interface Props {
 export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
     const [lastKnownTotal, setLastKnownTotal] = useState<number | null>(null);
 
-    const { selectedAddress, generatedAddresses } = useQubicLedgerApp();
+    const { selectedAddress } = useQubicLedgerApp();
 
     const { data, refetch, isError, isLoading } = useQuery(
         queryFactory.getTransactions.forIdentity({
@@ -128,7 +129,12 @@ export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
                                       component: (
                                           <>
                                               {' '}
-                                              <Text c='brand'>{hash}</Text>
+                                              <Anchor
+                                                  href={produceLinkToTransactionExplorer(hash)}
+                                                  target='_blank'
+                                              >
+                                                  <Text c='brand'>{hash}</Text>
+                                              </Anchor>
                                               <Tooltip
                                                   label='Copy transaction hash'
                                                   position='right'
@@ -161,7 +167,7 @@ export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
                             component: (
                                 <>
                                     {' '}
-                                    <Text c='brand'>{source}</Text>
+                                    <Text>{source}</Text>
                                     <Tooltip label='Copy source identity' position='right'>
                                         <Button
                                             p='0.25rem'
@@ -185,7 +191,7 @@ export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
                             component: (
                                 <>
                                     {' '}
-                                    <Text c='brand'>{destination}</Text>
+                                    <Text>{destination}</Text>
                                     <Tooltip label='Copy destination identity' position='right'>
                                         <Button
                                             p='0.25rem'
@@ -221,13 +227,6 @@ export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
     return (
         <Stack>
             <Stack display='flex' gap='12'>
-                {generatedAddresses.length > 1 && (
-                    <Link to='/wallet/addresses'>
-                        <Button w='max-content' variant='outline' onClick={() => setPage(0)}>
-                            Change Address
-                        </Button>
-                    </Link>
-                )}
                 <Group justify='space-between' align='center' w='max-content'>
                     <Title component='p' size='h2'>
                         Transactions of Account {selectedAddress.addressIndex + 1}
@@ -260,7 +259,7 @@ export const HistoryTransactions = ({ page, setPage, limit }: Props) => {
                 {transactionsComponent}
             </Stack>
 
-            {!isError && (
+            {!isError && !!lastKnownTotal && (
                 <Center w='100%' mt='md'>
                     <Stack>
                         <Pagination
