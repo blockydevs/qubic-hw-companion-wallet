@@ -5,6 +5,7 @@ import {
     useQubicCurrentTickQuery,
     useQubicWalletPendingSessionTransactionsContext,
 } from '@/packages/hw-app-qubic-react';
+import { produceLinkToTransactionExplorer } from '@/utils/links';
 import { Anchor, Group, Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification, updateNotification, useNotifications } from '@mantine/notifications';
@@ -54,10 +55,6 @@ const sentTransactionDataMap: Record<
         label: () => <Text c='orange'>Cannot connect, please try again later</Text>,
         progressColor: 'orange',
     },
-};
-
-export const produceLinkToTransactionExplorer = (txId: string) => {
-    return `${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT}/${txId}`;
 };
 
 export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) => {
@@ -211,7 +208,7 @@ export const SentTransactionDetailsProvider = ({ children }: PropsWithChildren) 
                     selectedTransactionDetailsData?.status ?? ('pending' as const)
                 ].label({
                     href: selectedTransactionDetailsData?.txId
-                        ? `https://explorer.qubic.org/network/tx/${selectedTransactionDetailsData.txId}`
+                        ? produceLinkToTransactionExplorer(selectedTransactionDetailsData.txId)
                         : undefined,
                 })}
                 beforeLabel={

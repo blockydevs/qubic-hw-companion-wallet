@@ -5,7 +5,6 @@ export { useQubicWalletPendingSessionTransactionsContext } from './src/hooks/qub
 
 export { useQubicCurrentTickQuery } from './src/hooks/qubic-rpc/use-qubic-current-tick-query';
 export { useQubicRpcBroadcastTransactionMutation } from './src/hooks/qubic-rpc/use-qubic-rpc-broadcast-transaction-mutation';
-export { useQubicWholeTransactionsHistoryInfiniteQuery } from './src/hooks/qubic-rpc/use-qubic-whole-transactions-history-infinite-query';
 
 export { useQubicRpcService } from './src/hooks/qubic-rpc/use-qubic-rpc-service';
 
@@ -15,6 +14,8 @@ export { QubicLedgerDemoModeProvider } from './src/providers/QubicLedgerDemoMode
 export { QubicWalletPendingSessionTransactionsProvider } from './src/providers/QubicWalletPendingSessionTransactionsProvider';
 
 export { QubicRpcService } from './src/services/qubic-rpc';
+
+export { createQubicRpcQueryFactory } from './src/utils/query-factory';
 
 export { encodeTransactionToBase64 } from './src/utils/transaction-encoder';
 

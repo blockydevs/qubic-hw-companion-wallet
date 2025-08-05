@@ -132,7 +132,7 @@ export const WalletOverviewPage = () => {
                     shadow='none'
                     maw='600px'
                     accountDetails={{
-                        accountName: 'Account 1',
+                        accountName: `Account ${selectedAddress.addressIndex + 1}`,
                         address: selectedAddress.identity,
                         isSelected: true,
                         isAddressVerified: verifiedIdentities.includes(selectedAddress.identity),

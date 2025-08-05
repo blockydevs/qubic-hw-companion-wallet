@@ -17,6 +17,7 @@ import { TruncatedText } from '@/components/truncated-text';
 import { HistoryTransactionDetailItem } from '@/routes/wallet/transactions/history-transaction-detail-item';
 import styles from '@/routes/wallet/transactions/transaction.module.css';
 import { copyAddress } from '@/utils/copy';
+import { produceLinkToTransactionExplorer } from '@/utils/links';
 
 interface HistoryTransactionProps {
     transactionId: string;
@@ -61,7 +62,7 @@ export const HistoryTransaction = ({
 
                 <Group gap='xs'>
                     <Anchor
-                        href={`https://explorer.qubic.org/network/tx/${transactionId}`}
+                        href={produceLinkToTransactionExplorer(transactionId)}
                         target='_blank'
                         c='gray.0'
                     >
