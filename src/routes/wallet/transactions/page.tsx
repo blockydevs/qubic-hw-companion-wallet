@@ -32,6 +32,10 @@ export const WalletTransactionsPage = () => {
         );
 
     useEffect(() => {
+        if (!selectedAddress) {
+            return;
+        }
+
         const tempLastKnownAmountOfPendingTransactions = lastKnownAmountOfPendingTransactions;
 
         if (tempLastKnownAmountOfPendingTransactions !== pendingTransactions.length) {
@@ -52,7 +56,7 @@ export const WalletTransactionsPage = () => {
         page,
         pendingTransactions,
         queryClient,
-        selectedAddress.identity,
+        selectedAddress,
     ]);
 
     if (!selectedAddress) {
