@@ -24,6 +24,7 @@ import { useVerifiedAddressContext } from '@/hooks/verify-address-context';
 import { useQubicLedgerApp } from '@/packages/hw-app-qubic-react';
 import { DeviceTypeContext } from '@/providers/DeviceTypeProvider';
 import { notifications } from '@mantine/notifications';
+import { TruncatedText } from '@/components/truncated-text';
 
 export const WalletAddressesPage = () => {
     const navigate = useNavigate();
@@ -199,6 +200,24 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Payment',
                                         onClick: () => {
+                                            if (selectedAddress?.identity !== address.identity) {
+                                                selectAddressByIndex(address.addressIndex);
+
+                                                notifications.show({
+                                                    title: 'Selected Account Updated',
+                                                    color: 'cyan',
+                                                    message: (
+                                                        <Group gap='0.25rem'>
+                                                            Switched to Account{' '}
+                                                            {address.addressIndex + 1}
+                                                            <TruncatedText size='sm' c='grey'>
+                                                                ({address.identity})
+                                                            </TruncatedText>
+                                                        </Group>
+                                                    ),
+                                                });
+                                            }
+
                                             navigate('/wallet/overview');
                                         },
                                     },
@@ -228,7 +247,7 @@ export const WalletAddressesPage = () => {
                                         ),
                                         label: 'Explorer',
                                         isExternalLink: true,
-                                        to: `https://explorer.qubic.org/network/address/${address.identity}`,
+                                        to: `${process.env.REACT_APP_QUBIC_EXPLORER_BASE_URL}/${process.env.REACT_APP_QUBIC_EXPLORER_ADDRESS_ENDPOINT}/${address.identity}`,
                                     },
                                 ]}
                             />

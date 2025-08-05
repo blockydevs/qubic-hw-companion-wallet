@@ -15,13 +15,13 @@ export const useConnectToQubicLedgerApp = () => {
 
     const { initApp, app, reset } = useQubicLedgerApp();
 
-    const checkIfQubicAppIsOpenOnLedgerMutation = useMutation({
+    const { mutate: checkIfQubicAppIsOpenOnLedgerMutate } = useMutation({
         mutationFn: async (transport: Transport) => {
             return await checkIfQubicAppIsOpenOnLedger(transport);
         },
     });
 
-    const prepareQubicLedgerAppMutation = useMutation({
+    const { mutate: prepareQubicLedgerAppMutate } = useMutation({
         mutationFn: async (currentApp: HWAppQubic | null) => {
             if (currentApp) {
                 return currentApp;
@@ -37,6 +37,11 @@ export const useConnectToQubicLedgerApp = () => {
                     });
 
                     await navigate('/');
+                },
+                onError: async () => {
+                    await reset();
+
+                    navigate('/');
                 },
             });
         },
@@ -66,9 +71,9 @@ export const useConnectToQubicLedgerApp = () => {
     );
 
     const handleConnectWithUsb = useCallback(async () => {
-        prepareQubicLedgerAppMutation.mutate(app, {
+        prepareQubicLedgerAppMutate(app, {
             onSuccess: async (qubicLedgerApp) => {
-                checkIfQubicAppIsOpenOnLedgerMutation.mutate(qubicLedgerApp.transport, {
+                checkIfQubicAppIsOpenOnLedgerMutate(qubicLedgerApp.transport, {
                     onSuccess: async () => {
                         setDeviceType('usb');
                         navigate(`/wallet/addresses`, { replace: true });
@@ -84,9 +89,9 @@ export const useConnectToQubicLedgerApp = () => {
             },
         });
     }, [
-        prepareQubicLedgerAppMutation,
+        prepareQubicLedgerAppMutate,
         app,
-        checkIfQubicAppIsOpenOnLedgerMutation,
+        checkIfQubicAppIsOpenOnLedgerMutate,
         setDeviceType,
         navigate,
         handleError,

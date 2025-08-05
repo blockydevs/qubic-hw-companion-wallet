@@ -1,7 +1,13 @@
 import { Text } from '@mantine/core';
-import type { PolymorphicComponentProps, TextProps } from '@mantine/core';
+import type { AnchorProps, PolymorphicComponentProps, TextProps } from '@mantine/core';
 
 interface TruncatedTextProps extends PolymorphicComponentProps<'text', TextProps> {
+    charsFromBeginning?: number;
+    charsFromEnd?: number;
+    truncateText?: string;
+    children: string | string[];
+}
+interface TruncatedTextLinkProps extends PolymorphicComponentProps<'a', AnchorProps> {
     charsFromBeginning?: number;
     charsFromEnd?: number;
     truncateText?: string;
@@ -14,11 +20,12 @@ export const TruncatedText = ({
     truncateText = '...',
     children,
     ...textProps
-}: TruncatedTextProps) => {
+}: TruncatedTextProps | TruncatedTextLinkProps) => {
     const childrenString = Array.isArray(children) ? children.join('') : children;
 
     const shouldTruncate =
-        charsFromBeginning + charsFromEnd + truncateText.length < childrenString.length;
+        charsFromBeginning + charsFromEnd + (truncateText?.length ?? 0) <
+        (childrenString?.length ?? 0);
 
     if (shouldTruncate) {
         return (

@@ -1,17 +1,18 @@
-import { DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS } from '../constants';
 import type { IQubicBroadcastedTransactionDTO } from '../types';
 import { Fetcher } from '../utils/fetcher';
 import {
     qubicBalanceSchema,
     qubicBroadcastedTransactionResult,
     qubicLatestTickSchema,
-    qubicTransactionsSchema,
+    transactionDataSchema,
+    transactionsForIdentitySchema,
 } from '../utils/validation-schemas';
 import { QubicTransaction } from '@qubic-lib/qubic-ts-library/dist/qubic-types/QubicTransaction';
 
 export class QubicRpcService {
-    constructor(public rpcUrl: string) {
+    constructor(public rpcUrl: string, public apiUrl: string) {
         this.rpcUrl = rpcUrl;
+        this.apiUrl = apiUrl;
     }
 
     async getBalance(identity: string) {
@@ -30,21 +31,39 @@ export class QubicRpcService {
         }).fetch(`${this.rpcUrl}v1/latestTick`);
     }
 
-    async getTransactions({
+    async getTransaction({ transactionId }: { transactionId: string }) {
+        return await Fetcher.create({
+            schema: transactionDataSchema,
+            errorMessage: `Invalid transactions response data for ${transactionId} transaction.`,
+        }).fetch(`${this.rpcUrl}v2/transactions/${transactionId}`);
+    }
+
+    async getTransactionsForIdentity({
         identity,
-        startTick,
-        endTick = startTick + DEFAULT_TICK_INTERVAL_FOR_TRANSACTIONS,
+        offset = 0,
+        size = 50,
     }: {
         identity: string;
-        startTick: number;
-        endTick?: number;
+        offset?: number;
+        size?: number;
     }) {
         return await Fetcher.create({
-            schema: qubicTransactionsSchema,
-            errorMessage: `Invalid transactions response data for ${identity} address.`,
-        }).fetch(
-            `${this.rpcUrl}v2/identities/${identity}/transfers?startTick=${startTick}&endTick=${endTick}`,
-        );
+            schema: transactionsForIdentitySchema,
+            errorMessage: `Invalid transactions response data for ${identity} identity.`,
+        }).fetch(`${this.apiUrl}getTransactionsForIdentity`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                identity,
+                pagination: {
+                    offset,
+                    size,
+                },
+            }),
+        });
     }
 
     async broadcastTransaction(

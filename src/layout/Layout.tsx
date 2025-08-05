@@ -1,6 +1,10 @@
 import { type PropsWithChildren, useLayoutEffect } from 'react';
+import { Link, useLocation } from 'react-router';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import LockIcon from '@mui/icons-material/Lock';
 import {
     AppShell,
+    Box,
     Burger,
     Center,
     Flex,
@@ -9,15 +13,13 @@ import {
     Transition,
     useMantineTheme,
 } from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { Link, useLocation } from 'react-router';
-import LockIcon from '@mui/icons-material/Lock';
 import {
     HEADER_HEIGHT,
     NAVBAR_TRANSITION_DURATION,
     NAVBAR_TRANSITION_TIMING_FUNCTION,
     NAVBAR_WIDTH,
 } from '@/constants';
+import { CurrentTick } from '@/components/current-tick';
 
 interface LayoutProps
     extends PropsWithChildren<{
@@ -27,6 +29,7 @@ interface LayoutProps
 export const Layout = ({ children, navbarContent }: LayoutProps) => {
     const [isNavbarOpened, { open: openNavbar, close: closeNavbar, toggle: toggleNavbar }] =
         useDisclosure();
+
     const { pathname } = useLocation();
 
     const { breakpoints } = useMantineTheme();
@@ -96,12 +99,21 @@ export const Layout = ({ children, navbarContent }: LayoutProps) => {
                                 timingFunction={NAVBAR_TRANSITION_TIMING_FUNCTION}
                             >
                                 {(styles) => (
-                                    <Link to='/'>
-                                        <LockIcon
-                                            htmlColor='var(--mantine-color-fontColor-text)'
-                                            style={styles}
-                                        />
-                                    </Link>
+                                    <Box
+                                        style={{
+                                            ...styles,
+                                            whiteSpace: 'pre',
+                                            gap: '0.5rem',
+                                            alignItems: 'center',
+                                        }}
+                                        display='flex'
+                                    >
+                                        <CurrentTick visibleFrom='sm' pb={5} />
+
+                                        <Link to='/'>
+                                            <LockIcon htmlColor='var(--mantine-color-fontColor-text)' />
+                                        </Link>
+                                    </Box>
                                 )}
                             </Transition>
                         </Flex>

@@ -278,32 +278,7 @@ const { transactionId } = await broadcastTransactionToRpc(encodedTransaction);
 -   Returns a mutation object with `mutateAsync`, `isLoading`, `error` and rest [`useMutation`](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation) return values.
 -   Mutation accepts a `QubicTransaction` or transaction hash string.
 
-#### `useQubicTransactionHistoryQuery`
 
-The `useQubicTransactionHistoryQuery` hook retrieves the transaction history for a given identity, starting from a specified tick. Transactions are fetched continuously as long as new ones are available.
-
-```tsx
-const { data, refetch, reset, firstTick, endTick } = useQubicTransactionHistoryQuery(identity);
-```
-
--   `firstTick`: The initial tick from which the transaction history starts.
--   `endTick`: The latest tick up to which the transactions have been fetched.
--   `data`: Contains the transaction history.
--   `refetch`: Fetch next chunk of transactions.
--   `reset`: Clears cached pages and refetches from the latest tick.
--   rest of [`useQuery`](https://tanstack.com/query/v4/docs/framework/react/reference/useQuery) result
-
-Transactions are fetched progressively, ensuring that all available transactions are retrieved without a predefined limit.
-
-#### How It Works
-
-1. **Initialization**: The hook initializes with the provided `identity` and `initialTick`. It sets up the initial state for `firstTick` and `endTick`.
-
-2. **Fetching Transactions**: The hook uses `useInfiniteQuery` to fetch transactions in batches. Each batch corresponds to a tick interval, defined by `tickInterval`. The `queryFn` fetches transactions for the specified identity within the tick range `[newStartTick, newEndTick]`.
-
-3. **Pagination**: The `getNextPageParam` function determines if there are more transactions to fetch. It stops fetching when `endTick - tickInterval` is less than 0.
-
-4. **State Management**: The hook manages the state of `firstTick` and `endTick` to keep track of the tick range for each batch of transactions.
 
 ### Using the Qubic RPC Service
 
@@ -356,18 +331,80 @@ const fetchTransactions = async (identity: string, startTick: number) => {
 };
 ```
 
-### Utility Functions
 
-#### Encoding Transactions to Base64
+### Query Factory
 
-The `encodeTransactionToBase64` utility function converts a transaction (in `Uint8Array` format) to a Base64-encoded string.
+The package provides a query factory utility for generating ready-to-use query objects compatible with [React Query](https://tanstack.com/query/latest/docs/framework/react/overview). This helps you easily fetch Qubic RPC data in a type-safe and consistent way.
+
+#### Importing and Creating the Query Factory
 
 ```typescript
-import { encodeTransactionToBase64 } from 'qubic-hw-app-react';
+import { createQubicRpcQueryFactory } from 'qubic-hw-app-react';
 
-const transaction = new Uint8Array([
-    /* transaction bytes */
-]);
-const encodedTransaction = encodeTransactionToBase64(transaction);
-console.log('Encoded transaction:', encodedTransaction);
+const rpcUrl = 'https://your-rpc-url';
+const apiUrl = 'https://your-api-url';
+const queryFactory = createQubicRpcQueryFactory(rpcUrl, apiUrl);
 ```
+
+#### Available Queries
+
+The query factory currently includes:
+
+- **getTransactions.forIdentity**: Fetches transactions for a given identity (address), with optional pagination.
+- **currentTick**: Fetches the current tick from the Qubic network, with optional polling interval.
+
+##### Query: getTransactions.forIdentity
+
+Fetches transactions for a specific identity. Returns data matching the `transactionsForIdentitySchema` type.
+
+**Usage Example:**
+
+```typescript
+import { useQuery } from '@tanstack/react-query';
+
+const identity = 'QU...';
+const { queryKey, queryFn } = queryFactory.getTransactions.forIdentity({ identity, offset: 0, size: 20 });
+const { data, isLoading, error } = useQuery({ queryKey, queryFn });
+
+// data will match the following schema:
+// {
+//   validForTick: number,
+//   hits: { total: number, from: number, size: number },
+//   transactions: Array<{
+//     hash: string,
+//     amount: string,
+//     source: string,
+//     destination: string,
+//     tickNumber: number,
+//     timestamp: string,
+//     inputType: number,
+//     inputSize: number,
+//     inputData: string,
+//     signature: string,
+//     moneyFlew: boolean,
+//   }>
+// }
+```
+
+##### Query: currentTick
+
+Fetches the current tick from the Qubic network. Returns a number (the current tick).
+
+**Usage Example:**
+
+```typescript
+import { useQuery } from '@tanstack/react-query';
+
+const { queryKey, queryFn, refetchInterval } = queryFactory.currentTick({ refreshInterval: 10000 });
+const { data: currentTick, isLoading, error } = useQuery({ queryKey, queryFn, refetchInterval });
+
+// currentTick will be a number (latest tick)
+```
+
+#### Notes
+
+- All queries are compatible with React Query's `useQuery` hook.
+- The query factory ensures correct query keys and functions for cache consistency and type safety.
+- You can extend the factory with additional queries as needed.
+
+See the [validation schemas](./src/utils/validation-schemas.ts) for detailed type definitions of the returned data.

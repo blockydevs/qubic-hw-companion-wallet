@@ -6,9 +6,35 @@ Qubic HW Companion Wallet is a frontend dApp that interacts with the Qubic block
 
 The application relies on the following environment variables for configuration:
 
--   `REACT_APP_IS_DEMO_MODE="true"` - Enables or disables the demo mode. When set to `true`, users can explore the application without connecting a Ledger device.
--   `REACT_APP_QUBIC_DERIVATION_PATH="m/44'/1'/0'/0/0"` - Specifies the derivation path for generating wallet addresses on the Ledger app.
--   `REACT_APP_QUBIC_RPC_URL="https://rpc.qubic.org/"` - Defines the RPC endpoint for communicating with the blockchain.
+-   `REACT_APP_IS_DEMO_MODE="true"`
+    Enables or disables the demo mode. When set to `true`, users can explore the application without connecting a Ledger device.
+
+-   `REACT_APP_QUBIC_DERIVATION_PATH="m/44'/1'/0'/0/0"`
+    Specifies the derivation path for generating wallet addresses on the Ledger app.
+
+-   `REACT_APP_QUBIC_RPC_URL="https://rpc.qubic.org/"`
+    Defines the RPC endpoint for communicating with the blockchain.
+
+-   `REACT_APP_TRANSACTION_TICK_OFFSET=10`
+    Sets the default offset (in ticks) to be added to the current tick for transaction expiration. Used for setting a future tick as deadline.
+
+-   `REACT_APP_QUBIC_TICK_FIELD_VISIBLE=false`
+    Controls the visibility of the tick input field in the transaction form. When set to `false`, the tick field is hidden and calculated automatically.
+
+-   `REACT_APP_QUBIC_TICK_REFRESH_INTERVAL=10000`
+    Determines how often (in milliseconds) the app fetches and refreshes the current tick from the blockchain.
+
+-   `REACT_APP_QUBIC_SHOW_TICK_SECONDS=true`
+    When enabled (`true`), display time passed from the latest tick update.
+
+-   `REACT_APP_QUBIC_EXPLORER_BASE_URL="https://explorer.qubic.org"`
+    URL For the Qubic explorer page.
+
+-   `REACT_APP_QUBIC_EXPLORER_ADDRESS_ENDPOINT="network/address"`
+    Endpoint in the explorer to read address information
+
+-   `REACT_APP_QUBIC_EXPLORER_TRANSACTION_ENDPOINT="network/tx"`
+    Endpoint in the explorer to read transaction information
 
 ## Compatible Browsers
 
@@ -89,19 +115,31 @@ const { selectedAddress } = useQubicLedgerApp();
 const { mutateAsync: sendTransactionSignedWithLedgerToRpc } =
     useQubicSendTransactionSignedWithLedgerToRpc(latestTick);
 const [isTransactionProcessing, setIsTransactionProcessing] = useState(false);
-
-const onSubmitHandler = async (values: {
-    sendTo: string;
-    amount: number;
-    tick: number;
-    resetForm: () => void;
-}) => {
-    try {
-        setIsTransactionProcessing(true);
-        await sendTransactionSignedWithLedgerToRpc(values);
-        setIsTransactionProcessing(false);
-    } catch (error) {
-        setIsTransactionProcessing(false);
-    }
-};
 ```
+
+## Wallet Transactions Page (`/wallet/transactions`)
+
+The `/wallet/transactions` route displays the transaction history and pending transactions for the currently selected wallet address.
+
+### Features
+
+-   **Transaction History**: Paginated list of all transactions (incoming and outgoing) for the selected address, loaded from the Qubic RPC using the `getTransactions.forIdentity` query.
+-   **Pending Transactions**: Shows transactions initiated from the wallet that are not yet confirmed on the network, with real-time progress tracking based on the current tick.
+-   **Transaction Details**: Each transaction can be expanded to show details such as transaction hash, timestamp, source, destination, and more. Copy buttons are provided for easy copying of hashes and addresses.
+-   **Pagination**: Navigate through pages of transaction history. The total number of transactions is displayed.
+
+### Example Usage
+
+Navigate to `/wallet/transactions` after selecting an address to view its transaction history and pending transactions. The page will automatically fetch and display the relevant data.
+
+**Key Components:**
+
+-   `HistoryTransactions`: Handles fetching and displaying the paginated transaction history for the selected address.
+-   `PendingTransactions`: Displays a list of pending (unconfirmed) transactions with progress indicators.
+-   `HistoryTransaction`: Renders individual transaction items with expandable details.
+
+**Data Loading:**
+
+-   Transaction history is loaded using the query factory's `getTransactions.forIdentity` query, ensuring up-to-date and paginated results.
+-   When loading, skeletons are displayed.
+-   Pending transactions are managed locally and updated as new transactions are sent or confirmed.

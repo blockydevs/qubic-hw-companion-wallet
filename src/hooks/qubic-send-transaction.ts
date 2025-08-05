@@ -19,6 +19,7 @@ interface QubicSendTransactionSignedWithLedgerToRpcParameters {
     onBeforeSignTransactionWithLedger?: () => Promise<void> | void;
     onBeforeBroadcastTransactionToRpc?: () => Promise<void> | void;
     onAfterBroadcastTransactionToRpc?: (sentTransactionData: {
+        from: string;
         sentTo: string;
         sentTxId: string;
         sentAmount: number;
@@ -82,6 +83,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
                 sentTo: destinationIdentity,
                 sentTxId: transactionId,
                 sentAmount: amount,
+                from: sourceIdentity,
             });
         },
         [broadcastTransactionToRpc, derivationPath, latestTick, ledgerSignTransaction],
@@ -100,6 +102,7 @@ export const useQubicSendTransactionSignedWithLedgerToRpc = (
                         sentTo: 'demo-transaction',
                         sentTxId: 'demo-transaction-id',
                         sentAmount: 100,
+                        from: 'demo-transaction-from',
                     });
 
                     resolve(void 0);

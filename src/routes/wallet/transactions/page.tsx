@@ -1,29 +1,63 @@
 import { Link } from 'react-router';
-import { Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
-import { HistoryTransaction } from '@/routes/wallet/transactions/history-transaction';
+import { Button, em, Stack, Text, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
-    useQubicCurrentTickQuery,
     useQubicLedgerApp,
-    useQubicTransactionHistoryQuery,
+    useQubicWalletPendingSessionTransactionsContext,
 } from '@/packages/hw-app-qubic-react';
+import { HistoryTransactions } from './-components/history-transactions';
+import { PendingTransactions } from './-components/pending-transactions';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryFactory } from '@/utils/query-factory';
+
+const LIMIT = 50;
 
 export const WalletTransactionsPage = () => {
+    const queryClient = useQueryClient();
     const { selectedAddress } = useQubicLedgerApp();
-    const { data: latestTick } = useQubicCurrentTickQuery();
+    const qubicWalletPendingSessionTransactionsContext =
+        useQubicWalletPendingSessionTransactionsContext();
 
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isLoading: transactionsLoading,
-        endTick,
-        firstTick,
-    } = useQubicTransactionHistoryQuery({
-        identity: selectedAddress?.identity,
-        initialTick: latestTick,
-    });
+    const [lastKnownAmountOfPendingTransactions, setLastKnownAmountOfPendingTransactions] =
+        useState(qubicWalletPendingSessionTransactionsContext.pendingTransactions.length);
 
-    const transactionsData = data?.pages?.flatMap((el) => el.transactions) ?? [];
+    const shouldShowTransactionHashInCollapse = useMediaQuery(`(min-width: ${em(1024)})`);
+
+    const [page, setPage] = useState(0);
+
+    const pendingTransactions =
+        qubicWalletPendingSessionTransactionsContext.pendingTransactions.filter(
+            (tx) => tx.status === 'pending',
+        );
+
+    useEffect(() => {
+        if (!selectedAddress) {
+            return;
+        }
+
+        const tempLastKnownAmountOfPendingTransactions = lastKnownAmountOfPendingTransactions;
+
+        if (tempLastKnownAmountOfPendingTransactions !== pendingTransactions.length) {
+            setLastKnownAmountOfPendingTransactions(pendingTransactions.length);
+        }
+
+        if (pendingTransactions.length < tempLastKnownAmountOfPendingTransactions) {
+            queryClient.invalidateQueries(
+                queryFactory.getTransactions.forIdentity({
+                    identity: selectedAddress.identity,
+                    offset: LIMIT * page,
+                    size: LIMIT,
+                }),
+            );
+        }
+    }, [
+        lastKnownAmountOfPendingTransactions,
+        page,
+        pendingTransactions,
+        queryClient,
+        selectedAddress,
+    ]);
 
     if (!selectedAddress) {
         return (
@@ -46,49 +80,14 @@ export const WalletTransactionsPage = () => {
 
     return (
         <Stack w='100%' gap='xl'>
-            <Stack>
-                <Title component='p' size='h2'>
-                    Transactions
-                </Title>
+            {pendingTransactions.length > 0 && (
+                <PendingTransactions
+                    pendingTransactions={pendingTransactions}
+                    shouldShowTransactionHashInCollapse={shouldShowTransactionHashInCollapse}
+                />
+            )}
 
-                <Stack gap='xs' w='100%'>
-                    {transactionsData.map(({ identity, tickNumber, transactions }) => (
-                        <HistoryTransaction
-                            key={`${identity}-${tickNumber}`}
-                            transactionId={transactions[0].transaction.txId}
-                            timestamp={transactions[0].timestamp}
-                            amount={transactions[0].transaction.amount}
-                            transactionType={
-                                transactions[0].transaction.sourceId === identity
-                                    ? 'outgoing'
-                                    : 'incoming'
-                            }
-                        />
-                    ))}
-                </Stack>
-
-                <Group w='100%' justify='space-between'>
-                    <Group>
-                        <Text fw={600}>Total Transactions: {transactionsData?.length ?? 0}</Text>
-                        <Text>
-                            Show transactions from {firstTick} to {endTick} tick
-                        </Text>
-
-                        {transactionsLoading ? (
-                            <Loader size={20} />
-                        ) : (
-                            <Button
-                                disabled={!hasNextPage}
-                                onClick={() => {
-                                    fetchNextPage();
-                                }}
-                            >
-                                {hasNextPage ? 'Load More' : 'No More Transactions'}
-                            </Button>
-                        )}
-                    </Group>
-                </Group>
-            </Stack>
+            <HistoryTransactions page={page} setPage={setPage} limit={LIMIT} />
         </Stack>
     );
 };
