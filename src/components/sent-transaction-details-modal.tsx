@@ -6,7 +6,7 @@ import type {
     IQubicPendingTransaction,
     QubicTransactionStatus,
 } from '@/packages/hw-app-qubic-react';
-import { produceLinkToTransactionExplorer } from '@/providers/SentTransactionDetailsProvider';
+import { produceLinkToTransactionExplorer } from '@/utils/links';
 
 interface SentTransactionDetailsModalProps
     extends ModalProps,

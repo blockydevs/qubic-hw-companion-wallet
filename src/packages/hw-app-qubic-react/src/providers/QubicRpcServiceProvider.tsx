@@ -7,8 +7,9 @@ export const QubicRpcServiceContext = createContext<QubicRpcService | null>(null
 export const QubicRpcServiceProvider = ({
     children,
     rpcUrl,
-}: PropsWithChildren<{ rpcUrl: string }>) => (
-    <QubicRpcServiceContext.Provider value={new QubicRpcService(rpcUrl)}>
+    apiUrl,
+}: PropsWithChildren<{ rpcUrl: string; apiUrl: string }>) => (
+    <QubicRpcServiceContext.Provider value={new QubicRpcService(rpcUrl, apiUrl)}>
         {children}
     </QubicRpcServiceContext.Provider>
 );

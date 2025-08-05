@@ -57,6 +57,7 @@ export default function App() {
             <ColorSchemeScript />
             <DeviceTypeProvider>
                 <QubicLedgerAppProvider
+                    apiUrl={process.env.REACT_APP_QUBIC_API_URL}
                     rpcUrl={process.env.REACT_APP_QUBIC_RPC_URL}
                     derivationPath={process.env.REACT_APP_QUBIC_DERIVATION_PATH}
                     transactionTickOffset={parseInt(
