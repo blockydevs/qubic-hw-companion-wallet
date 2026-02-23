@@ -27,15 +27,22 @@ export class QubicRpcService {
         return await Fetcher.create({
             schema: qubicLatestTickSchema,
             errorMessage: 'Invalid latest tick response data.',
-            transformResponse: (data) => data.latestTick,
-        }).fetch(`${this.rpcUrl}v1/latestTick`);
+            transformResponse: (data) => data.tickInfo?.tick ?? 0,
+        }).fetch(`${this.rpcUrl}live/v1/tick-info`);
     }
 
     async getTransaction({ transactionId }: { transactionId: string }) {
         return await Fetcher.create({
             schema: transactionDataSchema,
             errorMessage: `Invalid transactions response data for ${transactionId} transaction.`,
-        }).fetch(`${this.rpcUrl}v2/transactions/${transactionId}`);
+        }).fetch(`${this.rpcUrl}query/v1/getTransactionByHash`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ hash: transactionId }),
+        });
     }
 
     async getTransactionsForIdentity({

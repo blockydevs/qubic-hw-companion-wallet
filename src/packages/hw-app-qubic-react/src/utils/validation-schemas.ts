@@ -15,7 +15,12 @@ export const qubicBalanceSchema = z.object({
 });
 
 export const qubicLatestTickSchema = z.object({
-    latestTick: z.number(),
+    tickInfo: z.object({
+        tick: z.number(),
+        duration: z.number(),
+        epoch: z.number(),
+        initialTick: z.number(),
+    }),
 });
 
 export const transactionDetailsSchema = z.object({
@@ -31,8 +36,16 @@ export const transactionDetailsSchema = z.object({
 });
 
 export const transactionDataSchema = z.object({
-    transaction: transactionDetailsSchema,
+    hash: z.string(),
+    amount: z.string(),
+    source: z.string(),
+    destination: z.string(),
+    tickNumber: z.number(),
     timestamp: z.string(),
+    inputType: z.number(),
+    inputSize: z.number(),
+    inputData: z.string(),
+    signature: z.string(),
     moneyFlew: z.boolean(),
 });
 

@@ -78,12 +78,12 @@ export const QubicWalletPendingSessionTransactionsProvider = ({ children }: Prop
                     transactionId: pendingTransactionData.txId,
                 });
 
-                if (!txData || !txData.transaction) {
+                if (!txData) {
                     throw new Error('Transaction data not found');
                 }
 
                 return {
-                    txId: txData.transaction.txId,
+                    txId: txData.hash ?? '',
                     status: 'success' as const,
                 };
             },
