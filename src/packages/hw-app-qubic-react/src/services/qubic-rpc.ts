@@ -57,7 +57,7 @@ export class QubicRpcService {
         return await Fetcher.create({
             schema: transactionsForIdentitySchema,
             errorMessage: `Invalid transactions response data for ${identity} identity.`,
-        }).fetch(`${this.apiUrl}getTransactionsForIdentity`, {
+        }).fetch(`${this.rpcUrl}query/v1/getTransactionsForIdentity`, {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
